@@ -289,6 +289,96 @@ Si omites esto, las partidas se almacenarán localmente en tu carpeta de Steam.<
   <data name="Dashboard_Title" xml:space="preserve">
     <value>Panel</value>
   </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>Redirección y sincronización automática de guardados en la nube</value>
+  </data>
+  <data name="Dashboard_AutoSaveSyncActive" xml:space="preserve">
+    <value>Sincronización de autoguardado activa</value>
+  </data>
+  <data name="Dashboard_AllSavesSynchronized" xml:space="preserve">
+    <value>Todos los guardados sincronizados</value>
+  </data>
+  <data name="Dashboard_MonitoringGameSaves" xml:space="preserve">
+    <value>Monitoreando partidas activas. Los cambios se subirán automáticamente en segundo plano.</value>
+  </data>
+  <data name="Dashboard_UpToDate" xml:space="preserve">
+    <value>Al día</value>
+  </data>
+  <data name="Dashboard_AutoSaving" xml:space="preserve">
+    <value>Autoguardando: {0}</value>
+  </data>
+  <data name="Dashboard_UploadingSaveData" xml:space="preserve">
+    <value>Subiendo datos de guardado a la nube...</value>
+  </data>
+  <data name="Dashboard_UploadingFileFormat" xml:space="preserve">
+    <value>Subiendo {0} ({1:N0} bytes) a la nube...</value>
+  </data>
+  <data name="Dashboard_Uploading" xml:space="preserve">
+    <value>Subiendo...</value>
+  </data>
+  <data name="Dashboard_LastCloudBackupFormat" xml:space="preserve">
+    <value>Última copia en la nube: {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataBackedUpFormat" xml:space="preserve">
+    <value>Datos respaldados a las {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataFileBackedUpFormat" xml:space="preserve">
+    <value>{0} ({1:N0} bytes) respaldado a las {2}</value>
+  </data>
+  <data name="Dashboard_SaveFilesBackedUpFormat" xml:space="preserve">
+    <value>{0} archivo(s) respaldados a las {1}</value>
+  </data>
+  <data name="Dashboard_SaveFilesTotalBackedUpFormat" xml:space="preserve">
+    <value>{0} archivo(s) ({1}) respaldados a las {2}</value>
+  </data>
+  <data name="Dashboard_Synchronized" xml:space="preserve">
+    <value>Sincronizado</value>
+  </data>
+  <data name="Dashboard_ClickToOpen" xml:space="preserve">
+    <value>• Clic para abrir</value>
+  </data>
+  <data name="Dashboard_PersonalCloudSync" xml:space="preserve">
+    <value>Sincronización automática con tu nube personal</value>
+  </data>
+  <data name="Dashboard_SteamHooked" xml:space="preserve">
+    <value>Redirección de guardados de Steam conectada</value>
+  </data>
+  <data name="Dashboard_ProtectedCloudVersioning" xml:space="preserve">
+    <value>Protegido con copia de seguridad y versiones</value>
+  </data>
+  <data name="Dashboard_LuaFilesSync" xml:space="preserve">
+    <value>Sincronización de Lua</value>
+  </data>
+  <data name="Dashboard_AutoBackupActive" xml:space="preserve">
+    <value>Copia automática activa</value>
+  </data>
+  <data name="Dashboard_LuaCountFormat" xml:space="preserve">
+    <value>{0} Local • {1} Nube</value>
+  </data>
+  <data name="Dashboard_LuaAddonsFoundFormat" xml:space="preserve">
+    <value>{0} scripts de addons Lua encontrados en stplug-in</value>
+  </data>
+  <data name="Dashboard_NoLuaAddonsFound" xml:space="preserve">
+    <value>No se encontraron addons Lua locales en stplug-in</value>
+  </data>
+  <data name="Dashboard_Backup" xml:space="preserve">
+    <value>Copia</value>
+  </data>
+  <data name="Dashboard_Restore" xml:space="preserve">
+    <value>Restaurar</value>
+  </data>
+  <data name="Dashboard_BackupToolTip" xml:space="preserve">
+    <value>Hacer copia de seguridad manual de scripts Lua a la nube</value>
+  </data>
+  <data name="Dashboard_RestoreToolTip" xml:space="preserve">
+    <value>Restaurar scripts Lua desde la nube manualmente</value>
+  </data>
+  <data name="Dashboard_DllHooked" xml:space="preserve">
+    <value>Núcleo de redirección nativo C++20 conectado a Steam</value>
+  </data>
+  <data name="Dashboard_Active" xml:space="preserve">
+    <value>Activo</value>
+  </data>
   <data name="Dashboard_UpdateNow" xml:space="preserve">
     <value>Actualizar ahora</value>
   </data>

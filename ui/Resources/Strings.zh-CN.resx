@@ -389,6 +389,96 @@
   <data name="Dashboard_Title" xml:space="preserve">
     <value>仪表板</value>
   </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>自动云存档重定向与同步</value>
+  </data>
+  <data name="Dashboard_AutoSaveSyncActive" xml:space="preserve">
+    <value>自动保存同步已激活</value>
+  </data>
+  <data name="Dashboard_AllSavesSynchronized" xml:space="preserve">
+    <value>所有存档已同步</value>
+  </data>
+  <data name="Dashboard_MonitoringGameSaves" xml:space="preserve">
+    <value>正在监控活动游戏存档。存档更改将在后台自动上传。</value>
+  </data>
+  <data name="Dashboard_UpToDate" xml:space="preserve">
+    <value>最新</value>
+  </data>
+  <data name="Dashboard_AutoSaving" xml:space="preserve">
+    <value>正在自动保存：{0}</value>
+  </data>
+  <data name="Dashboard_UploadingSaveData" xml:space="preserve">
+    <value>正在上传存档数据到云端...</value>
+  </data>
+  <data name="Dashboard_UploadingFileFormat" xml:space="preserve">
+    <value>正在上传 {0} ({1:N0} 字节) 到云端...</value>
+  </data>
+  <data name="Dashboard_Uploading" xml:space="preserve">
+    <value>正在上传...</value>
+  </data>
+  <data name="Dashboard_LastCloudBackupFormat" xml:space="preserve">
+    <value>上次云备份：{0}</value>
+  </data>
+  <data name="Dashboard_SaveDataBackedUpFormat" xml:space="preserve">
+    <value>存档数据已于 {0} 备份</value>
+  </data>
+  <data name="Dashboard_SaveDataFileBackedUpFormat" xml:space="preserve">
+    <value>{0} ({1:N0} 字节) 已于 {2} 备份</value>
+  </data>
+  <data name="Dashboard_SaveFilesBackedUpFormat" xml:space="preserve">
+    <value>{0} 个存档文件已于 {1} 备份</value>
+  </data>
+  <data name="Dashboard_SaveFilesTotalBackedUpFormat" xml:space="preserve">
+    <value>{0} 个存档文件 ({1}) 已于 {2} 备份</value>
+  </data>
+  <data name="Dashboard_Synchronized" xml:space="preserve">
+    <value>已同步</value>
+  </data>
+  <data name="Dashboard_ClickToOpen" xml:space="preserve">
+    <value>• 点击打开</value>
+  </data>
+  <data name="Dashboard_PersonalCloudSync" xml:space="preserve">
+    <value>自动同步到您的个人云端</value>
+  </data>
+  <data name="Dashboard_SteamHooked" xml:space="preserve">
+    <value>Steam 客户端存档重定向已挂钩</value>
+  </data>
+  <data name="Dashboard_ProtectedCloudVersioning" xml:space="preserve">
+    <value>受云备份与版本控制保护</value>
+  </data>
+  <data name="Dashboard_LuaFilesSync" xml:space="preserve">
+    <value>Lua 文件同步</value>
+  </data>
+  <data name="Dashboard_AutoBackupActive" xml:space="preserve">
+    <value>自动备份已激活</value>
+  </data>
+  <data name="Dashboard_LuaCountFormat" xml:space="preserve">
+    <value>{0} 本地 • {1} 云端</value>
+  </data>
+  <data name="Dashboard_LuaAddonsFoundFormat" xml:space="preserve">
+    <value>在 stplug-in 中找到 {0} 个 Lua 插件脚本</value>
+  </data>
+  <data name="Dashboard_NoLuaAddonsFound" xml:space="preserve">
+    <value>在 stplug-in 中未找到本地 Lua 插件</value>
+  </data>
+  <data name="Dashboard_Backup" xml:space="preserve">
+    <value>备份</value>
+  </data>
+  <data name="Dashboard_Restore" xml:space="preserve">
+    <value>恢复</value>
+  </data>
+  <data name="Dashboard_BackupToolTip" xml:space="preserve">
+    <value>立即手动将本地 Lua 脚本备份到云端</value>
+  </data>
+  <data name="Dashboard_RestoreToolTip" xml:space="preserve">
+    <value>立即手动从云端恢复 Lua 脚本</value>
+  </data>
+  <data name="Dashboard_DllHooked" xml:space="preserve">
+    <value>原生 C++20 重定向核心已挂钩到 Steam</value>
+  </data>
+  <data name="Dashboard_Active" xml:space="preserve">
+    <value>活动</value>
+  </data>
   <data name="Dashboard_UpdateNow" xml:space="preserve">
     <value>立即更新</value>
   </data>

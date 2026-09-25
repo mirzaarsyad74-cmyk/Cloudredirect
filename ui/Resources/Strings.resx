@@ -389,6 +389,96 @@ If you skip this, saves will be stored locally in your Steam folder.</value>
   <data name="Dashboard_Title" xml:space="preserve">
     <value>Dashboard</value>
   </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>Automatic cloud save redirection &amp; synchronization</value>
+  </data>
+  <data name="Dashboard_AutoSaveSyncActive" xml:space="preserve">
+    <value>Auto-Save Sync Active</value>
+  </data>
+  <data name="Dashboard_AllSavesSynchronized" xml:space="preserve">
+    <value>All Saves Synchronized</value>
+  </data>
+  <data name="Dashboard_MonitoringGameSaves" xml:space="preserve">
+    <value>Monitoring active game saves. Save changes will automatically upload in background.</value>
+  </data>
+  <data name="Dashboard_UpToDate" xml:space="preserve">
+    <value>Up to date</value>
+  </data>
+  <data name="Dashboard_AutoSaving" xml:space="preserve">
+    <value>Auto-Saving: {0}</value>
+  </data>
+  <data name="Dashboard_UploadingSaveData" xml:space="preserve">
+    <value>Uploading save data to cloud...</value>
+  </data>
+  <data name="Dashboard_UploadingFileFormat" xml:space="preserve">
+    <value>Uploading {0} ({1:N0} bytes) to cloud...</value>
+  </data>
+  <data name="Dashboard_Uploading" xml:space="preserve">
+    <value>Uploading...</value>
+  </data>
+  <data name="Dashboard_LastCloudBackupFormat" xml:space="preserve">
+    <value>Last Cloud Backup: {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataBackedUpFormat" xml:space="preserve">
+    <value>Save data backed up at {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataFileBackedUpFormat" xml:space="preserve">
+    <value>{0} ({1:N0} bytes) backed up at {2}</value>
+  </data>
+  <data name="Dashboard_SaveFilesBackedUpFormat" xml:space="preserve">
+    <value>{0} save file(s) backed up at {1}</value>
+  </data>
+  <data name="Dashboard_SaveFilesTotalBackedUpFormat" xml:space="preserve">
+    <value>{0} save file(s) ({1}) backed up at {2}</value>
+  </data>
+  <data name="Dashboard_Synchronized" xml:space="preserve">
+    <value>Synchronized</value>
+  </data>
+  <data name="Dashboard_ClickToOpen" xml:space="preserve">
+    <value>• Click to open</value>
+  </data>
+  <data name="Dashboard_PersonalCloudSync" xml:space="preserve">
+    <value>Automatic sync to your personal cloud</value>
+  </data>
+  <data name="Dashboard_SteamHooked" xml:space="preserve">
+    <value>Steam client save redirection hooked</value>
+  </data>
+  <data name="Dashboard_ProtectedCloudVersioning" xml:space="preserve">
+    <value>Protected with cloud backup &amp; versioning</value>
+  </data>
+  <data name="Dashboard_LuaFilesSync" xml:space="preserve">
+    <value>Lua Files Sync</value>
+  </data>
+  <data name="Dashboard_AutoBackupActive" xml:space="preserve">
+    <value>Auto-Backup Active</value>
+  </data>
+  <data name="Dashboard_LuaCountFormat" xml:space="preserve">
+    <value>{0} Local • {1} Cloud</value>
+  </data>
+  <data name="Dashboard_LuaAddonsFoundFormat" xml:space="preserve">
+    <value>{0} Lua addon scripts found in stplug-in</value>
+  </data>
+  <data name="Dashboard_NoLuaAddonsFound" xml:space="preserve">
+    <value>No local Lua addons found in stplug-in</value>
+  </data>
+  <data name="Dashboard_Backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="Dashboard_Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Dashboard_BackupToolTip" xml:space="preserve">
+    <value>Manually backup local Lua scripts to Cloud now</value>
+  </data>
+  <data name="Dashboard_RestoreToolTip" xml:space="preserve">
+    <value>Manually restore Lua scripts from Cloud now</value>
+  </data>
+  <data name="Dashboard_DllHooked" xml:space="preserve">
+    <value>Native C++20 Redirection Core hooked into Steam</value>
+  </data>
+  <data name="Dashboard_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
   <data name="Dashboard_UpdateNow" xml:space="preserve">
     <value>Update Now</value>
   </data>

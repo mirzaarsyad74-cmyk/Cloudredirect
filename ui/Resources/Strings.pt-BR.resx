@@ -289,6 +289,96 @@ Se pular esta etapa, os saves serão armazenados localmente na sua pasta do Stea
   <data name="Dashboard_Title" xml:space="preserve">
     <value>Painel</value>
   </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>Redirecionamento e sincronização automática de salvamentos na nuvem</value>
+  </data>
+  <data name="Dashboard_AutoSaveSyncActive" xml:space="preserve">
+    <value>Sincronização de salvamento automático ativa</value>
+  </data>
+  <data name="Dashboard_AllSavesSynchronized" xml:space="preserve">
+    <value>Todos os salvamentos sincronizados</value>
+  </data>
+  <data name="Dashboard_MonitoringGameSaves" xml:space="preserve">
+    <value>Monitorando salvamentos ativos. As alterações serão enviadas automaticamente em segundo plano.</value>
+  </data>
+  <data name="Dashboard_UpToDate" xml:space="preserve">
+    <value>Atualizado</value>
+  </data>
+  <data name="Dashboard_AutoSaving" xml:space="preserve">
+    <value>Salvando automaticamente: {0}</value>
+  </data>
+  <data name="Dashboard_UploadingSaveData" xml:space="preserve">
+    <value>Enviando dados de salvamento para a nuvem...</value>
+  </data>
+  <data name="Dashboard_UploadingFileFormat" xml:space="preserve">
+    <value>Enviando {0} ({1:N0} bytes) para a nuvem...</value>
+  </data>
+  <data name="Dashboard_Uploading" xml:space="preserve">
+    <value>Enviando...</value>
+  </data>
+  <data name="Dashboard_LastCloudBackupFormat" xml:space="preserve">
+    <value>Último backup na nuvem: {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataBackedUpFormat" xml:space="preserve">
+    <value>Dados de salvamento salvos às {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataFileBackedUpFormat" xml:space="preserve">
+    <value>{0} ({1:N0} bytes) salvos às {2}</value>
+  </data>
+  <data name="Dashboard_SaveFilesBackedUpFormat" xml:space="preserve">
+    <value>{0} arquivo(s) salvos às {1}</value>
+  </data>
+  <data name="Dashboard_SaveFilesTotalBackedUpFormat" xml:space="preserve">
+    <value>{0} arquivo(s) ({1}) salvos às {2}</value>
+  </data>
+  <data name="Dashboard_Synchronized" xml:space="preserve">
+    <value>Sincronizado</value>
+  </data>
+  <data name="Dashboard_ClickToOpen" xml:space="preserve">
+    <value>• Clique para abrir</value>
+  </data>
+  <data name="Dashboard_PersonalCloudSync" xml:space="preserve">
+    <value>Sincronização automática para sua nuvem pessoal</value>
+  </data>
+  <data name="Dashboard_SteamHooked" xml:space="preserve">
+    <value>Redirecionamento de salvamentos do Steam conectado</value>
+  </data>
+  <data name="Dashboard_ProtectedCloudVersioning" xml:space="preserve">
+    <value>Protegido com backup na nuvem e versionamento</value>
+  </data>
+  <data name="Dashboard_LuaFilesSync" xml:space="preserve">
+    <value>Sincronização de arquivos Lua</value>
+  </data>
+  <data name="Dashboard_AutoBackupActive" xml:space="preserve">
+    <value>Backup automático ativo</value>
+  </data>
+  <data name="Dashboard_LuaCountFormat" xml:space="preserve">
+    <value>{0} Local • {1} Nuvem</value>
+  </data>
+  <data name="Dashboard_LuaAddonsFoundFormat" xml:space="preserve">
+    <value>{0} scripts de addons Lua encontrados em stplug-in</value>
+  </data>
+  <data name="Dashboard_NoLuaAddonsFound" xml:space="preserve">
+    <value>Nenhum addon Lua local encontrado em stplug-in</value>
+  </data>
+  <data name="Dashboard_Backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="Dashboard_Restore" xml:space="preserve">
+    <value>Restaurar</value>
+  </data>
+  <data name="Dashboard_BackupToolTip" xml:space="preserve">
+    <value>Fazer backup manual dos scripts Lua locais para a Nuvem agora</value>
+  </data>
+  <data name="Dashboard_RestoreToolTip" xml:space="preserve">
+    <value>Restaurar scripts Lua da Nuvem manualmente agora</value>
+  </data>
+  <data name="Dashboard_DllHooked" xml:space="preserve">
+    <value>Núcleo de redirecionamento nativo C++20 conectado ao Steam</value>
+  </data>
+  <data name="Dashboard_Active" xml:space="preserve">
+    <value>Ativo</value>
+  </data>
   <data name="Dashboard_UpdateNow" xml:space="preserve">
     <value>Atualizar Agora</value>
   </data>

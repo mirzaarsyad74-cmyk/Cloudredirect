@@ -62,16 +62,16 @@ public partial class DashboardPage : Page
 
             if (ev.IsUploading)
             {
-                ActivityTitle.Text = $"Auto-Saving: {gameDisplay}";
+                ActivityTitle.Text = S.Format("Dashboard_AutoSaving", gameDisplay);
                 ActivityDetail.Text = ev.Bytes > 0
-                    ? $"Uploading {ev.FileName} ({ev.Bytes:N0} bytes) to cloud..."
-                    : "Uploading save data to cloud...";
+                    ? S.Format("Dashboard_UploadingFileFormat", ev.FileName, ev.Bytes)
+                    : S.Get("Dashboard_UploadingSaveData");
                 ActivityProgressBar.Visibility = Visibility.Visible;
                 ActivityStatusBadge.Background = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x1B, 0x33, 0x47));
                 ActivityStatusBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x1A, 0x9F, 0xFF));
-                ActivityStatusText.Text = "Uploading...";
+                ActivityStatusText.Text = S.Get("Dashboard_Uploading");
                 ActivityStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x66, 0xC0, 0xF4));
                 ActivityIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.ArrowSync24;
@@ -80,18 +80,18 @@ public partial class DashboardPage : Page
             }
             else
             {
-                ActivityTitle.Text = $"Last Cloud Backup: {gameDisplay}";
+                ActivityTitle.Text = S.Format("Dashboard_LastCloudBackupFormat", gameDisplay);
                 ActivityDetail.Text = ev.Bytes > 0
-                    ? $"{ev.FileName} ({ev.Bytes:N0} bytes) backed up at {ev.Timestamp:t}"
-                    : $"Save data backed up at {ev.Timestamp:t}";
+                    ? S.Format("Dashboard_SaveDataFileBackedUpFormat", ev.FileName, ev.Bytes, ev.Timestamp.ToString("t"))
+                    : S.Format("Dashboard_SaveDataBackedUpFormat", ev.Timestamp.ToString("t"));
                 ActivityProgressBar.Visibility = Visibility.Collapsed;
                 ActivityStatusBadge.Background = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x18, 0x33, 0x21));
                 ActivityStatusBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x4C, 0x75, 0x15));
-                ActivityStatusText.Text = "Synchronized";
+                ActivityStatusText.Text = S.Get("Dashboard_Synchronized");
                 ActivityStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
-                    System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
+                    System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0xA4));
                 ActivityIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.Checkmark24;
                 ActivityIcon.Foreground = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
@@ -170,26 +170,26 @@ public partial class DashboardPage : Page
 
             AppCount.Text = S.Format("Dashboard_AppCountFormat", data.appCount);
 
-            LuaFilesCount.Text = $"{data.localLuas} Local • {data.cloudLuas} Cloud";
+            LuaFilesCount.Text = S.Format("Dashboard_LuaCountFormat", data.localLuas, data.cloudLuas);
             LuaFilesDetail.Text = data.localLuas > 0
-                ? $"{data.localLuas} Lua addon scripts found in stplug-in"
-                : "No local Lua addons found in stplug-in";
+                ? S.Format("Dashboard_LuaAddonsFoundFormat", data.localLuas)
+                : S.Get("Dashboard_NoLuaAddonsFound");
 
             // Update top activity banner with last backed up game & AppID
             if (data.lastBackup != null)
             {
-                ActivityTitle.Text = $"Last Cloud Backup: {data.lastBackup.GameName} (AppID: {data.lastBackup.AppId})";
+                ActivityTitle.Text = S.Format("Dashboard_LastCloudBackupFormat", $"{data.lastBackup.GameName} (AppID: {data.lastBackup.AppId})");
                 var timeStr = data.lastBackup.BackupTime.Date == DateTime.Today
                     ? data.lastBackup.BackupTime.ToString("t")
                     : data.lastBackup.BackupTime.ToString("g");
                 ActivityDetail.Text = data.lastBackup.TotalBytes > 0
-                    ? $"{data.lastBackup.FileCount} save file(s) ({Services.FileUtils.FormatSize(data.lastBackup.TotalBytes)}) backed up at {timeStr}"
-                    : $"{data.lastBackup.FileCount} save file(s) backed up at {timeStr}";
+                    ? S.Format("Dashboard_SaveFilesTotalBackedUpFormat", data.lastBackup.FileCount, Services.FileUtils.FormatSize(data.lastBackup.TotalBytes), timeStr)
+                    : S.Format("Dashboard_SaveFilesBackedUpFormat", data.lastBackup.FileCount, timeStr);
                 ActivityStatusBadge.Background = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x18, 0x33, 0x21));
                 ActivityStatusBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0x4C, 0x75, 0x15));
-                ActivityStatusText.Text = "Synchronized";
+                ActivityStatusText.Text = S.Get("Dashboard_Synchronized");
                 ActivityStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
                     System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
                 ActivityIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.Checkmark24;

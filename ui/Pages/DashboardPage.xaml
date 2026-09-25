@@ -21,7 +21,7 @@
                     <TextBlock Text="{res:Loc Dashboard_Title}"
                                FontSize="24" FontWeight="Bold"
                                Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                    <TextBlock Text="Automatic cloud save redirection &amp; synchronization"
+                    <TextBlock Text="{res:Loc Dashboard_Subtitle}"
                                FontSize="12"
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                Margin="0,2,0,0" />
@@ -77,7 +77,7 @@
                                     </EventTrigger>
                                 </Ellipse.Triggers>
                             </Ellipse>
-                            <TextBlock Text="Auto-Save Sync Active"
+                            <TextBlock Text="{res:Loc Dashboard_AutoSaveSyncActive}"
                                        FontSize="11" FontWeight="SemiBold"
                                        Foreground="#FFA4D007" />
                         </StackPanel>
@@ -111,11 +111,11 @@
                     <!-- Activity Details -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock x:Name="ActivityTitle"
-                                   Text="All Saves Synchronized"
+                                   Text="{res:Loc Dashboard_AllSavesSynchronized}"
                                    FontWeight="SemiBold" FontSize="13"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                         <TextBlock x:Name="ActivityDetail"
-                                   Text="Monitoring active game saves. Save changes will automatically upload in background."
+                                   Text="{res:Loc Dashboard_MonitoringGameSaves}"
                                    FontSize="11"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    Margin="0,2,0,0" />
@@ -131,7 +131,7 @@
                             Background="#183321" BorderBrush="#FF3B6B22" BorderThickness="1"
                             CornerRadius="12" Padding="10,4" VerticalAlignment="Center" Margin="12,0,0,0">
                         <TextBlock x:Name="ActivityStatusText"
-                                   Text="Up to date" FontSize="11" FontWeight="SemiBold"
+                                   Text="{res:Loc Dashboard_UpToDate}" FontSize="11" FontWeight="SemiBold"
                                    Foreground="#FFA4D007" />
                     </Border>
                 </Grid>
@@ -164,7 +164,7 @@
                                 <TextBlock Text="{res:Loc Dashboard_CloudProvider}"
                                            FontSize="11" FontWeight="SemiBold"
                                            Foreground="#FF8F98A0" />
-                                <TextBlock Text="• Click to open"
+                                <TextBlock Text="{res:Loc Dashboard_ClickToOpen}"
                                            FontSize="11" Foreground="#FF1A9FFF" Margin="6,0,0,0" />
                             </StackPanel>
                             <TextBlock x:Name="ProviderStatus"
@@ -172,7 +172,7 @@
                                        FontSize="15" FontWeight="Bold"
                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Margin="0,3,0,3" />
-                            <TextBlock Text="Automatic sync to your personal cloud"
+                            <TextBlock Text="{res:Loc Dashboard_PersonalCloudSync}"
                                        FontSize="11"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
@@ -202,7 +202,7 @@
                                        FontSize="14" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Margin="0,3,0,3" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="Steam client save redirection hooked"
+                            <TextBlock Text="{res:Loc Dashboard_SteamHooked}"
                                        FontSize="11"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
@@ -229,7 +229,7 @@
                                 <TextBlock Text="{res:Loc Dashboard_AppsSyncing}"
                                            FontSize="11" FontWeight="SemiBold"
                                            Foreground="#FF8F98A0" />
-                                <TextBlock Text="• Click to open"
+                                <TextBlock Text="{res:Loc Dashboard_ClickToOpen}"
                                            FontSize="11" Foreground="#FFA4D007" Margin="6,0,0,0" />
                             </StackPanel>
                             <TextBlock x:Name="AppCount"
@@ -237,7 +237,7 @@
                                        FontSize="15" FontWeight="Bold"
                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Margin="0,3,0,3" />
-                            <TextBlock Text="Protected with cloud backup &amp; versioning"
+                            <TextBlock Text="{res:Loc Dashboard_ProtectedCloudVersioning}"
                                        FontSize="11"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
@@ -260,22 +260,22 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="Lua Files Sync"
+                                <TextBlock Text="{res:Loc Dashboard_LuaFilesSync}"
                                            FontSize="11" FontWeight="SemiBold"
                                            Foreground="#FF8F98A0" />
                                 <Border Background="#183321" BorderBrush="#3B6B22" BorderThickness="1"
                                         CornerRadius="10" Padding="5,1" Margin="6,0,0,0">
-                                    <TextBlock Text="Auto-Backup Active" FontSize="10" FontWeight="SemiBold"
+                                    <TextBlock Text="{res:Loc Dashboard_AutoBackupActive}" FontSize="10" FontWeight="SemiBold"
                                                Foreground="#A4D007" />
                                 </Border>
                             </StackPanel>
                             <TextBlock x:Name="LuaFilesCount"
-                                       Text="Scanning..."
+                                       Text="{res:Loc Dashboard_Detecting}"
                                        FontSize="15" FontWeight="Bold"
                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Margin="0,3,0,3" />
                             <TextBlock x:Name="LuaFilesDetail"
-                                       Text="25 Lua addon scripts found in stplug-in"
+                                       Text=""
                                        FontSize="11"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
@@ -283,19 +283,19 @@
                             <ui:Button x:Name="LuaBackupBtn"
                                        Appearance="Secondary"
                                        Icon="{ui:SymbolIcon ArrowUpload24}"
-                                       Content="Backup"
+                                       Content="{res:Loc Dashboard_Backup}"
                                        Padding="10,5"
                                        Margin="0,0,6,0"
                                        Cursor="Hand"
-                                       ToolTip="Manually backup local Lua scripts to Cloud now"
+                                       ToolTip="{res:Loc Dashboard_BackupToolTip}"
                                        Click="LuaBackupManual_Click" />
                             <ui:Button x:Name="LuaRestoreBtn"
                                        Appearance="Secondary"
                                        Icon="{ui:SymbolIcon ArrowDownload24}"
-                                       Content="Restore"
+                                       Content="{res:Loc Dashboard_Restore}"
                                        Padding="10,5"
                                        Cursor="Hand"
-                                       ToolTip="Manually restore Lua scripts from Cloud now"
+                                       ToolTip="{res:Loc Dashboard_RestoreToolTip}"
                                        Click="LuaRestoreManual_Click" />
                         </StackPanel>
                     </Grid>
@@ -320,14 +320,14 @@
                                    FontSize="14" FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    Margin="0,3,0,2" />
-                        <TextBlock Text="Native C++20 Redirection Core hooked into Steam"
+                        <TextBlock Text="{res:Loc Dashboard_DllHooked}"
                                    FontSize="11"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <Border Background="#1B3322" BorderBrush="#FF4C7515" BorderThickness="1"
                                 CornerRadius="12" Padding="8,3" Margin="0,0,10,0">
-                            <TextBlock Text="Active" FontSize="11" FontWeight="SemiBold"
+                            <TextBlock Text="{res:Loc Dashboard_Active}" FontSize="11" FontWeight="SemiBold"
                                        Foreground="#FFA4D007" />
                         </Border>
                         <ui:SymbolIcon x:Name="DllIcon" Symbol="PlugConnected24" FontSize="20"

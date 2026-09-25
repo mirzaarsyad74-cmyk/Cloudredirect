@@ -375,6 +375,96 @@ If you skip this, saves will be stored locally in your Steam Folder.</value>
   <data name="Dashboard_Title" xml:space="preserve">
     <value>Papan Pemuka</value>
   </data>
+  <data name="Dashboard_Subtitle" xml:space="preserve">
+    <value>Pelepasan &amp; penyegerakan simpanan awan automatik</value>
+  </data>
+  <data name="Dashboard_AutoSaveSyncActive" xml:space="preserve">
+    <value>Segerak Simpanan Automatik Aktif</value>
+  </data>
+  <data name="Dashboard_AllSavesSynchronized" xml:space="preserve">
+    <value>Semua Simpanan Disegerakkan</value>
+  </data>
+  <data name="Dashboard_MonitoringGameSaves" xml:space="preserve">
+    <value>Memantau simpanan permainan aktif. Perubahan simpanan akan dimuat naik secara automatik di latar belakang.</value>
+  </data>
+  <data name="Dashboard_UpToDate" xml:space="preserve">
+    <value>Terkini</value>
+  </data>
+  <data name="Dashboard_AutoSaving" xml:space="preserve">
+    <value>Menyimpan Automatik: {0}</value>
+  </data>
+  <data name="Dashboard_UploadingSaveData" xml:space="preserve">
+    <value>Memuat naik data simpanan ke awan...</value>
+  </data>
+  <data name="Dashboard_UploadingFileFormat" xml:space="preserve">
+    <value>Memuat naik {0} ({1:N0} bait) ke awan...</value>
+  </data>
+  <data name="Dashboard_Uploading" xml:space="preserve">
+    <value>Memuat naik...</value>
+  </data>
+  <data name="Dashboard_LastCloudBackupFormat" xml:space="preserve">
+    <value>Sandaran Awan Terakhir: {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataBackedUpFormat" xml:space="preserve">
+    <value>Data simpanan disandarkan pada {0}</value>
+  </data>
+  <data name="Dashboard_SaveDataFileBackedUpFormat" xml:space="preserve">
+    <value>{0} ({1:N0} bait) disandarkan pada {2}</value>
+  </data>
+  <data name="Dashboard_SaveFilesBackedUpFormat" xml:space="preserve">
+    <value>{0} fail simpanan disandarkan pada {1}</value>
+  </data>
+  <data name="Dashboard_SaveFilesTotalBackedUpFormat" xml:space="preserve">
+    <value>{0} fail simpanan ({1}) disandarkan pada {2}</value>
+  </data>
+  <data name="Dashboard_Synchronized" xml:space="preserve">
+    <value>Disegerakkan</value>
+  </data>
+  <data name="Dashboard_ClickToOpen" xml:space="preserve">
+    <value>• Klik untuk buka</value>
+  </data>
+  <data name="Dashboard_PersonalCloudSync" xml:space="preserve">
+    <value>Segerak automatik ke awan peribadi anda</value>
+  </data>
+  <data name="Dashboard_SteamHooked" xml:space="preserve">
+    <value>Pelepasan simpanan klien Steam dipasang</value>
+  </data>
+  <data name="Dashboard_ProtectedCloudVersioning" xml:space="preserve">
+    <value>Dilindungi dengan sandaran awan &amp; versi</value>
+  </data>
+  <data name="Dashboard_LuaFilesSync" xml:space="preserve">
+    <value>Segerak Fail Lua</value>
+  </data>
+  <data name="Dashboard_AutoBackupActive" xml:space="preserve">
+    <value>Sandaran Automatik Aktif</value>
+  </data>
+  <data name="Dashboard_LuaCountFormat" xml:space="preserve">
+    <value>{0} Tempatan • {1} Awan</value>
+  </data>
+  <data name="Dashboard_LuaAddonsFoundFormat" xml:space="preserve">
+    <value>{0} skrip addon Lua ditemui dalam stplug-in</value>
+  </data>
+  <data name="Dashboard_NoLuaAddonsFound" xml:space="preserve">
+    <value>Tiada addon Lua tempatan ditemui dalam stplug-in</value>
+  </data>
+  <data name="Dashboard_Backup" xml:space="preserve">
+    <value>Sandar</value>
+  </data>
+  <data name="Dashboard_Restore" xml:space="preserve">
+    <value>Pulih</value>
+  </data>
+  <data name="Dashboard_BackupToolTip" xml:space="preserve">
+    <value>Sandarkan skrip Lua tempatan ke Awan secara manual sekarang</value>
+  </data>
+  <data name="Dashboard_RestoreToolTip" xml:space="preserve">
+    <value>Pulihkan skrip Lua daripada Awan secara manual sekarang</value>
+  </data>
+  <data name="Dashboard_DllHooked" xml:space="preserve">
+    <value>Teras Pelepasan Asli C++20 dipasang ke dalam Steam</value>
+  </data>
+  <data name="Dashboard_Active" xml:space="preserve">
+    <value>Aktif</value>
+  </data>
   <data name="Dashboard_UpdateNow" xml:space="preserve">
     <value>Update Now</value>
   </data>
@@ -388,61 +478,61 @@ If you skip this, saves will be stored locally in your Steam Folder.</value>
     <value>Penyedia Awan</value>
   </data>
   <data name="Dashboard_NotConfigured" xml:space="preserve">
-    <value>Not configured</value>
+    <value>Belum dikonfigurasikan</value>
   </data>
   <data name="Dashboard_SteamInstallation" xml:space="preserve">
-    <value>Steam Installation</value>
+    <value>Pemasangan Steam</value>
   </data>
   <data name="Dashboard_Detecting" xml:space="preserve">
-    <value>Detecting...</value>
+    <value>Mengesan...</value>
   </data>
   <data name="Dashboard_AppsSyncing" xml:space="preserve">
     <value>Aplikasi Menyegerak</value>
   </data>
   <data name="Dashboard_AppCountDefault" xml:space="preserve">
-    <value>0 Aplikasi configured</value>
+    <value>0 aplikasi dikonfigurasikan</value>
   </data>
   <data name="Dashboard_CloudRedirectDll" xml:space="preserve">
     <value>CloudRedirect DLL</value>
   </data>
   <data name="Dashboard_DllChecking" xml:space="preserve">
-    <value>Checking...</value>
+    <value>Memeriksa...</value>
   </data>
   <data name="Dashboard_QuickActions" xml:space="preserve">
     <value>Tindakan Pantas</value>
   </data>
   <data name="Dashboard_OpenLogFile" xml:space="preserve">
-    <value>Show Log in Folder</value>
+    <value>Papar Log dalam Folder</value>
   </data>
   <data name="Dashboard_RestartSteam" xml:space="preserve">
     <value>Mulakan Semula Steam</value>
   </data>
   <data name="Dashboard_NotFound" xml:space="preserve">
-    <value>Not found</value>
+    <value>Tidak ditemui</value>
   </data>
   <data name="Dashboard_DllNotInstalled" xml:space="preserve">
-    <value>Not installed</value>
+    <value>Tidak dipasang</value>
   </data>
   <data name="Dashboard_DllInstalledUpdateAvailable" xml:space="preserve">
-    <value>Installed (update available)</value>
+    <value>Dipasang (kemas kini tersedia)</value>
   </data>
   <data name="Dashboard_DllInstalled" xml:space="preserve">
-    <value>Installed</value>
+    <value>Dipasang</value>
   </data>
   <data name="Dashboard_AppCountFormat" xml:space="preserve">
-    <value>{0} Aplikasi(s) with cloud data</value>
+    <value>{0} aplikasi dengan data awan</value>
   </data>
   <data name="Dashboard_FolderAccessible" xml:space="preserve">
-    <value>{0} - Folder accessible</value>
+    <value>{0} - Folder boleh diakses</value>
   </data>
   <data name="Dashboard_FolderNotFound" xml:space="preserve">
-    <value>{0} - Folder not found</value>
+    <value>{0} - Folder tidak ditemui</value>
   </data>
   <data name="Dashboard_NoSyncFolder" xml:space="preserve">
-    <value>{0} - No Segerak Folder configured</value>
+    <value>{0} - Tiada folder segerak dikonfigurasikan</value>
   </data>
   <data name="Dashboard_Authenticated" xml:space="preserve">
-    <value>{0} - Authenticated</value>
+    <value>{0} - Disahkan</value>
   </data>
   <data name="Dashboard_AuthStatus" xml:space="preserve">
     <value>{0} - {1}</value>
