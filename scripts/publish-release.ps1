@@ -3,6 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+Add-Type -AssemblyName System.Net.Http
 
 # 1. Determine Token
 $token = $env:GITHUB_TOKEN
