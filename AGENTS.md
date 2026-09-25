@@ -1,22 +1,25 @@
 # Agent Guidelines for CloudRedirect
 
-## Post-Task Build Directive
-**MANDATORY**: Whenever you make any changes or complete any task in this codebase, you **MUST** automatically build and publish the Windows executable (`.exe`) before ending your turn.
-
-### Build / Publish Commands
-
-To publish the release executable:
-```powershell
-dotnet publish ui/CloudRedirect.csproj -c Release -r win-x64 --self-contained false -o ui/bin/publish
-```
-
-The published executable will be located at:
-`ui/bin/publish/CloudRedirect.exe`
-
-To run a fast incremental build check:
-```powershell
-dotnet build ui/CloudRedirect.csproj -c Release
-```
+## Post-Task Build & Release Directive
+**MANDATORY**: Whenever you make any changes or complete any task in this codebase, you **MUST** automatically:
+1. **Bump Version Number**: Increment `<ReleaseVersion>` in `Version.props` (e.g. `2.6.5` -> `2.6.6`) so that running instances of CloudRedirect can auto-detect the newer version and prompt/auto-install it.
+2. **Build and Publish the Windows Executable (`.exe`)**:
+   ```powershell
+   dotnet publish ui/CloudRedirect.csproj -c Release -r win-x64 --self-contained false -o ui/bin/publish
+   ```
+   The published executable will be at `ui/bin/publish/CloudRedirect.exe`.
+3. **Commit & Push Code**:
+   ```powershell
+   git add -A
+   git commit -m "..."
+   git push origin master
+   ```
+4. **Publish GitHub Release**:
+   Run the automated release script to create/update the GitHub Release for the new version and upload `CloudRedirect.exe` and `CloudRedirect.exe.sha256`:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File scripts/publish-release.ps1 -ReleaseBody "<Description of changes>"
+   ```
+   This ensures the in-app `AppUpdater` can detect the new release on GitHub, download the binary, and perform auto-update seamlessly.
 
 ## Project Overview
 - **Target Platform**: Windows x64 only.
