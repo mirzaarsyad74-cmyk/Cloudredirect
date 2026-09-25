@@ -51,8 +51,7 @@ public partial class SettingsPage : Page
         bool? SyncPlaytime,
         bool? SyncLuas,
         bool? AutoUpdateDll,
-        bool? ShowNonSteamGame,
-        bool? CustomCloudIcon);
+        bool? ShowNonSteamGame);
 
     // M15: Read config off UI thread to avoid slow-disk stall.
     private async Task LoadSettingsAsync()
@@ -61,10 +60,10 @@ public partial class SettingsPage : Page
         {
             var lang = ReadLanguageSetting();
 
-            bool? a = null, p = null, l = null, u = null, nsg = null, cci = null;
-            ReadSyncTogglesInto(ref a, ref p, ref l, ref u, ref nsg, ref cci);
+            bool? a = null, p = null, l = null, u = null, nsg = null;
+            ReadSyncTogglesInto(ref a, ref p, ref l, ref u, ref nsg);
 
-            return new SettingsSnapshot(lang, a, p, l, u, nsg, cci);
+            return new SettingsSnapshot(lang, a, p, l, u, nsg);
         });
 
         ApplySettingsSnapshot(snapshot);
@@ -79,7 +78,7 @@ public partial class SettingsPage : Page
         ExtraSection.Visibility = Visibility.Visible;
 
         ApplySyncToggles(snap.SyncAchievements, snap.SyncPlaytime, snap.SyncLuas, snap.AutoUpdateDll,
-                         snap.ShowNonSteamGame, snap.CustomCloudIcon);
+                         snap.ShowNonSteamGame);
     }
 
     private void ApplyLanguageSelector(string saved)
@@ -108,7 +107,7 @@ public partial class SettingsPage : Page
     }
 
     private void ApplySyncToggles(bool? achievements, bool? playtime, bool? luas, bool? autoUpdateDll,
-                                   bool? showNonSteamGame, bool? customCloudIcon)
+                                   bool? showNonSteamGame)
     {
         _syncLoading = true;
         try
@@ -118,7 +117,6 @@ public partial class SettingsPage : Page
             if (luas == true) SyncLuasToggle.IsChecked = true;
             if (autoUpdateDll == true) AutoUpdateDllToggle.IsChecked = true;
             if (showNonSteamGame == true) ShowNonSteamGameToggle.IsChecked = true;
-            if (customCloudIcon == true) SteamCloudIconToggle.IsChecked = true;
         }
         finally
         {
@@ -128,7 +126,7 @@ public partial class SettingsPage : Page
 
     /// <summary>Reads sync toggles from config.json (called inside Task.Run).</summary>
     private static void ReadSyncTogglesInto(ref bool? achievements, ref bool? playtime, ref bool? luas, ref bool? autoUpdateDll,
-                                              ref bool? showNonSteamGame, ref bool? customCloudIcon)
+                                              ref bool? showNonSteamGame)
     {
         try
         {
@@ -153,10 +151,6 @@ public partial class SettingsPage : Page
                 showNonSteamGame = nsg.ValueKind == JsonValueKind.True;
             else
                 showNonSteamGame = true; // default on when key absent
-            if (root.TryGetProperty("custom_cloud_icon", out var cci))
-                customCloudIcon = cci.ValueKind == JsonValueKind.True;
-            else
-                customCloudIcon = false;
         }
         catch { }
     }
@@ -301,73 +295,6 @@ public partial class SettingsPage : Page
         }
     }
 
-    private async void SteamCloudIconToggle_Changed(object sender, RoutedEventArgs e)
-    {
-        if (_syncLoading) return;
-
-        bool isChecked = SteamCloudIconToggle.IsChecked == true;
-        try
-        {
-            var steamPath = Services.SteamDetector.FindSteamPath();
-            if (string.IsNullOrEmpty(steamPath))
-            {
-                _syncLoading = true;
-                try { SteamCloudIconToggle.IsChecked = !isChecked; }
-                finally { _syncLoading = false; }
-
-                await Services.Dialog.ShowErrorAsync(
-                    S.Get("Common_Error"),
-                    "Steam installation path could not be located.");
-                return;
-            }
-
-            if (isChecked)
-            {
-                var (success, msg) = Services.SteamWebUiPatcher.ApplyPatch(steamPath);
-                if (!success)
-                {
-                    _syncLoading = true;
-                    try { SteamCloudIconToggle.IsChecked = false; }
-                    finally { _syncLoading = false; }
-
-                    await Services.Dialog.ShowErrorAsync(S.Get("Common_Error"), msg);
-                    return;
-                }
-
-                await Services.Dialog.ShowInfoAsync(
-                    S.Get("Settings_Done"),
-                    S.Get("Settings_CustomCloudIconSuccess"));
-            }
-            else
-            {
-                var (success, msg) = Services.SteamWebUiPatcher.RemovePatch(steamPath);
-                if (!success)
-                {
-                    _syncLoading = true;
-                    try { SteamCloudIconToggle.IsChecked = true; }
-                    finally { _syncLoading = false; }
-
-                    await Services.Dialog.ShowErrorAsync(S.Get("Common_Error"), msg);
-                    return;
-                }
-
-                await Services.Dialog.ShowInfoAsync(
-                    S.Get("Settings_Done"),
-                    S.Get("Settings_CustomCloudIconReverted"));
-            }
-        }
-        catch (Exception ex)
-        {
-            _syncLoading = true;
-            try { SteamCloudIconToggle.IsChecked = !isChecked; }
-            finally { _syncLoading = false; }
-
-            await Services.Dialog.ShowErrorAsync(
-                S.Get("Common_Error"),
-                ex.Message);
-        }
-    }
-
     /// <summary>Persists sync toggles to config.json; throws on I/O failure for caller to revert.</summary>
     private void SaveSyncToggles()
     {
@@ -386,7 +313,7 @@ public partial class SettingsPage : Page
                 writer.WriteBoolean("sync_luas", SyncLuasToggle.IsChecked == true);
                 writer.WriteBoolean("auto_update_dll", AutoUpdateDllToggle.IsChecked == true);
                 writer.WriteBoolean("show_non_steam_game", ShowNonSteamGameToggle.IsChecked == true);
-                writer.WriteBoolean("custom_cloud_icon", SteamCloudIconToggle.IsChecked == true);
+                writer.WriteBoolean("custom_cloud_icon", true);
             });
     }
 
