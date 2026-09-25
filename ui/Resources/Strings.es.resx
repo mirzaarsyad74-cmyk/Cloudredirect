@@ -49,6 +49,9 @@
   <data name="Nav_Dashboard" xml:space="preserve">
     <value>Panel</value>
   </data>
+  <data name="Nav_BackToDashboard" xml:space="preserve">
+    <value>Volver al panel</value>
+  </data>
   <data name="Nav_Setup" xml:space="preserve">
     <value>Configuración</value>
   </data>
@@ -1508,6 +1511,9 @@ Esto puede causar pérdida de datos en algunos casos.
   </data>
   <data name="AppUpdate_UpdateNow" xml:space="preserve">
     <value>Actualizar ahora</value>
+  </data>
+  <data name="AppUpdate_ReleaseNotes" xml:space="preserve">
+    <value>Notas de la versión</value>
   </data>
 
   <data name="Cleanup_OstBanner_Description" xml:space="preserve">

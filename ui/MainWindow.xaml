@@ -39,7 +39,7 @@
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                         <ui:Button x:Name="UpdateReleaseNotesButton"
-                                   Content="Release Notes"
+                                   Content="{res:Loc AppUpdate_ReleaseNotes}"
                                    Appearance="Secondary"
                                    Visibility="Collapsed"
                                    Margin="0,0,8,0"
@@ -96,7 +96,7 @@
                 <ui:Button x:Name="BackToDashboardBtn"
                            Appearance="Secondary"
                            Icon="{ui:SymbolIcon ArrowLeft24}"
-                           Content="Back to Dashboard"
+                           Content="{res:Loc Nav_BackToDashboard}"
                            Click="BackToDashboard_Click"
                            Cursor="Hand" />
                 <TextBlock x:Name="CurrentPageTitle"

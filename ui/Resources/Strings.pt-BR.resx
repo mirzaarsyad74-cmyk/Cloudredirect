@@ -49,6 +49,9 @@
   <data name="Nav_Dashboard" xml:space="preserve">
     <value>Painel</value>
   </data>
+  <data name="Nav_BackToDashboard" xml:space="preserve">
+    <value>Voltar ao painel</value>
+  </data>
   <data name="Nav_Setup" xml:space="preserve">
     <value>Configuração</value>
   </data>
@@ -1508,6 +1511,9 @@ Tem certeza?</value>
   </data>
   <data name="AppUpdate_UpdateNow" xml:space="preserve">
     <value>Atualizar agora</value>
+  </data>
+  <data name="AppUpdate_ReleaseNotes" xml:space="preserve">
+    <value>Notas de lançamento</value>
   </data>
 
   <data name="Cleanup_OstBanner_Description" xml:space="preserve">

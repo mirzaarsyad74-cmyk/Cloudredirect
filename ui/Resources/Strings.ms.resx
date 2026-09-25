@@ -52,6 +52,9 @@
   <data name="Nav_Dashboard" xml:space="preserve">
     <value>Papan Pemuka</value>
   </data>
+  <data name="Nav_BackToDashboard" xml:space="preserve">
+    <value>Kembali ke Papan Pemuka</value>
+  </data>
   <data name="Nav_Setup" xml:space="preserve">
     <value>Setup</value>
   </data>
@@ -599,10 +602,10 @@ Force-kill it?</value>
     <value>Penyedia Awan</value>
   </data>
   <data name="CloudProvider_Description" xml:space="preserve">
-    <value>Configure your Steam Penyedia Awan. Google Drive or a Local Folder.</value>
+    <value>Konfigurasikan Penyedia Awan Steam anda. Google Drive atau Folder Tempatan.</value>
   </data>
   <data name="CloudProvider_Provider" xml:space="preserve">
-    <value>Provider</value>
+    <value>Penyedia</value>
   </data>
   <data name="CloudProvider_GoogleDrive" xml:space="preserve">
     <value>Google Drive</value>
@@ -611,13 +614,13 @@ Force-kill it?</value>
     <value>OneDrive</value>
   </data>
   <data name="CloudProvider_FolderMappedDrive" xml:space="preserve">
-    <value>Folder / Mapped Drive</value>
+    <value>Folder / Pemacu Dipetakan</value>
   </data>
   <data name="CloudProvider_R2" xml:space="preserve">
     <value>Cloudflare R2</value>
   </data>
   <data name="CloudProvider_R2CredFilePath" xml:space="preserve">
-    <value>Credentials Fail Laluan</value>
+    <value>Laluan Fail Kredensial</value>
   </data>
   <data name="CloudProvider_R2CredPlaceholder" xml:space="preserve">
     <value>Laluan to R2 credentials JSON Fail</value>
@@ -728,25 +731,25 @@ Force-kill it?</value>
     <value>Local only (no cloud Segerak)</value>
   </data>
   <data name="CloudProvider_TokenFilePath" xml:space="preserve">
-    <value>Token Fail Laluan</value>
+    <value>Laluan Fail Token</value>
   </data>
   <data name="CloudProvider_TokenPlaceholder" xml:space="preserve">
-    <value>Laluan to OAuth tokens Fail</value>
+    <value>Laluan ke fail token OAuth</value>
   </data>
   <data name="CloudProvider_Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>Semak Imbas</value>
   </data>
   <data name="CloudProvider_Authentication" xml:space="preserve">
-    <value>Authentication</value>
+    <value>Pengesahan</value>
   </data>
   <data name="CloudProvider_AuthenticationStatus" xml:space="preserve">
-    <value>Authentication Status</value>
+    <value>Status Pengesahan</value>
   </data>
   <data name="CloudProvider_NoTokensLoaded" xml:space="preserve">
-    <value>No tokens loaded</value>
+    <value>Tiada token dimuatkan</value>
   </data>
   <data name="CloudProvider_SignIn" xml:space="preserve">
-    <value>Sign In</value>
+    <value>Log Masuk</value>
   </data>
   <data name="CloudProvider_Cancel" xml:space="preserve">
     <value>Batal</value>
@@ -809,10 +812,10 @@ Force-kill it?</value>
     <value>Aplikasi</value>
   </data>
   <data name="Apps_Description" xml:space="preserve">
-    <value>Cloud Simpan data for your injected Aplikasi.</value>
+    <value>Data simpanan awan untuk aplikasi yang disuntik anda.</value>
   </data>
   <data name="Apps_RestoreSaves" xml:space="preserve">
-    <value>Pulihkan Saves</value>
+    <value>Pulihkan Simpanan</value>
   </data>
   <data name="Apps_Files" xml:space="preserve">
     <value>Fail</value>
@@ -821,7 +824,7 @@ Force-kill it?</value>
     <value>CN:</value>
   </data>
   <data name="Apps_DeleteTooltip" xml:space="preserve">
-    <value>Padam Semua saves for this Aplikasi</value>
+    <value>Padam semua simpanan untuk aplikasi ini</value>
   </data>
   <data name="Apps_Back" xml:space="preserve">
     <value>Back</value>
@@ -919,13 +922,13 @@ You can Pulihkan from the Pulihkan Saves panel.</value>
     <value>Padam Gagal</value>
   </data>
   <data name="Apps_PruneTooltip" xml:space="preserve">
-    <value>Padam orphan cloud blobs no longer referenced by this Aplikasi</value>
+    <value>Padam fail awan terbiar yang tidak lagi dirujuk oleh Aplikasi ini</value>
   </data>
   <data name="Apps_ScanForOrphans" xml:space="preserve">
-    <value>Imbas Cloud for Orphans</value>
+    <value>Imbas Awan untuk Data Terbiar</value>
   </data>
   <data name="Apps_ScanOrphansExplainTitle" xml:space="preserve">
-    <value>Imbas Cloud for Orphans</value>
+    <value>Imbas Awan untuk Data Terbiar</value>
   </data>
   <data name="Apps_ScanOrphansExplainMessage" xml:space="preserve">
     <value>An &quot;orphan&quot; is a Simpan Fail in your cloud Storan that no Aplikasi on this PC still references - left behind when a Simpan was renamed, an Aplikasi was uninstalled, or a Segerak was interrupted. They take up space and can shadow newer saves on conflict.
@@ -1626,22 +1629,22 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
     <value>Segerakkan rekod masa bermain permainan antara PC anda.</value>
   </data>
   <data name="CloudProvider_UploadInFlight" xml:space="preserve">
-    <value>Concurrent Muat naik Saiz</value>
+    <value>Saiz Muat Naik Serentak</value>
   </data>
   <data name="CloudProvider_UploadInFlightHint" xml:space="preserve">
-    <value>Controls the maximum Fail Saiz of concurrent uploads. Increasing WILL NOT speed up loads, but increasing it can make multiple large saves fail to Muat naik. Changes are not recommended. Only change if you know what you are doing.</value>
+    <value>Mengawal saiz fail maksimum bagi muat naik serentak. Meningkatkannya TIDAK AKAN mempercepatkan pemuatan, tetapi boleh menyebabkan beberapa fail simpanan besar gagal dimuat naik. Perubahan tidak disyorkan kecuali anda tahu apa yang anda lakukan.</value>
   </data>
   <data name="CloudProvider_UploadInFlightValue" xml:space="preserve">
     <value>{0} MB</value>
   </data>
   <data name="CloudProvider_UploadInFlightConservative" xml:space="preserve">
-    <value>Safe (24)</value>
+    <value>Selamat (24)</value>
   </data>
   <data name="CloudProvider_UploadInFlightBalanced" xml:space="preserve">
-    <value>Balanced (44)</value>
+    <value>Seimbang (44)</value>
   </data>
   <data name="CloudProvider_UploadInFlightAggressive" xml:space="preserve">
-    <value>Aggressive (64)</value>
+    <value>Agresif (64)</value>
   </data>
   <data name="Settings_SyncLuas" xml:space="preserve">
     <value>Selaraskan Fail Lua</value>
@@ -1728,7 +1731,7 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
     <value>Couldn&#x27;t Simpan pin configuration: {0}</value>
   </data>
   <data name="Search_Placeholder" xml:space="preserve">
-    <value>Search by name or Aplikasi ID...</value>
+    <value>Cari mengikut nama atau ID Aplikasi...</value>
   </data>
   <data name="Settings_Parental" xml:space="preserve">
     <value>Steam Family</value>
@@ -1749,10 +1752,13 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
     <value>No client-side family restrictions are enforced.</value>
   </data>
   <data name="AppUpdate_Skip" xml:space="preserve">
-    <value>Skip</value>
+    <value>Langkau</value>
   </data>
   <data name="AppUpdate_UpdateNow" xml:space="preserve">
-    <value>Update Now</value>
+    <value>Kemas Kini Sekarang</value>
+  </data>
+  <data name="AppUpdate_ReleaseNotes" xml:space="preserve">
+    <value>Nota Keluaran</value>
   </data>
   <data name="News_WhatsNew" xml:space="preserve">
     <value>What&#x27;s new?</value>
@@ -1878,7 +1884,7 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
     <value>Ralat: {0}</value>
   </data>
   <data name="OAuth_Authenticated" xml:space="preserve">
-    <value>Authenticated.</value>
+    <value>Disahkan.</value>
   </data>
   <data name="Nav_Migration" xml:space="preserve">
     <value>Penghijrahan</value>

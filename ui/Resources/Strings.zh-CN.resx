@@ -52,6 +52,9 @@
   <data name="Nav_Dashboard" xml:space="preserve">
     <value>仪表板</value>
   </data>
+  <data name="Nav_BackToDashboard" xml:space="preserve">
+    <value>返回仪表盘</value>
+  </data>
   <data name="Nav_Setup" xml:space="preserve">
     <value>设置</value>
   </data>
@@ -1829,6 +1832,9 @@
   </data>
   <data name="AppUpdate_UpdateNow" xml:space="preserve">
     <value>立即更新</value>
+  </data>
+  <data name="AppUpdate_ReleaseNotes" xml:space="preserve">
+    <value>发行说明</value>
   </data>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->

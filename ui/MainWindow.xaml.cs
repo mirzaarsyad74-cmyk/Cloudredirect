@@ -358,6 +358,7 @@ public partial class MainWindow : FluentWindow
         TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
         if (!isDashboard)
         {
+            BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
             CurrentPageTitle.Text = pageType.Name switch
             {
                 nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
@@ -379,6 +380,8 @@ public partial class MainWindow : FluentWindow
             Title = S.Get("MainWindow_Title");
             UpdateSkipButton.Content = S.Get("AppUpdate_Skip");
             UpdateNowButton.Content = S.Get("AppUpdate_UpdateNow");
+            UpdateReleaseNotesButton.Content = S.Get("AppUpdate_ReleaseNotes");
+            BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
 
             RefreshCurrentPage();
         });
@@ -396,6 +399,7 @@ public partial class MainWindow : FluentWindow
             TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
             if (!isDashboard)
             {
+                BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
                 CurrentPageTitle.Text = pageType.Name switch
                 {
                     nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
