@@ -69,6 +69,8 @@ public partial class MainWindow : FluentWindow
             }
             catch { }
         };
+
+        Services.LanguageService.OnLanguageChanged += OnLanguageChanged;
     }
 
     private bool _isExplicitExit;
@@ -366,6 +368,45 @@ public partial class MainWindow : FluentWindow
                 nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
                 _ => ""
             };
+        }
+    }
+
+    private void OnLanguageChanged()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            AppTitleBar.Title = S.Get("MainWindow_TitleBar");
+            Title = S.Get("MainWindow_Title");
+            UpdateSkipButton.Content = S.Get("AppUpdate_Skip");
+            UpdateNowButton.Content = S.Get("AppUpdate_UpdateNow");
+
+            RefreshCurrentPage();
+        });
+    }
+
+    public void RefreshCurrentPage()
+    {
+        if (RootFrame.Content is Page currentPage)
+        {
+            var pageType = currentPage.GetType();
+            var newPage = Activator.CreateInstance(pageType);
+            RootFrame.Navigate(newPage);
+
+            bool isDashboard = pageType == typeof(Pages.DashboardPage);
+            TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
+            if (!isDashboard)
+            {
+                CurrentPageTitle.Text = pageType.Name switch
+                {
+                    nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
+                    nameof(Pages.AppsPage) => S.Get("Nav_Apps"),
+                    nameof(Pages.CleanupPage) => S.Get("Nav_Cleanup"),
+                    nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
+                    nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
+                    nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
+                    _ => ""
+                };
+            }
         }
     }
 

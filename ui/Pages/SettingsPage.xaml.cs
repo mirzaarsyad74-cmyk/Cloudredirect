@@ -15,24 +15,7 @@ public partial class SettingsPage : Page
 {
     private const string ReleasesUrl = "https://github.com/Selectively11/CloudRedirect/releases";
 
-    private bool _languageLoading;
     private bool _syncLoading;
-    /// <summary>
-    /// Index of the last LanguageOptions entry that was successfully
-    /// persisted to settings.json. Used to roll back the combo if a
-    /// later selection-change save fails so the UI never shows a
-    /// language different from what's actually on disk.
-    /// </summary>
-    private int _lastSavedLanguageIndex;
-    private static readonly (string ResourceKey, string Code)[] LanguageOptions =
-    [
-        ("Settings_SystemDefault", "system"),
-        ("Settings_LanguageEnglish", "en"),
-        ("Settings_LanguageSpanish", "es"),
-        ("Settings_LanguagePortuguese", "pt-BR"),
-        ("Settings_LanguageSimplifiedChinese", "zh-CN"),
-        ("Settings_LanguageMalay", "ms"),
-    ];
 
     public SettingsPage()
     {
@@ -44,9 +27,8 @@ public partial class SettingsPage : Page
         };
     }
 
-    /// <summary>Off-thread snapshot of settings.json + config.json state.</summary>
+    /// <summary>Off-thread snapshot of config.json state.</summary>
     private sealed record SettingsSnapshot(
-        string Language,
         bool? SyncAchievements,
         bool? SyncPlaytime,
         bool? SyncLuas,
@@ -58,12 +40,10 @@ public partial class SettingsPage : Page
     {
         var snapshot = await Task.Run(() =>
         {
-            var lang = ReadLanguageSetting();
-
             bool? a = null, p = null, l = null, u = null, nsg = null;
             ReadSyncTogglesInto(ref a, ref p, ref l, ref u, ref nsg);
 
-            return new SettingsSnapshot(lang, a, p, l, u, nsg);
+            return new SettingsSnapshot(a, p, l, u, nsg);
         });
 
         ApplySettingsSnapshot(snapshot);
@@ -71,39 +51,12 @@ public partial class SettingsPage : Page
 
     private void ApplySettingsSnapshot(SettingsSnapshot snap)
     {
-        ApplyLanguageSelector(snap.Language);
-
         ShowNonSteamGameCard.Visibility = Visibility.Collapsed;
         SyncLuasCard.Visibility = Visibility.Visible;
         ExtraSection.Visibility = Visibility.Visible;
 
         ApplySyncToggles(snap.SyncAchievements, snap.SyncPlaytime, snap.SyncLuas, snap.AutoUpdateDll,
                          snap.ShowNonSteamGame);
-    }
-
-    private void ApplyLanguageSelector(string saved)
-    {
-        _languageLoading = true;
-        try
-        {
-            LanguageComboBox.Items.Clear();
-
-            int selectedIndex = 0;
-            for (int i = 0; i < LanguageOptions.Length; i++)
-            {
-                var (resKey, code) = LanguageOptions[i];
-                LanguageComboBox.Items.Add(S.Get(resKey));
-                if (code == saved)
-                    selectedIndex = i;
-            }
-
-            LanguageComboBox.SelectedIndex = selectedIndex;
-            _lastSavedLanguageIndex = selectedIndex;
-        }
-        finally
-        {
-            _languageLoading = false;
-        }
     }
 
     private void ApplySyncToggles(bool? achievements, bool? playtime, bool? luas, bool? autoUpdateDll,
@@ -153,114 +106,6 @@ public partial class SettingsPage : Page
                 showNonSteamGame = true; // default on when key absent
         }
         catch { }
-    }
-
-    private async void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_languageLoading) return;
-
-        var idx = LanguageComboBox.SelectedIndex;
-        if (idx < 0 || idx >= LanguageOptions.Length) return;
-
-        var code = LanguageOptions[idx].Code;
-        try
-        {
-            SaveLanguageSetting(code);
-        }
-        catch (Exception ex)
-        {
-            // Revert the combo to the last successfully-persisted index so
-            // the user doesn't see a fake selection that won't survive
-            // restart. Suppress the re-fire via _languageLoading.
-            _languageLoading = true;
-            try { LanguageComboBox.SelectedIndex = _lastSavedLanguageIndex; }
-            finally { _languageLoading = false; }
-
-            await Services.Dialog.ShowErrorAsync(
-                S.Get("Common_Error"),
-                S.Format("Settings_FailedSaveLanguage", ex.Message));
-            return;
-        }
-
-        _lastSavedLanguageIndex = idx;
-        LanguageHintText.Text = S.Get("Settings_RestartRequired");
-        RestartButton.Visibility = Visibility.Visible;
-    }
-
-    private void RestartApp_Click(object sender, RoutedEventArgs e)
-    {
-        var exePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
-        if (exePath != null)
-            Process.Start(exePath);
-        Application.Current.Shutdown();
-    }
-
-    private static string GetSettingsPath()
-    {
-        return Path.Combine(Services.SteamDetector.GetConfigDir(), "settings.json");
-    }
-
-    private static string ReadLanguageSetting()
-    {
-        try
-        {
-            var path = GetSettingsPath();
-            if (!File.Exists(path)) return "system";
-
-            var json = File.ReadAllText(path);
-            using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("language", out var prop))
-                return prop.GetString() ?? "system";
-        }
-        catch { }
-        return "system";
-    }
-
-    /// <summary>
-    /// Writes the language preference to settings.json. Throws on real
-    /// I/O failure so the caller can revert the combo and surface the
-    /// error; the inner old-file parse catch is intentional (corrupt
-    /// settings → write fresh, preserving language only).
-    /// </summary>
-    private static void SaveLanguageSetting(string code)
-    {
-        var path = GetSettingsPath();
-        var dir = Path.GetDirectoryName(path)!;
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-
-        JsonElement existing = default;
-        if (File.Exists(path))
-        {
-            try
-            {
-                var oldJson = File.ReadAllText(path);
-                using var oldDoc = JsonDocument.Parse(oldJson);
-                existing = oldDoc.RootElement.Clone();
-            }
-            catch { }
-        }
-
-        using var ms = new System.IO.MemoryStream();
-        using (var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true }))
-        {
-            writer.WriteStartObject();
-            writer.WriteString("language", code);
-
-            if (existing.ValueKind == JsonValueKind.Object)
-            {
-                foreach (var prop in existing.EnumerateObject())
-                {
-                    if (prop.Name == "language") continue;
-                    prop.WriteTo(writer);
-                }
-            }
-
-            writer.WriteEndObject();
-        }
-
-        var newJson = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-        Services.FileUtils.AtomicWriteAllText(path, newJson);
     }
 
     private static string GetConfigPath()

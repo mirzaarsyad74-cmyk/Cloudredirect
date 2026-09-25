@@ -13,6 +13,7 @@ public partial class DashboardPage : Page
     private string? _steamPath;
     private System.Windows.Threading.DispatcherTimer? _autoRefreshTimer;
     private bool _isLoadingStatus;
+    private bool _languageLoading;
 
     public void HideDllUpdateBanner()
     {
@@ -24,6 +25,7 @@ public partial class DashboardPage : Page
         InitializeComponent();
         Loaded += async (_, _) =>
         {
+            InitializeLanguageSelector();
             Services.SaveUploadWatcherService.Start();
             Services.SaveUploadWatcherService.OnSaveActivity += HandleSaveActivity;
 
@@ -568,5 +570,49 @@ public partial class DashboardPage : Page
     private void SettingsAction_Click(object sender, RoutedEventArgs e)
     {
         (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.SettingsPage));
+    }
+
+    private void InitializeLanguageSelector()
+    {
+        _languageLoading = true;
+        try
+        {
+            LanguageComboBox.Items.Clear();
+            var currentCode = Services.LanguageService.ReadLanguagePreference();
+
+            int selectedIndex = 0;
+            var languages = Services.LanguageService.SupportedLanguages;
+            for (int i = 0; i < languages.Length; i++)
+            {
+                var lang = languages[i];
+                var itemText = lang.Code == "system"
+                    ? S.Get(lang.ResourceKey)
+                    : lang.DisplayName;
+
+                LanguageComboBox.Items.Add(itemText);
+                if (string.Equals(lang.Code, currentCode, StringComparison.OrdinalIgnoreCase))
+                {
+                    selectedIndex = i;
+                }
+            }
+
+            LanguageComboBox.SelectedIndex = selectedIndex;
+        }
+        finally
+        {
+            _languageLoading = false;
+        }
+    }
+
+    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_languageLoading) return;
+
+        var idx = LanguageComboBox.SelectedIndex;
+        var languages = Services.LanguageService.SupportedLanguages;
+        if (idx < 0 || idx >= languages.Length) return;
+
+        var selectedCode = languages[idx].Code;
+        Services.LanguageService.ApplyLanguage(selectedCode, save: true);
     }
 }

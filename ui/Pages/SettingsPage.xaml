@@ -20,39 +20,8 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Left Column: Language, Quality of Life, Danger Zone -->
+                <!-- Left Column: Quality of Life, Danger Zone -->
                 <StackPanel Grid.Column="0">
-                    <!-- Language Section -->
-                    <TextBlock Text="{res:Loc Settings_Language}"
-                               FontSize="17" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                               Margin="0,0,0,8" />
-
-                    <ui:CardControl Margin="0,0,0,16">
-                        <ui:CardControl.Header>
-                            <StackPanel>
-                                <TextBlock Text="{res:Loc Settings_Language}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                <TextBlock x:Name="LanguageHintText"
-                                           Text="{res:Loc Settings_LanguageHint}"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                           TextWrapping="Wrap" />
-                            </StackPanel>
-                        </ui:CardControl.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <ComboBox x:Name="LanguageComboBox"
-                                      Width="180"
-                                      SelectionChanged="LanguageComboBox_SelectionChanged" />
-                            <ui:Button x:Name="RestartButton"
-                                       Content="{res:Loc Settings_RestartNow}"
-                                       Icon="{ui:SymbolIcon ArrowSync24}"
-                                       Appearance="Primary"
-                                       Click="RestartApp_Click"
-                                       Visibility="Collapsed"
-                                       Margin="8,0,0,0" />
-                        </StackPanel>
-                    </ui:CardControl>
 
                     <!-- Quality of Life Section -->
                     <StackPanel x:Name="ExtraSection" Margin="0,0,0,16">

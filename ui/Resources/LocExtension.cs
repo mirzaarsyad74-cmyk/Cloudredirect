@@ -1,13 +1,16 @@
 using System;
+using System.Windows;
+using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace CloudRedirect.Resources;
 
 /// <summary>
 /// XAML markup extension for localized strings.
-/// Usage: <c>{res:Loc MainWindow_Title}</c>
+/// Connects dynamic bindings to <see cref="LocalizationManager"/> so UI elements
+/// automatically update their text whenever the application language changes without restart.
 /// </summary>
-[MarkupExtensionReturnType(typeof(string))]
+[MarkupExtensionReturnType(typeof(object))]
 public class LocExtension : MarkupExtension
 {
     public string Key { get; set; }
@@ -19,6 +22,30 @@ public class LocExtension : MarkupExtension
     {
         if (string.IsNullOrEmpty(Key))
             return "";
+
+        if (serviceProvider?.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget target)
+        {
+            if (target.TargetObject is DependencyObject && target.TargetProperty is DependencyProperty)
+            {
+                var binding = new Binding($"[{Key}]")
+                {
+                    Source = LocalizationManager.Instance,
+                    Mode = BindingMode.OneWay
+                };
+                return binding.ProvideValue(serviceProvider);
+            }
+
+            if (target.TargetObject is Setter)
+            {
+                var binding = new Binding($"[{Key}]")
+                {
+                    Source = LocalizationManager.Instance,
+                    Mode = BindingMode.OneWay
+                };
+                return binding;
+            }
+        }
+
         return S.Get(Key);
     }
 }
