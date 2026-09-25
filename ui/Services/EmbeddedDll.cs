@@ -76,6 +76,60 @@ internal static class EmbeddedDll
     /// journaled the rename. The DLL is ~900 KB so reading it into a
     /// byte[] up front is trivial.
     /// </summary>
+    /// <summary>
+    /// Deploys raw DLL bytes to destPath. If the DLL is locked by a running process
+    /// (e.g. Steam), uses Windows NTFS rename-swap to move the in-use file to .old
+    /// and deploy the new file in place.
+    /// </summary>
+    public static string? DeployBytes(string destPath, byte[] payload)
+    {
+        var oldPath = destPath + ".old";
+        if (File.Exists(oldPath))
+        {
+            try { File.Delete(oldPath); } catch { }
+        }
+
+        try
+        {
+            FileUtils.AtomicWriteAllBytes(destPath, payload);
+            return null;
+        }
+        catch (Exception)
+        {
+            // If direct atomic write fails for any reason (in-use by Steam, sharing violation, etc.),
+            // perform the hot-swap: rename in-use file to .old, then deploy the new DLL.
+            try
+            {
+                if (File.Exists(oldPath))
+                {
+                    try { File.Delete(oldPath); } catch { }
+                }
+
+                if (File.Exists(destPath))
+                {
+                    File.Move(destPath, oldPath, true);
+                }
+
+                try
+                {
+                    FileUtils.AtomicWriteAllBytes(destPath, payload);
+                }
+                catch
+                {
+                    File.WriteAllBytes(destPath, payload);
+                }
+                return null;
+            }
+            catch (Exception fallbackEx)
+            {
+                return fallbackEx.Message;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Atomically deploys the embedded cloud_redirect.dll to the given destination path.
+    /// </summary>
     /// <returns>null on success, or an error message string on failure.</returns>
     public static string? DeployTo(string destPath)
     {
@@ -91,17 +145,9 @@ internal static class EmbeddedDll
             payload = ms.ToArray();
         }
 
-        try
-        {
-            FileUtils.AtomicWriteAllBytes(destPath, payload);
-            return null;
-        }
-        catch (IOException ex) when (ex.Message.Contains("used by another process", StringComparison.OrdinalIgnoreCase)
-                                  || ex.HResult == unchecked((int)0x80070020)) // ERROR_SHARING_VIOLATION
-        {
-            return S.Get("EmbeddedDll_InUse");
-        }
+        return DeployBytes(destPath, payload);
     }
+
 
     private static string ComputeSha256(Stream stream)
     {

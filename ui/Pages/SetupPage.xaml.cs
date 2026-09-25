@@ -40,12 +40,9 @@ public partial class SetupPage : Page
         };
     }
 
-    private Wpf.Ui.Controls.NavigationView? FindNavigationView()
+    private void NavigateToCloudProvider()
     {
-        var window = Window.GetWindow(this);
-        if (window is MainWindow mw)
-            return mw.RootNavigation;
-        return null;
+        (Window.GetWindow(this) as MainWindow)?.NavigateTo(typeof(CloudProviderPage));
     }
 
     private void DiagnosticsToggle_Click(object sender, RoutedEventArgs e)
@@ -474,8 +471,7 @@ public partial class SetupPage : Page
 
                 if (wantsConfigure)
                 {
-                    var nav = FindNavigationView();
-                    nav?.Navigate(typeof(CloudProviderPage));
+                    NavigateToCloudProvider();
                 }
                 else if (existingConfig == null)
                 {

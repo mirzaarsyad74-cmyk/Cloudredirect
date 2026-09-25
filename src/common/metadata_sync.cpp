@@ -4,6 +4,8 @@ namespace MetadataSync {
 
 std::atomic<bool> steamToolsPresent{false};
 std::atomic<bool> syncLuas{false};
+std::atomic<bool> syncLuasBackup{true};
+std::atomic<bool> syncLuasRestore{true};
 // Default OFF: WIP opt-in features; the user enables them.
 std::atomic<bool> syncAchievements{false};
 std::atomic<bool> syncPlaytime{false};

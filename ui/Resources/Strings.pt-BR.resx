@@ -1716,6 +1716,9 @@ Tem certeza?</value>
   <data name="Settings_LanguageSimplifiedChinese" xml:space="preserve">
     <value>简体中文</value>
   </data>
+  <data name="Settings_LanguageMalay" xml:space="preserve">
+    <value>Malaio (Bahasa Melayu)</value>
+  </data>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- News Page                                                           -->
@@ -1955,4 +1958,16 @@ Tem certeza?</value>
     <value>Escaneando provedor de origem...</value>
   </data>
 
+  <data name="Settings_CustomCloudIcon" xml:space="preserve">
+    <value>Ícone de status do Steam Cloud</value>
+  </data>
+  <data name="Settings_CustomCloudIconHint" xml:space="preserve">
+    <value>Substitui o ícone de status da nuvem Steam pelo do CloudRedirect apenas para jogos Lua (jogos próprios originais mantêm o ícone padrão).</value>
+  </data>
+  <data name="Settings_CustomCloudIconSuccess" xml:space="preserve">
+    <value>Ícone do CloudRedirect injetado no Steam! Reinicie o Steam ou pressione F5 na Biblioteca Steam para ver o ícone atualizado.</value>
+  </data>
+  <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
+    <value>Ícone de status do Steam Cloud restaurado para o padrão. Reinicie o Steam ou pressione F5 na Biblioteca Steam.</value>
+  </data>
 </root>

@@ -8,50 +8,149 @@ using System.Windows.Controls;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using TextBlock = System.Windows.Controls.TextBlock;
+using CloudRedirect.Resources;
 
 namespace CloudRedirect;
 
 public partial class MainWindow : FluentWindow
 {
     private Services.AppUpdater.CheckResult? _pendingUpdate;
+    private System.Windows.Threading.DispatcherTimer? _autoUpdateTimer;
     public bool AppUpdateAvailable { get; private set; }
 
     public MainWindow()
     {
         InitializeComponent();
 
+        var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        if (ver != null)
+        {
+            var title = $"CloudRedirect v{ver.Major}.{ver.Minor}.{ver.Build}";
+            Title = title;
+            if (AppTitleBar != null)
+                AppTitleBar.Title = title;
+        }
+
+        var workArea = SystemParameters.WorkArea;
+        if (Height > workArea.Height - 30)
+            Height = Math.Max(MinHeight, workArea.Height - 40);
+        if (Width > workArea.Width - 30)
+            Width = Math.Max(MinWidth, workArea.Width - 40);
+
         Loaded += async (_, _) =>
         {
             try
             {
-                SystemThemeWatcher.Watch(this);
+                Services.TrayIconService.Instance.Initialize(this);
 
                 _ = CheckForAutoUpdateAsync();
+
+                // Periodic check for new releases every 30 minutes
+                _autoUpdateTimer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMinutes(30)
+                };
+                _autoUpdateTimer.Tick += async (_, _) => await CheckForAutoUpdateAsync();
+                _autoUpdateTimer.Start();
+
+                // Auto-setup compatible unlock tools (OST, HubcapTools), deploy DLL and ensure default config
+                await Services.AutoSetupService.RunAutoSetupAsync();
+
+                _ = Task.Run(() =>
+                {
+                    Services.SteamWebUiPatcher.AutoRefreshIfEnabled();
+                    Services.SteamWebUiPatcher.StartWatcher();
+                });
 
                 var mode = await Task.Run(() => MigrateLegacyMode());
                 ApplyMode(mode);
 
-                bool needsSetup = await Task.Run(() => NeedsSetup());
-
-                if (mode == null)
-                    RootNavigation.Navigate(typeof(Pages.ChoiceModePage));
-                else if (needsSetup)
-                    RootNavigation.Navigate(typeof(Pages.SetupPage));
-                // else if (ShouldShowNews())
-                //     RootNavigation.Navigate(typeof(Pages.NewsPage));
-                else
-                    RootNavigation.Navigate(typeof(Pages.DashboardPage));
+                NavigateTo(typeof(Pages.DashboardPage));
             }
             catch { }
         };
     }
 
+    private bool _isExplicitExit;
+    private bool _isPromptingExit;
+
+    public void ForceExit()
+    {
+        _isExplicitExit = true;
+        Services.TrayIconService.Instance.Dispose();
+        Close();
+    }
+
+    protected override async void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        if (_isExplicitExit)
+        {
+            base.OnClosing(e);
+            return;
+        }
+
+        e.Cancel = true;
+
+        if (_isPromptingExit) return;
+        _isPromptingExit = true;
+        try
+        {
+            await PromptExitOrMinimizeAsync();
+        }
+        finally
+        {
+            _isPromptingExit = false;
+        }
+    }
+
+    private async Task PromptExitOrMinimizeAsync()
+    {
+        var box = new Wpf.Ui.Controls.MessageBox
+        {
+            Title = "CloudRedirect",
+            Content = new System.Windows.Controls.StackPanel
+            {
+                Children =
+                {
+                    new System.Windows.Controls.TextBlock
+                    {
+                        Text = "Choose an option upon closing:",
+                        FontSize = 14,
+                        FontWeight = FontWeights.SemiBold,
+                        Foreground = (System.Windows.Media.Brush)Application.Current.FindResource("TextFillColorPrimaryBrush"),
+                        Margin = new Thickness(0, 0, 0, 8),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    new System.Windows.Controls.TextBlock
+                    {
+                        Text = "• Minimize to Tray: CloudRedirect keeps running in the system tray to sync saves in the background.\n• Exit: Close and quit the application completely.",
+                        FontSize = 12,
+                        Foreground = (System.Windows.Media.Brush)Application.Current.FindResource("TextFillColorSecondaryBrush"),
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
+            },
+            PrimaryButtonText = "Minimize to Tray",
+            PrimaryButtonAppearance = ControlAppearance.Primary,
+            SecondaryButtonText = "Exit",
+            SecondaryButtonAppearance = ControlAppearance.Danger,
+            CloseButtonText = "Cancel"
+        };
+
+        var result = await box.ShowDialogAsync();
+        if (result == Wpf.Ui.Controls.MessageBoxResult.Primary)
+        {
+            Services.TrayIconService.Instance.MinimizeToTray();
+        }
+        else if (result == Wpf.Ui.Controls.MessageBoxResult.Secondary)
+        {
+            ForceExit();
+        }
+    }
+
     private static string? MigrateLegacyMode()
     {
         var mode = Services.SteamDetector.ReadModeSetting();
-
-        if (mode == null)
-            return null;
 
         if (mode != "cloud_redirect")
         {
@@ -70,17 +169,6 @@ public partial class MainWindow : FluentWindow
 
     public void ApplyMode(string? mode, string? clientType = null)
     {
-        var configured = mode == "cloud_redirect";
-        var vis = configured ? Visibility.Visible : Visibility.Collapsed;
-        NavCloudProvider.Visibility = vis;
-        NavApps.Visibility = vis;
-        NavCleanup.Visibility = vis;
-        NavCloud760.Visibility = vis;
-
-        NavManifestPinning.Visibility = Visibility.Collapsed;
-        NavChoiceMode.Visibility = Visibility.Collapsed;
-
-        RootNavigation.UpdateLayout();
     }
 
     /// <summary>True on first run of a new release version; writes a .news-seen marker.</summary>
@@ -134,8 +222,8 @@ public partial class MainWindow : FluentWindow
     }
 
     /// <summary>
-    /// Checks GitHub for a newer version. If found, shows an inline banner
-    /// with changelog and Update/Skip buttons.
+    /// Checks GitHub for a newer version. If found, automatically downloads
+    /// and installs the update.
     /// </summary>
     private async Task CheckForAutoUpdateAsync()
     {
@@ -147,22 +235,45 @@ public partial class MainWindow : FluentWindow
 
             _pendingUpdate = result;
             var versionStr = result.TagName?.TrimStart('v') ?? result.TagName ?? "unknown";
-            var body = result.Body?.Trim() ?? "";
 
-            UpdateBannerTitle.Text = $"Update available - v{versionStr}";
-            UpdateBannerStatus.Text = "A new version of CloudRedirect is ready to install.";
-
-            if (!string.IsNullOrEmpty(body))
-            {
-                UpdateChangelogText.Text = body;
-                UpdateChangelogScroll.Visibility = Visibility.Visible;
-            }
-
-            if (!string.IsNullOrEmpty(result.HtmlUrl))
-                UpdateReleaseNotesButton.Visibility = Visibility.Visible;
+            // Automatically download and install new update
+            UpdateBannerTitle.Text = $"Updating CloudRedirect to v{versionStr}...";
+            UpdateBannerStatus.Text = "Downloading update from GitHub...";
+            UpdateNowButton.Visibility = Visibility.Collapsed;
+            UpdateSkipButton.Visibility = Visibility.Collapsed;
+            UpdateReleaseNotesButton.Visibility = Visibility.Collapsed;
+            UpdateChangelogScroll.Visibility = Visibility.Collapsed;
+            UpdateProgressBar.Visibility = Visibility.Visible;
+            UpdateProgressBar.IsIndeterminate = true;
 
             AppUpdateAvailable = true;
             UpdateBanner.Visibility = Visibility.Visible;
+
+            var error = await Services.AppUpdater.DownloadAndApplyAsync(
+                result.DownloadUrl,
+                (pct, status) => Dispatcher.Invoke(() =>
+                {
+                    UpdateBannerStatus.Text = status;
+                    if (pct >= 0)
+                    {
+                        UpdateProgressBar.IsIndeterminate = false;
+                        UpdateProgressBar.Value = pct;
+                    }
+                    else
+                    {
+                        UpdateProgressBar.IsIndeterminate = true;
+                    }
+                }));
+
+            if (error != null)
+            {
+                UpdateBannerTitle.Text = $"Update to v{versionStr} failed";
+                UpdateBannerStatus.Text = error;
+                UpdateProgressBar.Visibility = Visibility.Collapsed;
+                UpdateNowButton.Content = "Retry";
+                UpdateNowButton.Visibility = Visibility.Visible;
+                UpdateSkipButton.Visibility = Visibility.Visible;
+            }
         }
         catch
         {
@@ -234,6 +345,35 @@ public partial class MainWindow : FluentWindow
         _pendingUpdate = null;
     }
 
+    public void NavigateTo(Type pageType)
+    {
+        if (RootFrame.Content?.GetType() == pageType) return;
+
+        var page = Activator.CreateInstance(pageType);
+        RootFrame.Navigate(page);
+
+        bool isDashboard = pageType == typeof(Pages.DashboardPage);
+        TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
+        if (!isDashboard)
+        {
+            CurrentPageTitle.Text = pageType.Name switch
+            {
+                nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
+                nameof(Pages.AppsPage) => S.Get("Nav_Apps"),
+                nameof(Pages.CleanupPage) => S.Get("Nav_Cleanup"),
+                nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
+                nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
+                nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
+                _ => ""
+            };
+        }
+    }
+
+    private void BackToDashboard_Click(object sender, RoutedEventArgs e)
+    {
+        NavigateTo(typeof(Pages.DashboardPage));
+    }
+
     public void ShowRestartSteam()
     {
         // Button is always visible now; kept for callers.
@@ -281,7 +421,5 @@ public partial class MainWindow : FluentWindow
             })?.Dispose();
         }
         catch { }
-
-        RestartSteamItem.Visibility = Visibility.Collapsed;
     }
 }

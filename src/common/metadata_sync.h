@@ -6,6 +6,8 @@ namespace MetadataSync {
 
 extern std::atomic<bool> steamToolsPresent;
 extern std::atomic<bool> syncLuas;
+extern std::atomic<bool> syncLuasBackup;
+extern std::atomic<bool> syncLuasRestore;
 
 // Native stats/playtime sync gates (config: sync_achievements / sync_playtime).
 extern std::atomic<bool> syncAchievements;
@@ -15,17 +17,12 @@ extern std::atomic<bool> syncPlaytime;
 extern std::atomic<bool> schemaFetch;
 
 inline bool IsEnabled() {
-    return steamToolsPresent.load(std::memory_order_relaxed) &&
-           syncLuas.load(std::memory_order_relaxed);
+    return syncLuas.load(std::memory_order_relaxed);
 }
 
-// SteamTools-client gate. Win: needs DLL entry. Linux: always open.
+// Client gate for unlock solutions (OpenSteamTool, HubcapTools, etc.)
 inline bool StGateOpen() {
-#if defined(__linux__)
     return true;
-#else
-    return steamToolsPresent.load(std::memory_order_relaxed);
-#endif
 }
 
 // Per-feature flag AND'd with the ST-gate (for hook-based paths only).

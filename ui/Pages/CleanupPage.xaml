@@ -5,8 +5,8 @@
       xmlns:res="clr-namespace:CloudRedirect.Resources"
       ScrollViewer.CanContentScroll="False">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
-        <StackPanel MaxWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,16">
+        <StackPanel>
 
             <TextBlock Text="{res:Loc Cleanup_Title}"
                        FontSize="28" FontWeight="SemiBold"
@@ -58,10 +58,10 @@
 
                 <Border x:Name="UndoBanner"
                         Visibility="Collapsed"
-                        Background="#303080E0"
-                        BorderBrush="#603080E0"
+                        Background="#261A4B6B"
+                        BorderBrush="#501A9FFF"
                         BorderThickness="1"
-                        CornerRadius="8"
+                        CornerRadius="6"
                         Padding="16"
                         Margin="0,0,0,16">
                     <Grid>
@@ -106,16 +106,16 @@
 
                 <Border x:Name="NukePanel"
                         Visibility="Collapsed"
-                        Background="#30FF3030"
-                        BorderBrush="#60FF3030"
+                        Background="#268A2528"
+                        BorderBrush="#60B3363B"
                         BorderThickness="1"
-                        CornerRadius="8"
+                        CornerRadius="6"
                         Padding="20"
                         Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="{res:Loc Cleanup_DangerZone}"
                                    FontSize="18" FontWeight="Bold"
-                                   Foreground="#FFE04040"
+                                   Foreground="{DynamicResource SystemFillColorCriticalBrush}"
                                    Margin="0,0,0,6" />
                         <TextBlock x:Name="NukeDescription"
                                    Text=""

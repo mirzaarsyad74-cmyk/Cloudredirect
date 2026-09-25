@@ -1,0 +1,308 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+
+    <!-- ====================================================================
+         STEAM THEME COLOR DEFINITIONS
+         Faithfully matching the modern Steam Desktop Client palette:
+         - Deep space charcoal base (#171a21)
+         - Rich Steam navy blue body (#1b2838)
+         - Distinctive card elevated surface (#1a2432 / #1e2837)
+         - Signature Steam cyan highlight (#1a9fff) and store blue (#66c0f4)
+         - Iconic Steam "Play" green gradient for primary actions (#5c7e10 -> #4b6b0d)
+         - Steam muted labels (#8f98a0) and crisp white headings (#f3f3f3)
+         ==================================================================== -->
+
+    <!-- Base Palette Colors -->
+    <Color x:Key="SteamBgDarkestColor">#FF0E141B</Color>
+    <Color x:Key="SteamBgBaseColor">#FF171A21</Color>
+    <Color x:Key="SteamBgNavyColor">#FF1B2838</Color>
+    <Color x:Key="SteamBgElevatedColor">#FF1E293B</Color>
+    <Color x:Key="SteamBgCardColor">#FF1A2432</Color>
+    <Color x:Key="SteamBgCardSecondaryColor">#FF212E3E</Color>
+    <Color x:Key="SteamBgInputColor">#FF121922</Color>
+    <Color x:Key="SteamBorderDefaultColor">#FF2A3D54</Color>
+    <Color x:Key="SteamBorderSubtleColor">#FF1E2C3D</Color>
+    <Color x:Key="SteamBorderHighlightColor">#FF3D5A7D</Color>
+
+    <!-- Accent Colors -->
+    <Color x:Key="SteamAccentCyanColor">#FF1A9FFF</Color>
+    <Color x:Key="SteamAccentLightBlueColor">#FF66C0F4</Color>
+    <Color x:Key="SteamAccentBlueHoverColor">#FF2D79B2</Color>
+    <Color x:Key="SteamAccentBluePressedColor">#FF1378C2</Color>
+
+    <!-- Steam Play Green Action Button Colors -->
+    <Color x:Key="SteamPlayGreenTopColor">#FF5C7E10</Color>
+    <Color x:Key="SteamPlayGreenBottomColor">#FF4B6B0D</Color>
+    <Color x:Key="SteamPlayGreenHoverTopColor">#FF6EA114</Color>
+    <Color x:Key="SteamPlayGreenHoverBottomColor">#FF598210</Color>
+    <Color x:Key="SteamPlayGreenBorderColor">#FF6CA015</Color>
+
+    <!-- Steam Blue Button Colors -->
+    <Color x:Key="SteamBlueBtnTopColor">#FF214B6B</Color>
+    <Color x:Key="SteamBlueBtnBottomColor">#FF1B3D57</Color>
+    <Color x:Key="SteamBlueBtnHoverColor">#FF2B5F87</Color>
+    <Color x:Key="SteamBlueBtnBorderColor">#FF3877A5</Color>
+
+    <!-- Secondary Button Colors -->
+    <Color x:Key="SteamSecondaryBtnBgColor">#FF283446</Color>
+    <Color x:Key="SteamSecondaryBtnHoverColor">#FF35455C</Color>
+    <Color x:Key="SteamSecondaryBtnBorderColor">#FF3C4F68</Color>
+
+    <!-- Danger Colors -->
+    <Color x:Key="SteamDangerTopColor">#FF8A2528</Color>
+    <Color x:Key="SteamDangerBottomColor">#FF6C1B1D</Color>
+    <Color x:Key="SteamDangerHoverTopColor">#FFA62F33</Color>
+    <Color x:Key="SteamDangerBorderColor">#FFB3363B</Color>
+
+    <!-- Text Colors -->
+    <Color x:Key="SteamTextPrimaryColor">#FFF3F3F3</Color>
+    <Color x:Key="SteamTextSecondaryColor">#FF8F98A0</Color>
+    <Color x:Key="SteamTextTertiaryColor">#FF626F7D</Color>
+    <Color x:Key="SteamTextDisabledColor">#FF414E5D</Color>
+
+    <!-- ====================================================================
+         GRADIENTS & THEME BRUSHES
+         ==================================================================== -->
+
+    <LinearGradientBrush x:Key="SteamWindowBackgroundGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF1B2838" Offset="0.0" />
+        <GradientStop Color="#FF192534" Offset="0.35" />
+        <GradientStop Color="#FF171A21" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SteamContentBackgroundGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF1B2838" Offset="0.0" />
+        <GradientStop Color="#FF182331" Offset="0.4" />
+        <GradientStop Color="#FF171A21" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SteamCardGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF1E2837" Offset="0.0" />
+        <GradientStop Color="#FF1A2330" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SteamPlayButtonGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource SteamPlayGreenTopColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource SteamPlayGreenBottomColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SteamPlayButtonHoverGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource SteamPlayGreenHoverTopColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource SteamPlayGreenHoverBottomColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SteamBlueButtonGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource SteamBlueBtnTopColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource SteamBlueBtnBottomColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SteamDangerButtonGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource SteamDangerTopColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource SteamDangerBottomColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- Solid Brushes -->
+    <SolidColorBrush x:Key="SteamBgDarkestBrush" Color="{StaticResource SteamBgDarkestColor}" />
+    <SolidColorBrush x:Key="SteamBgBaseBrush" Color="{StaticResource SteamBgBaseColor}" />
+    <SolidColorBrush x:Key="SteamBgNavyBrush" Color="{StaticResource SteamBgNavyColor}" />
+    <SolidColorBrush x:Key="SteamBgCardBrush" Color="{StaticResource SteamBgCardColor}" />
+    <SolidColorBrush x:Key="SteamBgCardSecondaryBrush" Color="{StaticResource SteamBgCardSecondaryColor}" />
+    <SolidColorBrush x:Key="SteamBgInputBrush" Color="{StaticResource SteamBgInputColor}" />
+    <SolidColorBrush x:Key="SteamBorderDefaultBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="SteamBorderSubtleBrush" Color="{StaticResource SteamBorderSubtleColor}" />
+    <SolidColorBrush x:Key="SteamBorderHighlightBrush" Color="{StaticResource SteamBorderHighlightColor}" />
+    <SolidColorBrush x:Key="SteamAccentCyanBrush" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="SteamAccentLightBlueBrush" Color="{StaticResource SteamAccentLightBlueColor}" />
+    <SolidColorBrush x:Key="SteamTextPrimaryBrush" Color="{StaticResource SteamTextPrimaryColor}" />
+    <SolidColorBrush x:Key="SteamTextSecondaryBrush" Color="{StaticResource SteamTextSecondaryColor}" />
+    <SolidColorBrush x:Key="SteamTextTertiaryBrush" Color="{StaticResource SteamTextTertiaryColor}" />
+
+    <!-- ====================================================================
+         WPF-UI DESIGN SYSTEM OVERRIDES
+         These keys override WPF-UI's default Dark theme tokens so all controls
+         natively pick up the Steam look and feel.
+         ==================================================================== -->
+
+    <!-- Windows & Surfaces -->
+    <LinearGradientBrush x:Key="ApplicationBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF1B2838" Offset="0.0" />
+        <GradientStop Color="#FF182331" Offset="0.4" />
+        <GradientStop Color="#FF171A21" Offset="1.0" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="{StaticResource SteamBgBaseColor}" />
+    <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="{StaticResource SteamBgNavyColor}" />
+    <SolidColorBrush x:Key="SolidBackgroundFillColorTertiaryBrush" Color="{StaticResource SteamBgElevatedColor}" />
+    <SolidColorBrush x:Key="SolidBackgroundFillColorBaseAltBrush" Color="{StaticResource SteamBgDarkestColor}" />
+
+    <!-- Navigation View -->
+    <LinearGradientBrush x:Key="NavigationViewContentBackground" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF1B2838" Offset="0.0" />
+        <GradientStop Color="#FF182331" Offset="0.35" />
+        <GradientStop Color="#FF171A21" Offset="1.0" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="{StaticResource SteamBgDarkestColor}" />
+    <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FF1F2D3E" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#FF16202D" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FF1A2736" />
+    <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{StaticResource SteamTextSecondaryColor}" />
+    <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{StaticResource SteamTextPrimaryColor}" />
+    <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{StaticResource SteamTextPrimaryColor}" />
+
+    <!-- Title Bar -->
+    <SolidColorBrush x:Key="TitleBarBackground" Color="{StaticResource SteamBgDarkestColor}" />
+    <SolidColorBrush x:Key="TitleBarForeground" Color="{StaticResource SteamTextPrimaryColor}" />
+
+    <!-- Cards & Containers -->
+    <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="{StaticResource SteamBgCardColor}" />
+    <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="{StaticResource SteamBgCardSecondaryColor}" />
+    <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+
+    <!-- Form Controls & Inputs -->
+    <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="{StaticResource SteamBgInputColor}" />
+    <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#FF18222E" />
+    <SolidColorBrush x:Key="ControlFillColorTertiaryBrush" Color="#FF1F2B3A" />
+    <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FF0F151D" />
+    <SolidColorBrush x:Key="ControlFillColorTransparentBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="ControlStrokeColorSecondaryBrush" Color="{StaticResource SteamBorderHighlightColor}" />
+    <SolidColorBrush x:Key="ControlStrongStrokeColorDefaultBrush" Color="{StaticResource SteamBorderHighlightColor}" />
+
+    <!-- ComboBox DropDown & Popup System Overrides -->
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{StaticResource SteamBgCardColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="{StaticResource SteamTextPrimaryColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF1F2D3E" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="FlyoutBackground" Color="{StaticResource SteamBgCardColor}" />
+    <SolidColorBrush x:Key="FlyoutBorderBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="{StaticResource SteamBgCardColor}" />
+    <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="{StaticResource SteamBgCardColor}" />
+    <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource SteamBgInputColor}" />
+    <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FF18222E" />
+    <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="{StaticResource SteamBgInputColor}" />
+    <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#FF10141A" />
+    <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="{StaticResource SteamBorderDefaultColor}" />
+    <SolidColorBrush x:Key="ComboBoxBorderBrushFocused" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="ComboBoxForeground" Color="{StaticResource SteamTextPrimaryColor}" />
+    <SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="{StaticResource SteamTextSecondaryColor}" />
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#FF1F2D3E" />
+    <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="{StaticResource SteamTextPrimaryColor}" />
+    <SolidColorBrush x:Key="ComboBoxItemForeground" Color="{StaticResource SteamTextPrimaryColor}" />
+
+    <!-- Accent Brushes (Steam Cyan / Electric Blue) -->
+    <Color x:Key="SystemAccentColor">#FF1A9FFF</Color>
+    <Color x:Key="SystemAccentColorPrimary">#FF1A9FFF</Color>
+    <Color x:Key="SystemAccentColorSecondary">#FF66C0F4</Color>
+    <Color x:Key="SystemAccentColorTertiary">#FF1378C2</Color>
+    <SolidColorBrush x:Key="SystemAccentColorBrush" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="SystemAccentColorPrimaryBrush" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="SystemAccentColorSecondaryBrush" Color="{StaticResource SteamAccentLightBlueColor}" />
+    <SolidColorBrush x:Key="SystemAccentColorTertiaryBrush" Color="{StaticResource SteamAccentBluePressedColor}" />
+    <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="{StaticResource SteamAccentLightBlueColor}" />
+    <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="{StaticResource SteamAccentBluePressedColor}" />
+    <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="{StaticResource SteamAccentLightBlueColor}" />
+    <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="{StaticResource SteamAccentCyanColor}" />
+    <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+
+    <!-- Text & Labels -->
+    <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="{StaticResource SteamTextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="{StaticResource SteamTextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="{StaticResource SteamTextTertiaryColor}" />
+    <SolidColorBrush x:Key="TextFillColorDisabledBrush" Color="{StaticResource SteamTextDisabledColor}" />
+
+    <!-- Success & Critical Status Colors (Aligned with Steam Store) -->
+    <SolidColorBrush x:Key="SystemFillColorSuccessBrush" Color="#FF5C7E10" />
+    <SolidColorBrush x:Key="SystemFillColorSuccessBackgroundBrush" Color="#FF192B15" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBrush" Color="#FFD32F2F" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBackgroundBrush" Color="#FF2B1515" />
+    <SolidColorBrush x:Key="SystemFillColorAttentionBrush" Color="#FFE5A93B" />
+    <SolidColorBrush x:Key="SystemFillColorAttentionBackgroundBrush" Color="#FF2B2415" />
+
+    <!-- ====================================================================
+         CONTROL STYLES (Implicit & Explicit)
+         ==================================================================== -->
+
+    <!-- Steam CardControl Style -->
+    <Style TargetType="{x:Type ui:CardControl}" BasedOn="{StaticResource {x:Type ui:CardControl}}">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="Padding" Value="16,14" />
+    </Style>
+
+    <!-- Steam Card Style -->
+    <Style TargetType="{x:Type ui:Card}" BasedOn="{StaticResource {x:Type ui:Card}}">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Steam TextBox Style -->
+    <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+        <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="CaretBrush" Value="{StaticResource SteamAccentCyanBrush}" />
+    </Style>
+
+    <!-- Steam PasswordBox Style -->
+    <Style TargetType="{x:Type ui:PasswordBox}" BasedOn="{StaticResource {x:Type ui:PasswordBox}}">
+        <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <!-- Steam ComboBox Style -->
+    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,6" />
+    </Style>
+
+    <!-- Steam ComboBoxItem Style -->
+    <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+        <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource SteamSecondaryBtnBgColor}" />
+                <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#FF1F2D3E" />
+                <Setter Property="Foreground" Value="{StaticResource SteamAccentCyanBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Steam ToggleSwitch Style -->
+    <Style TargetType="{x:Type ui:ToggleSwitch}" BasedOn="{StaticResource {x:Type ui:ToggleSwitch}}">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <!-- Steam ProgressBar Style -->
+    <Style TargetType="{x:Type ProgressBar}">
+        <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource SteamAccentCyanBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- Steam TitleBar Style -->
+    <Style TargetType="{x:Type ui:TitleBar}" BasedOn="{StaticResource {x:Type ui:TitleBar}}">
+        <Setter Property="Background" Value="{StaticResource TitleBarBackground}" />
+        <Setter Property="Foreground" Value="{StaticResource TitleBarForeground}" />
+    </Style>
+
+</ResourceDictionary>

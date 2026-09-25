@@ -98,38 +98,19 @@ set(PROVIDER_SOURCES
     src/providers/r2_provider.cpp
 )
 
-if(WIN32)
-    set(PLATFORM_SOURCES
-        src/platform/win/dllmain.cpp
-        src/platform/win/cr_api.cpp
-        src/platform/win/cloud_intercept.cpp
-        src/platform/win/sig_scanner.cpp
-        src/platform/win/sc_resolver.cpp
-        src/platform/win/log.cpp
-        src/platform/win/http_server.cpp
-        src/platform/win/http_util.cpp
-        src/platform/win/http_transport_win.cpp
-        src/platform/win/token_store_win.cpp
-        src/platform/win/platform_win.cpp
-    )
-else()
-    set(PLATFORM_SOURCES
-        src/platform/linux/init.cpp
-        src/platform/linux/vtable_hook.cpp
-        src/platform/linux/cloud_hooks.cpp
-        src/platform/linux/cloud_intercept.cpp
-        src/platform/linux/stats_hooks.cpp
-        src/platform/linux/gamesplayed_hook.cpp
-        src/platform/linux/live_playtime.cpp
-        src/platform/linux/http_transport_linux.cpp
-        src/platform/linux/token_store_linux.cpp
-        src/platform/linux/log.cpp
-        src/platform/linux/http_server.cpp
-        src/platform/linux/http_util.cpp
-        src/platform/linux/platform_linux.cpp
-        src/platform/linux/file_util.cpp
-    )
-endif()
+set(PLATFORM_SOURCES
+    src/platform/win/dllmain.cpp
+    src/platform/win/cr_api.cpp
+    src/platform/win/cloud_intercept.cpp
+    src/platform/win/sig_scanner.cpp
+    src/platform/win/sc_resolver.cpp
+    src/platform/win/log.cpp
+    src/platform/win/http_server.cpp
+    src/platform/win/http_util.cpp
+    src/platform/win/http_transport_win.cpp
+    src/platform/win/token_store_win.cpp
+    src/platform/win/platform_win.cpp
+)
 
 # ── Build target ────────────────────────────────────────────────────────
 
@@ -152,83 +133,18 @@ target_compile_definitions(cloud_redirect PRIVATE
     CR_RELEASE_VERSION="${CR_RELEASE_VERSION}"
 )
 
-if(WIN32)
-    target_include_directories(cloud_redirect PRIVATE src/platform/win)
-    target_link_libraries(cloud_redirect PRIVATE
-        Shlwapi Advapi32 ws2_32 winhttp Crypt32 Shell32 Ole32 Psapi
-    )
-    
-    # CLI wrapper executable
-    add_executable(cloud_redirect_cli
-        src/platform/win/cli_main.cpp
-    )
-    target_link_libraries(cloud_redirect_cli PRIVATE Shell32 Ole32)
-    # Ensure DLL is built before CLI
-    add_dependencies(cloud_redirect_cli cloud_redirect)
+target_include_directories(cloud_redirect PRIVATE src/platform/win)
+target_link_libraries(cloud_redirect PRIVATE
+    Shlwapi Advapi32 ws2_32 winhttp Crypt32 Shell32 Ole32 Psapi
+)
 
-    # Standalone Steam Cloud file manager for a single AppID (default 760).
-    # Self-contained: resolves the steam_api64.dll flat exports at runtime, so it
-    # needs no Steamworks SDK headers/libs. steam_api64.dll must sit next to it.
-    add_executable(cloud760_tool
-        src/platform/win/cloud760_tool.cpp
-    )
-else()
-    target_include_directories(cloud_redirect PRIVATE src/platform/linux)
-    target_link_libraries(cloud_redirect PRIVATE dl pthread)
-    # Steam on Linux is 32-bit; use LINUX_32BIT=ON when cross-compiling on 64-bit host
-    # Match Steam's pre-C++11 ABI
-    target_compile_definitions(cloud_redirect PRIVATE _GLIBCXX_USE_CXX11_ABI=0 _FILE_OFFSET_BITS=64)
-    if(LINUX_32BIT)
-        target_compile_options(cloud_redirect PRIVATE -m32)
-        target_link_options(cloud_redirect PRIVATE -m32)
-        target_link_libraries(cloud_redirect PRIVATE atomic)
-        # Fix multilib include path for i686 libstdc++ headers on Fedora
-        # Try to detect GCC version for correct path
-        execute_process(
-            COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-            OUTPUT_VARIABLE GCC_VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        string(REGEX MATCH "^[0-9]+" GCC_MAJOR "${GCC_VERSION}")
-        target_include_directories(cloud_redirect SYSTEM BEFORE PRIVATE
-            /usr/include/c++/${GCC_MAJOR}/i686-redhat-linux
-        )
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        # Cross-compiling 32-bit on 64-bit: find the multilib atomic
-        find_library(LIBATOMIC_32 NAMES atomic
-            PATHS /usr/lib/gcc/x86_64-redhat-linux/16/32
-                  /usr/lib/gcc/x86_64-redhat-linux/14/32
-                  /usr/lib/gcc/x86_64-linux-gnu/13/32
-                  /usr/lib/gcc/x86_64-linux-gnu/12/32
-                  /usr/lib/gcc/x86_64-linux-gnu/11/32
-                  /usr/lib/i386-linux-gnu
-                  /usr/lib32
-            NO_DEFAULT_PATH)
-        if(LIBATOMIC_32)
-            target_link_libraries(cloud_redirect PRIVATE ${LIBATOMIC_32})
-        else()
-            target_link_libraries(cloud_redirect PRIVATE atomic)
-        endif()
-    endif()
-    # Strip in release
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        target_link_options(cloud_redirect PRIVATE -s)
-    endif()
-
-    # CLI wrapper (32-bit loader for cloud_redirect.so)
-    add_executable(cloud_redirect_cli
-        src/platform/linux/cli_main.cpp
-    )
-    target_link_libraries(cloud_redirect_cli PRIVATE dl)
-    if(LINUX_32BIT)
-        target_compile_options(cloud_redirect_cli PRIVATE -m32)
-        target_link_options(cloud_redirect_cli PRIVATE -m32)
-    endif()
-    add_dependencies(cloud_redirect_cli cloud_redirect)
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        target_link_options(cloud_redirect_cli PRIVATE -s)
-    endif()
-endif()
+# CLI wrapper executable
+add_executable(cloud_redirect_cli
+    src/platform/win/cli_main.cpp
+)
+target_link_libraries(cloud_redirect_cli PRIVATE Shell32 Ole32)
+# Ensure DLL is built before CLI
+add_dependencies(cloud_redirect_cli cloud_redirect)
 
 # ── Tests ───────────────────────────────────────────────────────────────
 
@@ -289,14 +205,8 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests/autocloud_native_tests.cpp)
             src/common/sigv4.cpp
             src/common/sha256_hmac.cpp
         )
-        target_include_directories(r2_provider_tests PRIVATE src/common src/providers)
-        if(WIN32)
-            target_include_directories(r2_provider_tests PRIVATE src/platform/win)
-            target_sources(r2_provider_tests PRIVATE src/platform/win/http_util.cpp)
-        else()
-            target_include_directories(r2_provider_tests PRIVATE src/platform/linux)
-            target_sources(r2_provider_tests PRIVATE src/platform/linux/http_util.cpp)
-        endif()
+        target_include_directories(r2_provider_tests PRIVATE src/common src/providers src/platform/win)
+        target_sources(r2_provider_tests PRIVATE src/platform/win/http_util.cpp)
         add_test(NAME r2_provider_tests COMMAND r2_provider_tests)
     endif()
 
@@ -318,12 +228,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests/autocloud_native_tests.cpp)
         tests/cloud_staging_tests.cpp
         src/common/cloud_staging.cpp
     )
-    target_include_directories(cloud_staging_tests PRIVATE src/common)
-    if(WIN32)
-        target_include_directories(cloud_staging_tests PRIVATE src/platform/win)
-    else()
-        target_include_directories(cloud_staging_tests PRIVATE src/platform/linux)
-    endif()
+    target_include_directories(cloud_staging_tests PRIVATE src/common src/platform/win)
     add_test(NAME cloud_staging_tests COMMAND cloud_staging_tests)
 
     add_executable(cloud_storage_staging_tests
@@ -355,28 +260,15 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests/autocloud_native_tests.cpp)
         src/providers/s3_provider.cpp
         src/providers/r2_provider.cpp
     )
-    target_include_directories(cloud_storage_staging_tests PRIVATE src/common src/providers src/testutil)
-    if(WIN32)
-        target_include_directories(cloud_storage_staging_tests PRIVATE src/platform/win)
-        target_sources(cloud_storage_staging_tests PRIVATE
-            src/platform/win/log.cpp
-            src/platform/win/platform_win.cpp
-            src/platform/win/http_util.cpp
-            src/platform/win/http_transport_win.cpp
-            src/platform/win/token_store_win.cpp
-        )
-        target_link_libraries(cloud_storage_staging_tests PRIVATE Shlwapi Advapi32 ws2_32 winhttp Crypt32 Shell32 Ole32)
-    else()
-        target_include_directories(cloud_storage_staging_tests PRIVATE src/platform/linux)
-        target_sources(cloud_storage_staging_tests PRIVATE
-            src/platform/linux/log.cpp
-            src/platform/linux/platform_linux.cpp
-            src/platform/linux/http_util.cpp
-            src/platform/linux/http_transport_linux.cpp
-            src/platform/linux/token_store_linux.cpp
-        )
-        target_link_libraries(cloud_storage_staging_tests PRIVATE pthread dl)
-    endif()
+    target_include_directories(cloud_storage_staging_tests PRIVATE src/common src/providers src/testutil src/platform/win)
+    target_sources(cloud_storage_staging_tests PRIVATE
+        src/platform/win/log.cpp
+        src/platform/win/platform_win.cpp
+        src/platform/win/http_util.cpp
+        src/platform/win/http_transport_win.cpp
+        src/platform/win/token_store_win.cpp
+    )
+    target_link_libraries(cloud_storage_staging_tests PRIVATE Shlwapi Advapi32 ws2_32 winhttp Crypt32 Shell32 Ole32)
     add_test(NAME cloud_storage_staging_tests COMMAND cloud_storage_staging_tests)
 
     add_executable(pending_ops_journal_tests
@@ -384,14 +276,8 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests/autocloud_native_tests.cpp)
         src/common/pending_ops_journal.cpp
         src/common/json.cpp
     )
-    target_include_directories(pending_ops_journal_tests PRIVATE src/common)
-    if(WIN32)
-        target_include_directories(pending_ops_journal_tests PRIVATE src/platform/win)
-        target_sources(pending_ops_journal_tests PRIVATE src/platform/win/log.cpp src/platform/win/platform_win.cpp)
-    else()
-        target_include_directories(pending_ops_journal_tests PRIVATE src/platform/linux)
-        target_sources(pending_ops_journal_tests PRIVATE src/platform/linux/log.cpp src/platform/linux/platform_linux.cpp)
-    endif()
+    target_include_directories(pending_ops_journal_tests PRIVATE src/common src/platform/win)
+    target_sources(pending_ops_journal_tests PRIVATE src/platform/win/log.cpp src/platform/win/platform_win.cpp)
     add_test(NAME pending_ops_journal_tests COMMAND pending_ops_journal_tests)
 
     add_executable(json_tests
@@ -422,42 +308,29 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/tests/autocloud_native_tests.cpp)
         src/common/metadata_sync.cpp
         src/common/vdf.cpp
     )
-    target_include_directories(stats_store_tests PRIVATE src/common)
-    if(WIN32)
-        target_include_directories(stats_store_tests PRIVATE src/platform/win)
-        target_sources(stats_store_tests PRIVATE
-            src/platform/win/log.cpp
-            src/platform/win/platform_win.cpp
-        )
-        target_link_libraries(stats_store_tests PRIVATE Shlwapi Advapi32 Crypt32 Shell32 Ole32)
-    else()
-        target_include_directories(stats_store_tests PRIVATE src/platform/linux)
-        target_sources(stats_store_tests PRIVATE
-            src/platform/linux/log.cpp
-            src/platform/linux/platform_linux.cpp
-            src/platform/linux/file_util.cpp
-        )
-        target_link_libraries(stats_store_tests PRIVATE pthread dl)
-    endif()
+    target_include_directories(stats_store_tests PRIVATE src/common src/platform/win)
+    target_sources(stats_store_tests PRIVATE
+        src/platform/win/log.cpp
+        src/platform/win/platform_win.cpp
+    )
+    target_link_libraries(stats_store_tests PRIVATE Shlwapi Advapi32 Crypt32 Shell32 Ole32)
     add_test(NAME stats_store_tests COMMAND stats_store_tests)
 endif()
 
-# ── UI (Windows only) ───────────────────────────────────────────────────
+# ── UI ──────────────────────────────────────────────────────────────────
 
-if(WIN32)
-    # The csproj expects the DLL/CLI at ../build/Release/; copy from the actual
-    # build output dir so out-of-tree builds (build-win) work correctly.
-    add_custom_target(ui ALL
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/build/Release"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:cloud_redirect>"
-            "${CMAKE_SOURCE_DIR}/build/Release/cloud_redirect.dll"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:cloud_redirect_cli>"
-            "${CMAKE_SOURCE_DIR}/build/Release/cloud_redirect_cli.exe"
-        COMMAND dotnet publish -c Release -r win-x64 --self-contained false -o bin/publish
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ui
-        COMMENT "Publishing CloudRedirect UI"
-        DEPENDS cloud_redirect cloud_redirect_cli
-    )
-endif()
+# The csproj expects the DLL/CLI at ../build/Release/; copy from the actual
+# build output dir so out-of-tree builds (build-win) work correctly.
+add_custom_target(ui ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/build/Release"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:cloud_redirect>"
+        "${CMAKE_SOURCE_DIR}/build/Release/cloud_redirect.dll"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:cloud_redirect_cli>"
+        "${CMAKE_SOURCE_DIR}/build/Release/cloud_redirect_cli.exe"
+    COMMAND dotnet publish -c Release -r win-x64 --self-contained false -o bin/publish
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ui
+    COMMENT "Publishing CloudRedirect UI"
+    DEPENDS cloud_redirect cloud_redirect_cli
+)

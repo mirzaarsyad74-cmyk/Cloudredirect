@@ -64,7 +64,7 @@ public partial class ChoiceModePage : Page
 
         var mw = Window.GetWindow(this) as MainWindow;
         mw?.ApplyMode("cloud_redirect");
-        mw?.RootNavigation.Navigate(typeof(SetupPage));
+        mw?.NavigateTo(typeof(DashboardPage));
     }
 
     // Persists both settings.json (mode) and the pin config (cloud_redirect)

@@ -5,105 +5,366 @@
       xmlns:res="clr-namespace:CloudRedirect.Resources"
       ScrollViewer.CanContentScroll="False">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
-        <StackPanel MaxWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,14">
+        <DockPanel LastChildFill="True">
 
-            <Border x:Name="UpdateBanner"
-                    Visibility="Collapsed"
-                    Background="#332F7A2F"
-                    BorderBrush="#FF6A9F42"
+            <!-- Hidden banner kept for backward compatibility if needed -->
+            <Border x:Name="UpdateBanner" Visibility="Collapsed" />
+
+            <!-- Header with Title & Active Status Badge -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{res:Loc Dashboard_Title}"
+                               FontSize="24" FontWeight="Bold"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                    <TextBlock Text="Automatic cloud save redirection &amp; synchronization"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+
+                <!-- Header Controls: Settings button & Live Auto-Save Pulse Badge -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:Button Appearance="Secondary"
+                               Icon="{ui:SymbolIcon Settings24}"
+                               Content="{res:Loc Nav_Settings}"
+                               Click="SettingsAction_Click"
+                               Margin="0,0,10,0"
+                               Padding="12,6"
+                               Cursor="Hand" />
+                    <Border Background="#1A2D22"
+                            BorderBrush="#FF4C7515"
+                            BorderThickness="1"
+                            CornerRadius="16"
+                            Padding="10,5"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="8" Height="8" Fill="#FFA4D007" Margin="0,0,6,0">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                 From="1.0" To="0.3" Duration="0:0:1.2" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <TextBlock Text="Auto-Save Sync Active"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Foreground="#FFA4D007" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Real-Time Auto-Save Activity / Progress Notification Banner -->
+            <Border DockPanel.Dock="Top"
+                    x:Name="SaveActivityCard"
+                    Background="#142433"
+                    BorderBrush="#FF1B527A"
                     BorderThickness="1"
                     CornerRadius="8"
-                    Padding="16"
-                    Margin="0,0,0,16">
-                <DockPanel>
-                    <ui:Button Content="{res:Loc Dashboard_UpdateNow}"
-                               Appearance="Success"
-                               DockPanel.Dock="Right"
-                               VerticalAlignment="Center"
-                               Click="UpdateDll_Click" />
-                    <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
-                        <TextBlock Text="{res:Loc Dashboard_UpdateAvailable}"
-                                   FontWeight="SemiBold" FontSize="14"
+                    Padding="14,8"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Animated Icon -->
+                    <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18"
+                            Background="#1E384D" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <ui:SymbolIcon x:Name="ActivityIcon" Symbol="ArrowSync24" FontSize="18"
+                                       Foreground="#FF66C0F4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- Activity Details -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock x:Name="ActivityTitle"
+                                   Text="All Saves Synchronized"
+                                   FontWeight="SemiBold" FontSize="13"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <TextBlock Text="{res:Loc Dashboard_UpdateAvailableDescription}"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Name="ActivityDetail"
+                                   Text="Monitoring active game saves. Save changes will automatically upload in background."
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Margin="0,2,0,0" />
+                        <ProgressBar x:Name="ActivityProgressBar"
+                                     Height="3" Margin="0,6,0,0"
+                                     Visibility="Collapsed"
+                                     IsIndeterminate="True"
+                                     Foreground="#FF1A9FFF" Background="#0F1822" />
                     </StackPanel>
-                </DockPanel>
+
+                    <!-- Status Pill -->
+                    <Border Grid.Column="2" x:Name="ActivityStatusBadge"
+                            Background="#183321" BorderBrush="#FF3B6B22" BorderThickness="1"
+                            CornerRadius="12" Padding="10,4" VerticalAlignment="Center" Margin="12,0,0,0">
+                        <TextBlock x:Name="ActivityStatusText"
+                                   Text="Up to date" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#FFA4D007" />
+                    </Border>
+                </Grid>
             </Border>
 
-            <TextBlock Text="{res:Loc Dashboard_Title}"
-                       FontSize="28" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                       Margin="0,0,0,24" />
+            <!-- 2x2 Metric Cards Grid -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <ui:CardControl Margin="0,0,0,12">
-                <ui:CardControl.Header>
-                    <StackPanel>
-                        <TextBlock Text="{res:Loc Dashboard_CloudProvider}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <TextBlock x:Name="ProviderStatus"
-                                   Text="{res:Loc Dashboard_NotConfigured}"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    </StackPanel>
-                </ui:CardControl.Header>
-                <ui:SymbolIcon x:Name="ProviderIcon" Symbol="Cloud24" FontSize="24" />
-            </ui:CardControl>
+                <!-- CARD 1: Cloud Storage Provider (Click to open) -->
+                <Border Grid.Row="0" Grid.Column="0"
+                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10" Margin="0,0,0,10"
+                        Cursor="Hand" MouseLeftButtonUp="CloudProviderCard_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{res:Loc Dashboard_CloudProvider}"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="#FF8F98A0" />
+                                <TextBlock Text="• Click to open"
+                                           FontSize="11" Foreground="#FF1A9FFF" Margin="6,0,0,0" />
+                            </StackPanel>
+                            <TextBlock x:Name="ProviderStatus"
+                                       Text="{res:Loc Dashboard_NotConfigured}"
+                                       FontSize="15" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Margin="0,3,0,3" />
+                            <TextBlock Text="Automatic sync to your personal cloud"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
+                                Background="#1A2D3E" VerticalAlignment="Top">
+                            <ui:SymbolIcon x:Name="ProviderIcon" Symbol="Cloud24" FontSize="20"
+                                           Foreground="#FF1A9FFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
 
-            <ui:CardControl Margin="0,0,0,12">
-                <ui:CardControl.Header>
-                    <StackPanel>
-                        <TextBlock Text="{res:Loc Dashboard_SteamInstallation}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <TextBlock x:Name="SteamStatus"
-                                   Text="{res:Loc Dashboard_Detecting}"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    </StackPanel>
-                </ui:CardControl.Header>
-                <ui:SymbolIcon Symbol="Desktop24" FontSize="24" />
-            </ui:CardControl>
+                <!-- CARD 2: Steam Client Integration -->
+                <Border Grid.Row="0" Grid.Column="2"
+                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{res:Loc Dashboard_SteamInstallation}"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Foreground="#FF8F98A0" />
+                            <TextBlock x:Name="SteamStatus"
+                                       Text="{res:Loc Dashboard_Detecting}"
+                                       FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Margin="0,3,0,3" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="Steam client save redirection hooked"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
+                                Background="#1A2D3E" VerticalAlignment="Top">
+                            <ui:SymbolIcon Symbol="Desktop24" FontSize="20"
+                                           Foreground="#FF66C0F4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
 
-            <ui:CardControl Margin="0,0,0,12">
-                <ui:CardControl.Header>
-                    <StackPanel>
-                        <TextBlock Text="{res:Loc Dashboard_AppsSyncing}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <TextBlock x:Name="AppCount"
-                                   Text="{res:Loc Dashboard_AppCountDefault}"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    </StackPanel>
-                </ui:CardControl.Header>
-                <ui:SymbolIcon Symbol="Apps24" FontSize="24" />
-            </ui:CardControl>
+                <!-- CARD 3: Game Saves (Click to open) -->
+                <Border Grid.Row="1" Grid.Column="0"
+                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10"
+                        Cursor="Hand" MouseLeftButtonUp="AppsSyncingCard_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{res:Loc Dashboard_AppsSyncing}"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="#FF8F98A0" />
+                                <TextBlock Text="• Click to open"
+                                           FontSize="11" Foreground="#FFA4D007" Margin="6,0,0,0" />
+                            </StackPanel>
+                            <TextBlock x:Name="AppCount"
+                                       Text="{res:Loc Dashboard_AppCountDefault}"
+                                       FontSize="15" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Margin="0,3,0,3" />
+                            <TextBlock Text="Protected with cloud backup &amp; versioning"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
+                                Background="#1A3322" VerticalAlignment="Top">
+                            <ui:SymbolIcon Symbol="Apps24" FontSize="20"
+                                           Foreground="#FFA4D007" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
 
-            <ui:CardControl Margin="0,0,0,12">
-                <ui:CardControl.Header>
+                <!-- CARD 4: Lua Files Found (Local & Cloud) -->
+                <Border Grid.Row="1" Grid.Column="2"
+                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="Lua Files Sync"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="#FF8F98A0" />
+                                <Border Background="#183321" BorderBrush="#3B6B22" BorderThickness="1"
+                                        CornerRadius="10" Padding="5,1" Margin="6,0,0,0">
+                                    <TextBlock Text="Auto-Backup Active" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="#A4D007" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock x:Name="LuaFilesCount"
+                                       Text="Scanning..."
+                                       FontSize="15" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Margin="0,3,0,3" />
+                            <TextBlock x:Name="LuaFilesDetail"
+                                       Text="25 Lua addon scripts found in stplug-in"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0,0,0">
+                            <ui:Button x:Name="LuaBackupBtn"
+                                       Appearance="Secondary"
+                                       Icon="{ui:SymbolIcon ArrowUpload24}"
+                                       Content="Backup"
+                                       Padding="10,5"
+                                       Margin="0,0,6,0"
+                                       Cursor="Hand"
+                                       ToolTip="Manually backup local Lua scripts to Cloud now"
+                                       Click="LuaBackupManual_Click" />
+                            <ui:Button x:Name="LuaRestoreBtn"
+                                       Appearance="Secondary"
+                                       Icon="{ui:SymbolIcon ArrowDownload24}"
+                                       Content="Restore"
+                                       Padding="10,5"
+                                       Cursor="Hand"
+                                       ToolTip="Manually restore Lua scripts from Cloud now"
+                                       Click="LuaRestoreManual_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- CARD 5: Redirection Core DLL -->
+            <Border DockPanel.Dock="Top"
+                    Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                    CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Text="{res:Loc Dashboard_CloudRedirectDll}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                        <TextBlock Text="{res:Loc Dashboard_CloudRedirectDll}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#FF8F98A0" />
                         <TextBlock x:Name="DllStatus"
                                    Text="{res:Loc Dashboard_DllChecking}"
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Margin="0,3,0,2" />
+                        <TextBlock Text="Native C++20 Redirection Core hooked into Steam"
+                                   FontSize="11"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
-                </ui:CardControl.Header>
-                <ui:SymbolIcon x:Name="DllIcon" Symbol="PlugConnected24" FontSize="24" />
-            </ui:CardControl>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="#1B3322" BorderBrush="#FF4C7515" BorderThickness="1"
+                                CornerRadius="12" Padding="8,3" Margin="0,0,10,0">
+                            <TextBlock Text="Active" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="#FFA4D007" />
+                        </Border>
+                        <ui:SymbolIcon x:Name="DllIcon" Symbol="PlugConnected24" FontSize="20"
+                                       Foreground="#FFA4D007" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-            <TextBlock Text="{res:Loc Dashboard_QuickActions}"
-                       FontSize="20" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                       Margin="0,24,0,12" />
+            <!-- Quick Actions Toolbar -->
+            <DockPanel DockPanel.Dock="Top">
+                <TextBlock DockPanel.Dock="Top"
+                           Text="{res:Loc Dashboard_QuickActions}"
+                           FontSize="16" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                           Margin="0,0,0,6" />
 
-            <WrapPanel>
-                <ui:Button Content="{res:Loc Dashboard_OpenLogFile}"
-                           Icon="{ui:SymbolIcon Document24}"
-                           Margin="0,0,8,8"
-                           Click="OpenLog_Click" />
-                <ui:Button Content="{res:Loc Dashboard_RestartSteam}"
-                           Icon="{ui:SymbolIcon ArrowSync24}"
-                           Margin="0,0,8,8"
-                           Click="RestartSteam_Click" />
-            </WrapPanel>
-        </StackPanel>
+                <WrapPanel>
+                    <!-- Steam Play Green Button -->
+                    <ui:Button Content="{res:Loc Dashboard_RestartSteam}"
+                               Icon="{ui:SymbolIcon ArrowSync24}"
+                               Background="#FF5C7E10"
+                               BorderBrush="#FF75B022"
+                               Foreground="#FFFFFFFF"
+                               FontWeight="SemiBold"
+                               Padding="14,6"
+                               Margin="0,0,8,6"
+                               Cursor="Hand"
+                               Click="RestartSteam_Click" />
+
+                    <ui:Button Content="{res:Loc Nav_Cleanup}"
+                               Icon="{ui:SymbolIcon Delete24}"
+                               Padding="12,6"
+                               Margin="0,0,8,6"
+                               Cursor="Hand"
+                               Click="CleanUpAction_Click" />
+
+                    <ui:Button Content="{res:Loc Nav_Stats}"
+                               Icon="{ui:SymbolIcon Trophy24}"
+                               Padding="12,6"
+                               Margin="0,0,8,6"
+                               Cursor="Hand"
+                               Click="StatsAction_Click" />
+
+                    <ui:Button Content="{res:Loc Nav_Migration}"
+                               Icon="{ui:SymbolIcon ArrowSync24}"
+                               Padding="12,6"
+                               Margin="0,0,8,6"
+                               Cursor="Hand"
+                               Click="MigrationAction_Click" />
+
+                    <!-- Utility Buttons -->
+                    <ui:Button Content="{res:Loc Dashboard_OpenLogFile}"
+                               Icon="{ui:SymbolIcon Document24}"
+                               Padding="12,6"
+                               Margin="0,0,8,6"
+                               Cursor="Hand"
+                               Click="OpenLog_Click" />
+                </WrapPanel>
+            </DockPanel>
+        </DockPanel>
     </ScrollViewer>
 </Page>

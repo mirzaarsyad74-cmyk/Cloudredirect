@@ -1420,6 +1420,9 @@
   <data name="Settings_LanguageSimplifiedChinese" xml:space="preserve">
     <value>简体中文</value>
   </data>
+  <data name="Settings_LanguageMalay" xml:space="preserve">
+    <value>马来语 (Bahasa Melayu)</value>
+  </data>
   <data name="Settings_Sync" xml:space="preserve">
     <value>同步</value>
   </data>
@@ -1976,6 +1979,18 @@
     <value>正在扫描来源提供商...</value>
   </data>
 
+  <data name="Settings_CustomCloudIcon" xml:space="preserve">
+    <value>Steam 云状态图标</value>
+  </data>
+  <data name="Settings_CustomCloudIconHint" xml:space="preserve">
+    <value>仅为 Lua 游戏将 Steam 库云状态图标替换为 CloudRedirect 图标（原版自购游戏保持 Steam 原版图标）。</value>
+  </data>
+  <data name="Settings_CustomCloudIconSuccess" xml:space="preserve">
+    <value>CloudRedirect 图标已成功注入 Steam！请重启 Steam 或在 Steam 库中按 F5 刷新查看。</value>
+  </data>
+  <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
+    <value>Steam 云状态图标已恢复默认。请重启 Steam 或在 Steam 库中按 F5 刷新。</value>
+  </data>
 </root>
 
 

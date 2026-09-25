@@ -12,6 +12,5 @@
     
     <!-- Per-platform revision counters - increment independently for platform hotfixes -->
     <WindowsRevision>1</WindowsRevision>
-    <LinuxRevision>1</LinuxRevision>
   </PropertyGroup>
 </Project>

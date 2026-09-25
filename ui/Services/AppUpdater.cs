@@ -283,4 +283,81 @@ internal static class AppUpdater
             try { if (File.Exists(tempPath)) File.Delete(tempPath); } catch { }
         }
     }
+
+    /// <summary>
+    /// Checks GitHub for a newer cloud_redirect.dll release asset.
+    /// </summary>
+    internal static async Task<(bool UpdateAvailable, byte[]? DllBytes)> CheckRemoteDllAsync(string deployedDllPath)
+    {
+        try
+        {
+            var json = await Http.GetStringAsync(ReleasesApiUrl);
+            using var doc = JsonDocument.Parse(json);
+            var releases = doc.RootElement;
+            if (releases.GetArrayLength() == 0) return (false, null);
+
+            var localVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            if (localVersion == null) return (false, null);
+
+            JsonElement root = default;
+            bool foundCandidate = false;
+            foreach (var rel in releases.EnumerateArray())
+            {
+                if (rel.TryGetProperty("prerelease", out var pr) && pr.ValueKind == JsonValueKind.True) continue;
+                if (rel.TryGetProperty("draft", out var dr) && dr.ValueKind == JsonValueKind.True) continue;
+                var tag = rel.GetProperty("tag_name").GetString() ?? "";
+                if (IsPrereleaseTag(tag)) continue;
+                if (!Version.TryParse(tag.TrimStart('v'), out var rVer) || rVer <= localVersion) continue;
+
+                root = rel;
+                foundCandidate = true;
+                break;
+            }
+
+            if (!foundCandidate || !root.TryGetProperty("assets", out var assets))
+                return (false, null);
+
+            string? dllUrl = null;
+            string? sha256Url = null;
+            foreach (var asset in assets.EnumerateArray())
+            {
+                var name = asset.GetProperty("name").GetString() ?? "";
+                if (name.Equals("cloud_redirect.dll", StringComparison.OrdinalIgnoreCase))
+                    dllUrl = asset.GetProperty("browser_download_url").GetString();
+                else if (name.Equals("cloud_redirect.dll.sha256", StringComparison.OrdinalIgnoreCase))
+                    sha256Url = asset.GetProperty("browser_download_url").GetString();
+            }
+
+            if (dllUrl == null) return (false, null);
+
+            if (sha256Url != null && File.Exists(deployedDllPath))
+            {
+                var remoteHash = (await Http.GetStringAsync(sha256Url)).Trim();
+                if (remoteHash.Length == 64)
+                {
+                    var localHash = ComputeFileSHA256(deployedDllPath);
+                    if (string.Equals(localHash, remoteHash, StringComparison.OrdinalIgnoreCase))
+                        return (false, null);
+                }
+            }
+
+            var bytes = await Http.GetByteArrayAsync(dllUrl);
+            if (bytes == null || bytes.Length == 0) return (false, null);
+
+            if (sha256Url != null)
+            {
+                var remoteHash = (await Http.GetStringAsync(sha256Url)).Trim();
+                using var sha = SHA256.Create();
+                var downloadedHash = Convert.ToHexString(sha.ComputeHash(bytes));
+                if (!string.Equals(downloadedHash, remoteHash, StringComparison.OrdinalIgnoreCase))
+                    return (false, null);
+            }
+
+            return (true, bytes);
+        }
+        catch
+        {
+            return (false, null);
+        }
+    }
 }

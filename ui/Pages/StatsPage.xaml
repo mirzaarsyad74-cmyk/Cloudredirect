@@ -11,8 +11,8 @@
     </Page.Resources>
 
     <Grid>
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
-        <StackPanel MaxWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,16">
+        <StackPanel>
             <Grid Margin="0,0,0,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

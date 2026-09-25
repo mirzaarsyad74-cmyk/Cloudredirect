@@ -3567,27 +3567,29 @@ static void SyncLuaFiles() {
     bool manifestChanged = false;
 
     // Extract cloud luas missing locally; never delete or tombstone.
-    for (auto& [filename, entry] : cloudManifest) {
-        if (!IsValidLuaFilename(filename)) {
-            LOG("[LuaSync] Skipping invalid manifest entry: %s", filename.c_str());
-            continue;
-        }
-        bool onDisk = localByName.count(filename) > 0;
+    if (MetadataSync::syncLuasRestore.load()) {
+        for (auto& [filename, entry] : cloudManifest) {
+            if (!IsValidLuaFilename(filename)) {
+                LOG("[LuaSync] Skipping invalid manifest entry: %s", filename.c_str());
+                continue;
+            }
+            bool onDisk = localByName.count(filename) > 0;
 
-        if (!onDisk) {
-            auto it = cloudFiles.find(filename);
-            if (it != cloudFiles.end()) {
-                std::error_code ec;
-                // Route via Utf8ToPath: create_directories on std::string narrows via ACP internally.
-                std::filesystem::create_directories(FileUtil::Utf8ToPath(luaDir), ec);
-                std::string destPath = luaDir + filename;
-                // Atomic-write so a crash never leaves a partial lua.
-                if (FileUtil::AtomicWriteBinary(destPath, it->second.data(), it->second.size())) {
-                    localByName[filename] = entry.mod;
-                    extracted++;
-                    LOG("[LuaSync] Extracted new lua: %s (%zu bytes)", filename.c_str(), it->second.size());
-                } else {
-                    LOG("[LuaSync] Failed to extract lua %s", filename.c_str());
+            if (!onDisk) {
+                auto it = cloudFiles.find(filename);
+                if (it != cloudFiles.end()) {
+                    std::error_code ec;
+                    // Route via Utf8ToPath: create_directories on std::string narrows via ACP internally.
+                    std::filesystem::create_directories(FileUtil::Utf8ToPath(luaDir), ec);
+                    std::string destPath = luaDir + filename;
+                    // Atomic-write so a crash never leaves a partial lua.
+                    if (FileUtil::AtomicWriteBinary(destPath, it->second.data(), it->second.size())) {
+                        localByName[filename] = entry.mod;
+                        extracted++;
+                        LOG("[LuaSync] Extracted new lua: %s (%zu bytes)", filename.c_str(), it->second.size());
+                    } else {
+                        LOG("[LuaSync] Failed to extract lua %s", filename.c_str());
+                    }
                 }
             }
         }
@@ -3622,17 +3624,19 @@ static void SyncLuaFiles() {
     }
 
     // Propagate local additions up; never remove or tombstone entries.
-    for (auto& [filename, modTime] : localByName) {
-        auto it = cloudManifest.find(filename);
-        if (it == cloudManifest.end()) {
-            cloudManifest[filename] = { modTime, 0 };
-            addedToCloud++;
-            manifestChanged = true;
+    if (MetadataSync::syncLuasBackup.load()) {
+        for (auto& [filename, modTime] : localByName) {
+            auto it = cloudManifest.find(filename);
+            if (it == cloudManifest.end()) {
+                cloudManifest[filename] = { modTime, 0 };
+                addedToCloud++;
+                manifestChanged = true;
+            }
         }
     }
 
-    bool needUpload = manifestChanged || extracted > 0;
-    if (!needUpload && cloudManifest.empty() && !localFiles.empty()) {
+    bool needUpload = MetadataSync::syncLuasBackup.load() && (manifestChanged || extracted > 0);
+    if (MetadataSync::syncLuasBackup.load() && !needUpload && cloudManifest.empty() && !localFiles.empty()) {
         needUpload = true;
         LOG("[LuaSync] Cloud empty, seeding %zu lua files", localFiles.size());
         for (auto& lf : localFiles)
@@ -4663,11 +4667,24 @@ void Init(const std::string& steamPath, bool cloudSaveOnly, CR_NotifyFn notifyCa
                     std::memory_order_relaxed);
         }
 
-        // Lua sync requires SteamTools.
-        if (MetadataSync::steamToolsPresent.load(std::memory_order_relaxed)) {
-            if (cfg["sync_luas"].type == Json::Type::Bool)
-                MetadataSync::syncLuas = cfg["sync_luas"].boolean();
+        // Lua sync
+        if (cfg["sync_luas"].type == Json::Type::Bool) {
+            MetadataSync::syncLuas = cfg["sync_luas"].boolean();
+            LOG("[NS] Lua sync enabled from config: %d", (int)MetadataSync::syncLuas.load());
         }
+        if (cfg["sync_luas_backup"].type == Json::Type::Bool) {
+            MetadataSync::syncLuasBackup = cfg["sync_luas_backup"].boolean();
+        } else {
+            MetadataSync::syncLuasBackup = MetadataSync::syncLuas.load();
+        }
+        if (cfg["sync_luas_restore"].type == Json::Type::Bool) {
+            MetadataSync::syncLuasRestore = cfg["sync_luas_restore"].boolean();
+        } else {
+            MetadataSync::syncLuasRestore = MetadataSync::syncLuas.load();
+        }
+        LOG("[NS] Lua sync gates: backup=%d, restore=%d",
+            MetadataSync::syncLuasBackup.load() ? 1 : 0,
+            MetadataSync::syncLuasRestore.load() ? 1 : 0);
         // Native stats/playtime sync gates. Absent -> keep default (OFF, WIP).
         // When off, the matching native path does not interfere with Steam at all.
         if (cfg["sync_achievements"].type == Json::Type::Bool)
@@ -6984,7 +7001,7 @@ static void ShutdownImpl() {
     }
 
     // Upload current lua state before cloud provider shuts down
-    if (g_syncLuas) UploadLuaOnShutdown();
+    if (g_syncLuas && MetadataSync::syncLuasBackup.load()) UploadLuaOnShutdown();
 
     ShutdownRpcHandlers();
 

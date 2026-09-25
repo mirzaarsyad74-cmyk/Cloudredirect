@@ -20,9 +20,7 @@ public partial class MigrationPage : Page
     private static readonly (string Key, string Label)[] Providers =
     {
         ("gdrive", "Google Drive"),
-        ("onedrive", "OneDrive"),
-        ("r2", "Cloudflare R2"),
-        ("s3", "S3 Compatible"),
+        ("folder", "Local Folder / Mapped Drive"),
     };
 
     private readonly SteamStoreClient _storeClient = SteamStoreClient.Shared;

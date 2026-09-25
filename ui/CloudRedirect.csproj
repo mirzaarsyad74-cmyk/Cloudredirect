@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\Version.props" />
 
@@ -28,9 +28,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="steam_logo3.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="CloudRedirect.Tests\**" />
     <None Remove="CloudRedirect.Tests\**" />
     <EmbeddedResource Remove="CloudRedirect.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cloud_redirect.dll" LogicalName="cloud_redirect.dll" Condition="Exists('Resources\cloud_redirect.dll')" />
+    <EmbeddedResource Include="Resources\cloud_redirect_cli.exe" LogicalName="cloud_redirect_cli.exe" Condition="Exists('Resources\cloud_redirect_cli.exe')" />
   </ItemGroup>
 
   <!-- Copy the C++ DLL into Resources/ and add it as an embedded resource after the
@@ -50,28 +59,10 @@
     <Copy SourceFiles="$(NativeCliSource)" DestinationFiles="$(NativeCliDest)"
           Condition="Exists('$(NativeCliSource)')"
           SkipUnchangedFiles="true" />
-    <ItemGroup Condition="Exists('$(NativeDllDest)')">
-      <EmbeddedResource Include="$(NativeDllDest)" LogicalName="cloud_redirect.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="Exists('$(NativeCliDest)')">
-      <EmbeddedResource Include="$(NativeCliDest)" LogicalName="cloud_redirect_cli.exe" />
-    </ItemGroup>
     <Warning Text="cloud_redirect.dll not found at $(NativeDllSource) — embedded resource will be stale or missing"
              Condition="!Exists('$(NativeDllSource)')" />
     <Warning Text="cloud_redirect_cli.exe not found at $(NativeCliSource) — embedded CLI will be stale or missing"
              Condition="!Exists('$(NativeCliSource)')" />
   </Target>
-
-  <!-- 32-bit Steam Cloud manager tool + its steam_api.dll, EMBEDDED into the
-       single-file exe so we ship one file only. They are extracted side by side
-       to a temp dir on demand (see EmbeddedCloud760) and the 64-bit UI spawns the
-       32-bit tool from there. This is the same steam_api.dll that
-       SteamCloudFileManagerLite ships. -->
-  <ItemGroup>
-    <None Remove="native\cloud760_tool.exe" />
-    <None Remove="native\steam_api.dll" />
-    <EmbeddedResource Include="native\cloud760_tool.exe" LogicalName="cloud760_tool.exe" />
-    <EmbeddedResource Include="native\steam_api.dll" LogicalName="steam_api.dll" />
-  </ItemGroup>
 
 </Project>

@@ -11,6 +11,8 @@ namespace CloudRedirect.Pages;
 public partial class DashboardPage : Page
 {
     private string? _steamPath;
+    private System.Windows.Threading.DispatcherTimer? _autoRefreshTimer;
+    private bool _isLoadingStatus;
 
     public void HideDllUpdateBanner()
     {
@@ -22,20 +24,86 @@ public partial class DashboardPage : Page
         InitializeComponent();
         Loaded += async (_, _) =>
         {
+            Services.SaveUploadWatcherService.Start();
+            Services.SaveUploadWatcherService.OnSaveActivity += HandleSaveActivity;
+
             try { await LoadStatusAsync(); }
             catch { }
 
-            // Give the app-level update check time to finish, then hide the
-            // DLL banner if a full app update is available (avoids two banners).
-            await Task.Delay(3000);
-            if (Window.GetWindow(this) is MainWindow mw && mw.AppUpdateAvailable)
-                UpdateBanner.Visibility = Visibility.Collapsed;
+            _autoRefreshTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(10)
+            };
+            _autoRefreshTimer.Tick += async (_, _) =>
+            {
+                try { await LoadStatusAsync(); }
+                catch { }
+            };
+            _autoRefreshTimer.Start();
         };
+
+        Unloaded += (_, _) =>
+        {
+            Services.SaveUploadWatcherService.OnSaveActivity -= HandleSaveActivity;
+            _autoRefreshTimer?.Stop();
+            _autoRefreshTimer = null;
+        };
+    }
+
+    private void HandleSaveActivity(Services.SaveUploadEvent ev)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            string gameDisplay = ev.AppId > 0
+                ? $"{ev.GameName} (AppID: {ev.AppId})"
+                : ev.GameName;
+
+            if (ev.IsUploading)
+            {
+                ActivityTitle.Text = $"Auto-Saving: {gameDisplay}";
+                ActivityDetail.Text = ev.Bytes > 0
+                    ? $"Uploading {ev.FileName} ({ev.Bytes:N0} bytes) to cloud..."
+                    : "Uploading save data to cloud...";
+                ActivityProgressBar.Visibility = Visibility.Visible;
+                ActivityStatusBadge.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x1B, 0x33, 0x47));
+                ActivityStatusBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x1A, 0x9F, 0xFF));
+                ActivityStatusText.Text = "Uploading...";
+                ActivityStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x66, 0xC0, 0xF4));
+                ActivityIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.ArrowSync24;
+                ActivityIcon.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x1A, 0x9F, 0xFF));
+            }
+            else
+            {
+                ActivityTitle.Text = $"Last Cloud Backup: {gameDisplay}";
+                ActivityDetail.Text = ev.Bytes > 0
+                    ? $"{ev.FileName} ({ev.Bytes:N0} bytes) backed up at {ev.Timestamp:t}"
+                    : $"Save data backed up at {ev.Timestamp:t}";
+                ActivityProgressBar.Visibility = Visibility.Collapsed;
+                ActivityStatusBadge.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x18, 0x33, 0x21));
+                ActivityStatusBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x4C, 0x75, 0x15));
+                ActivityStatusText.Text = "Synchronized";
+                ActivityStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
+                ActivityIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.Checkmark24;
+                ActivityIcon.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
+            }
+        });
     }
 
     // M16: Gather data off the UI thread, update controls on dispatcher
     private async Task LoadStatusAsync()
     {
+        if (_isLoadingStatus) return;
+        _isLoadingStatus = true;
+        try
+        {
         var data = await Task.Run(() =>
         {
             var steamPath = Services.SteamDetector.FindSteamPath();
@@ -44,6 +112,9 @@ public partial class DashboardPage : Page
             Services.CloudConfig config = null;
             int appCount = 0;
             Services.TokenStatus tokenStatus = null;
+            int localLuas = 0;
+            int cloudLuas = 0;
+            Services.LastBackupInfo? lastBackup = null;
 
             if (steamPath != null)
             {
@@ -61,12 +132,17 @@ public partial class DashboardPage : Page
                 }
 
                 // M9: Check OAuth token status off the UI thread (DPAPI + file I/O).
-                // R2/S3 use static credentials, not OAuth tokens.
                 if (config?.TokenPath != null && config.Provider is not "r2" and not "s3")
                     tokenStatus = Services.OAuthService.CheckTokenStatus(config.TokenPath);
+
+                var luaCounts = Services.SteamDetector.CountLuaFiles(steamPath);
+                localLuas = luaCounts.LocalCount;
+                cloudLuas = luaCounts.CloudCount;
+
+                lastBackup = Services.SteamDetector.GetLastBackupInfo(steamPath);
             }
 
-            return (steamPath, dllExists, dllCurrent, config, appCount, tokenStatus);
+            return (steamPath, dllExists, dllCurrent, config, appCount, tokenStatus, localLuas, cloudLuas, lastBackup);
         });
 
         _steamPath = data.steamPath;
@@ -76,27 +152,54 @@ public partial class DashboardPage : Page
 
         if (data.steamPath != null)
         {
-            if (!data.dllExists)
+            if (!data.dllExists || data.dllCurrent == false)
             {
-                DllStatus.Text = S.Get("Dashboard_DllNotInstalled");
-                DllIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.PlugDisconnected24;
+                // Auto-apply update immediately
+                var destPath = Path.Combine(data.steamPath, "cloud_redirect.dll");
+                Services.EmbeddedDll.DeployTo(destPath);
             }
-            else if (data.dllCurrent == false)
-            {
-                DllStatus.Text = S.Get("Dashboard_DllInstalledUpdateAvailable");
-                DllIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.ArrowSync24;
-                UpdateBanner.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                DllStatus.Text = S.Get("Dashboard_DllInstalled");
-                DllIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.PlugConnected24;
-            }
+
+            DllStatus.Text = S.Get("Dashboard_DllInstalled");
+            DllIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.PlugConnected24;
+            UpdateBanner.Visibility = Visibility.Collapsed;
 
             if (data.config != null)
                 UpdateProviderAuthStatus(data.config, data.tokenStatus);
 
             AppCount.Text = S.Format("Dashboard_AppCountFormat", data.appCount);
+
+            LuaFilesCount.Text = $"{data.localLuas} Local • {data.cloudLuas} Cloud";
+            LuaFilesDetail.Text = data.localLuas > 0
+                ? $"{data.localLuas} Lua addon scripts found in stplug-in"
+                : "No local Lua addons found in stplug-in";
+
+            // Update top activity banner with last backed up game & AppID
+            if (data.lastBackup != null)
+            {
+                ActivityTitle.Text = $"Last Cloud Backup: {data.lastBackup.GameName} (AppID: {data.lastBackup.AppId})";
+                var timeStr = data.lastBackup.BackupTime.Date == DateTime.Today
+                    ? data.lastBackup.BackupTime.ToString("t")
+                    : data.lastBackup.BackupTime.ToString("g");
+                ActivityDetail.Text = data.lastBackup.TotalBytes > 0
+                    ? $"{data.lastBackup.FileCount} save file(s) ({Services.FileUtils.FormatSize(data.lastBackup.TotalBytes)}) backed up at {timeStr}"
+                    : $"{data.lastBackup.FileCount} save file(s) backed up at {timeStr}";
+                ActivityStatusBadge.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x18, 0x33, 0x21));
+                ActivityStatusBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0x4C, 0x75, 0x15));
+                ActivityStatusText.Text = "Synchronized";
+                ActivityStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
+                ActivityIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.Checkmark24;
+                ActivityIcon.Foreground = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
+                ActivityProgressBar.Visibility = Visibility.Collapsed;
+            }
+        }
+        }
+        finally
+        {
+            _isLoadingStatus = false;
         }
     }
 
@@ -375,5 +478,95 @@ public partial class DashboardPage : Page
             await Services.Dialog.ShowErrorAsync(S.Get("Common_Error"), S.Format("Dashboard_FailedUpdateDll", ex.Message));
             UpdateBanner.Visibility = Visibility.Visible;
         }
+    }
+
+    private async void LuaBackupManual_Click(object sender, RoutedEventArgs e)
+    {
+        if (_steamPath == null) return;
+        var btn = sender as Wpf.Ui.Controls.Button;
+        if (btn != null) btn.IsEnabled = false;
+
+        try
+        {
+            var result = await Task.Run(() => Services.LuaSyncHelper.ManualBackup(_steamPath));
+            if (result.Success)
+            {
+                await Services.Dialog.ShowInfoAsync("Lua Backup Successful",
+                    $"Successfully backed up {result.FileCount} Lua script(s) to cloud storage.\nTimestamp: {DateTime.Now:t}");
+            }
+            else
+            {
+                await Services.Dialog.ShowWarningAsync("Lua Backup", result.Message);
+            }
+            await LoadStatusAsync();
+        }
+        catch (Exception ex)
+        {
+            await Services.Dialog.ShowErrorAsync("Lua Backup Failed", ex.Message);
+        }
+        finally
+        {
+            if (btn != null) btn.IsEnabled = true;
+        }
+    }
+
+    private async void LuaRestoreManual_Click(object sender, RoutedEventArgs e)
+    {
+        if (_steamPath == null) return;
+        var btn = sender as Wpf.Ui.Controls.Button;
+        if (btn != null) btn.IsEnabled = false;
+
+        try
+        {
+            var result = await Task.Run(() => Services.LuaSyncHelper.ManualRestore(_steamPath));
+            if (result.Success)
+            {
+                await Services.Dialog.ShowInfoAsync("Lua Restore Successful",
+                    $"Successfully restored {result.FileCount} Lua script(s) to config/stplug-in.\nTimestamp: {DateTime.Now:t}");
+            }
+            else
+            {
+                await Services.Dialog.ShowWarningAsync("Lua Restore", result.Message);
+            }
+            await LoadStatusAsync();
+        }
+        catch (Exception ex)
+        {
+            await Services.Dialog.ShowErrorAsync("Lua Restore Failed", ex.Message);
+        }
+        finally
+        {
+            if (btn != null) btn.IsEnabled = true;
+        }
+    }
+
+    private void CloudProviderCard_Click(object sender, RoutedEventArgs e)
+    {
+        (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.CloudProviderPage));
+    }
+
+    private void AppsSyncingCard_Click(object sender, RoutedEventArgs e)
+    {
+        (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.AppsPage));
+    }
+
+    private void CleanUpAction_Click(object sender, RoutedEventArgs e)
+    {
+        (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.CleanupPage));
+    }
+
+    private void StatsAction_Click(object sender, RoutedEventArgs e)
+    {
+        (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.StatsPage));
+    }
+
+    private void MigrationAction_Click(object sender, RoutedEventArgs e)
+    {
+        (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.MigrationPage));
+    }
+
+    private void SettingsAction_Click(object sender, RoutedEventArgs e)
+    {
+        (Application.Current.MainWindow as MainWindow)?.NavigateTo(typeof(Pages.SettingsPage));
     }
 }

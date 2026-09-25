@@ -9,9 +9,60 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:UrlToImageSourceConverter x:Key="UrlToImageSource" />
 
+        <!-- Subtle delete button that only turns red on hover -->
+        <Style x:Key="SubtleDeleteButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#55687D" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#381B1D" />
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#8A2528" />
+                                <Setter Property="Foreground" Value="#FF6B6E" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#521F22" />
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#B3363B" />
+                                <Setter Property="Foreground" Value="#FFA4A7" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Steam game card container style with subtle border & hover glow -->
+        <Style x:Key="GameCardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SteamBgCardBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SteamBorderSubtleBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,9" />
+            <Setter Property="MinHeight" Value="72" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource SteamBorderHighlightBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource SteamBgCardSecondaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- Card list items: no ListBox selection/hover chrome, stretch wide. -->
         <Style x:Key="CardItemStyle" TargetType="ListBoxItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="Background" Value="Transparent" />
@@ -31,13 +82,28 @@
          rest and owns the only scrollbar. Pixel scroll keeps the mouse wheel
          working over cards while still UI-virtualizing (only visible cards are
          realized / images decoded), which kills the navigate-to-Apps lag. -->
-    <DockPanel Margin="24" MaxWidth="800" HorizontalAlignment="Left">
+    <DockPanel Margin="24">
 
-        <TextBlock DockPanel.Dock="Top"
-                   Text="{res:Loc Apps_Title}"
-                   FontSize="28" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                   Margin="0,0,0,8" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
+            <TextBlock Text="{res:Loc Apps_Title}"
+                       FontSize="28" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                       Margin="0,0,12,0" />
+            <Border Background="#121A24"
+                    BorderBrush="#253548"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="8,3"
+                    VerticalAlignment="Center">
+                <TextBlock x:Name="AppVersionText"
+                           Text="v2.6.5"
+                           FontFamily="Cascadia Code,Consolas,Courier New"
+                           FontSize="12"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource SteamAccentCyanBrush}"
+                           VerticalAlignment="Center" />
+            </Border>
+        </StackPanel>
 
         <TextBlock DockPanel.Dock="Top"
                    Text="{res:Loc Apps_Description}"
@@ -77,67 +143,137 @@
                          Padding="0"
                          ItemContainerStyle="{StaticResource CardItemStyle}"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ScrollViewer.CanContentScroll="True"
-                         VirtualizingPanel.IsVirtualizing="True"
-                         VirtualizingPanel.VirtualizationMode="Recycling"
-                         VirtualizingPanel.ScrollUnit="Pixel">
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.CanContentScroll="False"
+                         SizeChanged="AppList_SizeChanged">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Loaded="AppsWrapPanel_Loaded"
+                                       Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="0,0,0,8">
-                                <ui:CardControl>
-                                    <ui:CardControl.Header>
-                                        <Grid>
+                            <Grid Margin="4">
+                                <Border Style="{StaticResource GameCardBorderStyle}">
+                                    <StackPanel>
+                                        <Grid Height="52">
                                             <Grid.ColumnDefinitions>
+                                                <!-- Game Header Artwork -->
                                                 <ColumnDefinition Width="Auto" />
+                                                <!-- Title & Structured Info -->
                                                 <ColumnDefinition Width="*" />
+                                                <!-- Delete / Action Buttons -->
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
+                                            <!-- Game Header Artwork -->
                                             <Border Grid.Column="0"
-                                                    Width="92" Height="43"
+                                                    Width="104" Height="48"
                                                     CornerRadius="4"
-                                                    Margin="0,0,12,0"
+                                                    Margin="0,0,10,0"
                                                     VerticalAlignment="Center"
+                                                    Background="#121922"
+                                                    BorderBrush="#253548"
+                                                    BorderThickness="1"
                                                     ClipToBounds="True">
-                                                <Border.Background>
-                                                    <ImageBrush ImageSource="{Binding HeaderUrl, Converter={StaticResource UrlToImageSource}}"
-                                                                Stretch="UniformToFill"
-                                                                RenderOptions.BitmapScalingMode="HighQuality" />
-                                                </Border.Background>
+                                                <Grid>
+                                                    <ui:SymbolIcon Symbol="Games24"
+                                                                   FontSize="20"
+                                                                   Foreground="#223344"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center" />
+                                                    <Border>
+                                                        <Border.Background>
+                                                            <ImageBrush ImageSource="{Binding HeaderUrl, Converter={StaticResource UrlToImageSource}}"
+                                                                        Stretch="UniformToFill"
+                                                                        RenderOptions.BitmapScalingMode="HighQuality" />
+                                                        </Border.Background>
+                                                    </Border>
+                                                </Grid>
                                             </Border>
 
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding DisplayName}"
-                                                           FontSize="15" FontWeight="SemiBold"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                           TextTrimming="CharacterEllipsis" />
-                                                <WrapPanel Margin="0,3,0,0">
-                                                    <TextBlock Text="{Binding AppId}"
-                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                               FontSize="12"
-                                                               Margin="0,0,12,0" />
-                                                    <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                               FontSize="12"
-                                                               Margin="0,0,12,0">
-                                                        <Run Text="{Binding FileCount, Mode=OneWay}" />
-                                                        <Run Text="{res:Loc Apps_Files}" />
-                                                    </TextBlock>
-                                                    <TextBlock Text="{Binding TotalSize}"
-                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                               FontSize="12"
-                                                               Margin="0,0,12,0" />
-                                                    <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                               FontSize="12"
-                                                               Margin="0,0,12,0">
-                                                        <Run Text="{res:Loc Apps_ChangeNumber}" />
-                                                        <Run Text="{Binding ChangeNumber, Mode=OneWay}" />
-                                                    </TextBlock>
-                                                    <TextBlock Text="{Binding RootTokens}"
-                                                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                                               FontSize="12" />
-                                                </WrapPanel>
-                                            </StackPanel>
+                                            <!-- Middle: Title + Badges (Single Row, Never Wraps) -->
+                                            <Grid Grid.Column="1" VerticalAlignment="Center" Margin="0,0,6,0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
 
+                                                <!-- Line 1: Title -->
+                                                <TextBlock Grid.Row="0"
+                                                           Text="{Binding DisplayName}"
+                                                           FontSize="13.5" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource SteamTextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Margin="0,0,0,4" />
+
+                                                <!-- Line 2: Fixed Single-Line Badges -->
+                                                <Grid Grid.Row="1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- AppID Pill -->
+                                                    <Border Grid.Column="0"
+                                                            Background="#121A24"
+                                                            BorderBrush="#233246"
+                                                            BorderThickness="1"
+                                                            CornerRadius="3"
+                                                            Padding="5,1"
+                                                            Margin="0,0,6,0">
+                                                        <TextBlock Text="{Binding AppId}"
+                                                                   FontFamily="Cascadia Code,Consolas,Courier New"
+                                                                   FontSize="10.5"
+                                                                   Foreground="#8F98A0"
+                                                                   VerticalAlignment="Center" />
+                                                    </Border>
+
+                                                    <!-- Files & Size Pill (Trims cleanly if space is tight) -->
+                                                    <Border Grid.Column="1"
+                                                            Background="#121A24"
+                                                            BorderBrush="#233246"
+                                                            BorderThickness="1"
+                                                            CornerRadius="3"
+                                                            Padding="6,1"
+                                                            Margin="0,0,6,0">
+                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <ui:SymbolIcon Symbol="Cloud20"
+                                                                           FontSize="11"
+                                                                           Foreground="{DynamicResource SteamAccentCyanBrush}"
+                                                                           Margin="0,0,4,0"
+                                                                           VerticalAlignment="Center" />
+                                                            <TextBlock FontSize="10.5"
+                                                                       Foreground="#C6D4DF"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center">
+                                                                <Run Text="{Binding FileCount, Mode=OneWay}" />
+                                                                <Run Text=" " />
+                                                                <Run Text="{res:Loc Apps_Files}" />
+                                                                <Run Text="  •  " Foreground="#41556C" />
+                                                                <Run Text="{Binding TotalSize}" />
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Change Number Pill -->
+                                                    <Border Grid.Column="2"
+                                                            Background="#121A24"
+                                                            BorderBrush="#233246"
+                                                            BorderThickness="1"
+                                                            CornerRadius="3"
+                                                            Padding="5,1">
+                                                        <TextBlock FontSize="10.5" Foreground="#8F98A0" VerticalAlignment="Center">
+                                                            <Run Text="{res:Loc Apps_ChangeNumber}" Foreground="#55697E" />
+                                                            <Run Text="{Binding ChangeNumber, Mode=OneWay}" />
+                                                        </TextBlock>
+                                                    </Border>
+                                                </Grid>
+                                            </Grid>
+
+                                            <!-- Actions: Orphans & Delete -->
                                             <StackPanel Grid.Column="2"
                                                         Orientation="Horizontal"
                                                         VerticalAlignment="Center">
@@ -146,63 +282,63 @@
                                                            VerticalAlignment="Center"
                                                            Click="OrphansToggle_Click"
                                                            Visibility="{Binding HasOrphans, Converter={StaticResource BoolToVis}}"
-                                                           Margin="0,0,8,0" />
+                                                           Margin="0,0,6,0" />
                                                 <Button Click="DeleteApp_Click"
                                                         ToolTip="{res:Loc Apps_DeleteTooltip}"
-                                                        Padding="8,6"
-                                                        Margin="4,0,0,0"
-                                                        Background="Transparent"
-                                                        BorderBrush="Transparent">
+                                                        Width="30" Height="30"
+                                                        Cursor="Hand"
+                                                        Style="{StaticResource SubtleDeleteButtonStyle}">
                                                     <ui:SymbolIcon Symbol="Delete24"
-                                                                   FontSize="18"
-                                                                   Foreground="#E74C3C" />
+                                                                   FontSize="16" />
                                                 </Button>
                                             </StackPanel>
                                         </Grid>
-                                    </ui:CardControl.Header>
-                                </ui:CardControl>
 
-                                <!--
-                                    Detail panel is a sibling of the CardControl, not a child,
-                                    so it inherits the ItemsControl's full horizontal bounds.
-                                    The symmetric 16px left/right margin keeps content inside
-                                    the card's visual footprint; without a right margin the
-                                    Prune button pokes past the card's right edge and, when
-                                    the page's vertical scrollbar appears, past the viewport.
-                                -->
-                                <StackPanel Visibility="{Binding OrphansDetailVisibility}"
-                                            Margin="16,8,16,0">
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding OrphanSummary}"
-                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                   VerticalAlignment="Center" />
-                                        <ui:Button Grid.Column="1"
-                                                   Content="{res:Loc Apps_PruneAll}"
-                                                   Icon="{ui:SymbolIcon Delete24}"
-                                                   Appearance="Danger"
-                                                   Click="PruneOrphans_Click" />
-                                    </Grid>
-                                    <ItemsControl ItemsSource="{Binding OrphanFilesPreview}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding}"
-                                                           FontFamily="Cascadia Code,Consolas,Courier New"
-                                                           FontSize="12"
-                                                           Margin="0,1"
-                                                           TextTrimming="CharacterEllipsis"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                 </StackPanel>
-                             </StackPanel>
-                          </DataTemplate>
-                      </ListBox.ItemTemplate>
+                                        <!-- Orphans Detail Panel -->
+                                        <Border Visibility="{Binding OrphansDetailVisibility}"
+                                                Margin="0,8,0,0"
+                                                Padding="10,8"
+                                                Background="#121820"
+                                                BorderBrush="#253548"
+                                                BorderThickness="1"
+                                                CornerRadius="4">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="{Binding OrphanSummary}"
+                                                               Foreground="{DynamicResource SteamTextSecondaryBrush}"
+                                                               FontSize="11.5"
+                                                               VerticalAlignment="Center" />
+                                                    <ui:Button Grid.Column="1"
+                                                               Content="{res:Loc Apps_PruneAll}"
+                                                               Icon="{ui:SymbolIcon Delete24}"
+                                                               Appearance="Danger"
+                                                               Padding="8,4"
+                                                               Click="PruneOrphans_Click" />
+                                                </Grid>
+                                                <ItemsControl ItemsSource="{Binding OrphanFilesPreview}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}"
+                                                                       FontFamily="Cascadia Code,Consolas,Courier New"
+                                                                       FontSize="11"
+                                                                       Margin="0,1"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       Foreground="{DynamicResource SteamTextPrimaryBrush}" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
 
             </DockPanel>

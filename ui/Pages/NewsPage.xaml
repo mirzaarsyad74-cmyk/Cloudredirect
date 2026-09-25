@@ -10,10 +10,10 @@
 
             <Border x:Name="UpdateBanner"
                     Visibility="Collapsed"
-                    Background="#332F7A2F"
-                    BorderBrush="#FF6A9F42"
+                    Background="#261A2B15"
+                    BorderBrush="#FF5C7E10"
                     BorderThickness="1"
-                    CornerRadius="8"
+                    CornerRadius="6"
                     Padding="16"
                     Margin="0,0,0,16">
                 <DockPanel>

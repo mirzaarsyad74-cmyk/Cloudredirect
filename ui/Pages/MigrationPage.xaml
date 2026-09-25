@@ -27,8 +27,8 @@
         </Style>
     </Page.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
-        <StackPanel MaxWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,16">
+        <StackPanel>
 
             <TextBlock Text="{res:Loc Migration_Title}"
                        FontSize="28" FontWeight="SemiBold"

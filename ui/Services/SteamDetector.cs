@@ -314,7 +314,266 @@ public static class SteamDetector
             return null;
         }
     }
+
+    /// <summary>
+    /// Counts local Lua files in config/stplug-in/*.lua and cloud-synced Lua files from .sync_state / LuaManifest.json.
+    /// </summary>
+    public static (int LocalCount, int CloudCount) CountLuaFiles(string? steamPath)
+    {
+        if (string.IsNullOrEmpty(steamPath) || !Directory.Exists(steamPath))
+            return (0, 0);
+
+        int localCount = 0;
+        int cloudCount = 0;
+
+        try
+        {
+            var luaDir = Path.Combine(steamPath, "config", "stplug-in");
+            if (Directory.Exists(luaDir))
+            {
+                localCount = Directory.GetFiles(luaDir, "*.lua").Length;
+
+                var syncStatePath = Path.Combine(luaDir, ".sync_state");
+                if (File.Exists(syncStatePath))
+                {
+                    var lines = File.ReadAllLines(syncStatePath);
+                    // First line is timestamp; subsequent lines are filenames
+                    cloudCount = System.Math.Max(0, lines.Length - 1);
+                }
+            }
+
+            // If .sync_state wasn't found or was 0, check LuaManifest.json in local cloud storage cache
+            if (cloudCount == 0)
+            {
+                var storageDir = Path.Combine(steamPath, "cloud_redirect", "storage");
+                if (Directory.Exists(storageDir))
+                {
+                    foreach (var accountDir in Directory.GetDirectories(storageDir))
+                    {
+                        var manifestPath = Path.Combine(accountDir, "0", "LuaManifest.json");
+                        if (File.Exists(manifestPath))
+                        {
+                            try
+                            {
+                                var json = File.ReadAllText(manifestPath);
+                                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                                int active = 0;
+                                foreach (var prop in doc.RootElement.EnumerateObject())
+                                {
+                                    bool isDel = prop.Value.TryGetProperty("del", out var d) && d.GetInt64() > 0;
+                                    if (!isDel) active++;
+                                }
+                                if (active > cloudCount) cloudCount = active;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
+        }
+        catch { }
+
+        return (localCount, cloudCount);
+    }
+
+    /// <summary>
+    /// Reads Lua sync configuration (sync_luas, sync_luas_backup, sync_luas_restore).
+    /// </summary>
+    public static (bool SyncLuas, bool SyncBackup, bool SyncRestore) ReadLuaSyncConfig()
+    {
+        try
+        {
+            var configPath = GetConfigFilePath();
+            if (!File.Exists(configPath)) return (true, true, true);
+            var json = File.ReadAllText(configPath);
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            bool syncLuas = !root.TryGetProperty("sync_luas", out var sl) || sl.ValueKind != System.Text.Json.JsonValueKind.False;
+            bool backup = !root.TryGetProperty("sync_luas_backup", out var b) || b.ValueKind != System.Text.Json.JsonValueKind.False;
+            bool restore = !root.TryGetProperty("sync_luas_restore", out var r) || r.ValueKind != System.Text.Json.JsonValueKind.False;
+            return (syncLuas, backup, restore);
+        }
+        catch
+        {
+            return (true, true, true);
+        }
+    }
+
+    /// <summary>
+    /// Saves Lua sync configuration (sync_luas, sync_luas_backup, sync_luas_restore).
+    /// </summary>
+    public static void SaveLuaSyncConfig(bool backup, bool restore)
+    {
+        try
+        {
+            var configPath = GetConfigFilePath();
+            bool syncLuas = backup || restore;
+            ConfigHelper.SaveConfig(configPath,
+                new[] { "sync_luas", "sync_luas_backup", "sync_luas_restore" },
+                writer =>
+                {
+                    writer.WriteBoolean("sync_luas", syncLuas);
+                    writer.WriteBoolean("sync_luas_backup", backup);
+                    writer.WriteBoolean("sync_luas_restore", restore);
+                });
+        }
+        catch { }
+    }
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<uint, string> _appNameCache = new();
+
+    /// <summary>
+    /// Gets the friendly game name for an AppID by reading appmanifest_<AppID>.acf in Steam libraries.
+    /// Falls back to AppID if not found locally.
+    /// </summary>
+    public static string GetGameName(string? steamPath, uint appId)
+    {
+        if (appId == 0) return "General Save Data";
+        if (_appNameCache.TryGetValue(appId, out var cached))
+            return cached;
+
+        if (!string.IsNullOrEmpty(steamPath) && Directory.Exists(steamPath))
+        {
+            var libraryPaths = GetLibraryFolderPaths(steamPath);
+            foreach (var libPath in libraryPaths)
+            {
+                var manifestPath = Path.Combine(libPath, "steamapps", $"appmanifest_{appId}.acf");
+                if (File.Exists(manifestPath))
+                {
+                    try
+                    {
+                        foreach (var line in File.ReadLines(manifestPath))
+                        {
+                            var trimmed = line.Trim();
+                            if (trimmed.StartsWith("\"name\"", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var parts = trimmed.Split('"');
+                                if (parts.Length >= 4 && !string.IsNullOrWhiteSpace(parts[3]))
+                                {
+                                    var name = parts[3].Trim();
+                                    _appNameCache[appId] = name;
+                                    return name;
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
+
+        var fallback = $"App {appId}";
+        _appNameCache[appId] = fallback;
+        return fallback;
+    }
+
+    private static List<string> GetLibraryFolderPaths(string steamPath)
+    {
+        var paths = new List<string> { steamPath };
+        var vdfPath = Path.Combine(steamPath, "config", "libraryfolders.vdf");
+        if (!File.Exists(vdfPath)) return paths;
+
+        try
+        {
+            foreach (var line in File.ReadLines(vdfPath))
+            {
+                var trimmed = line.Trim();
+                if (!trimmed.StartsWith("\"path\"", StringComparison.OrdinalIgnoreCase)) continue;
+
+                var parts = trimmed.Split('"');
+                if (parts.Length >= 4)
+                {
+                    var p = parts[3].Replace("\\\\", "\\");
+                    if (Directory.Exists(p) && !paths.Contains(p, StringComparer.OrdinalIgnoreCase))
+                        paths.Add(p);
+                }
+            }
+        }
+        catch { }
+        return paths;
+    }
+
+    /// <summary>
+    /// Scans cloud_redirect/storage to discover the most recently backed up game, its AppID, and stats.
+    /// </summary>
+    public static LastBackupInfo? GetLastBackupInfo(string? steamPath)
+    {
+        if (string.IsNullOrEmpty(steamPath) || !Directory.Exists(steamPath))
+            return null;
+
+        var storageDir = Path.Combine(steamPath, "cloud_redirect", "storage");
+        if (!Directory.Exists(storageDir))
+            return null;
+
+        uint latestAppId = 0;
+        DateTime latestTime = DateTime.MinValue;
+        string? latestAppDir = null;
+
+        try
+        {
+            foreach (var accountDir in Directory.GetDirectories(storageDir))
+            {
+                foreach (var appDir in Directory.GetDirectories(accountDir))
+                {
+                    var folderName = Path.GetFileName(appDir);
+                    if (folderName == "0" || !uint.TryParse(folderName, out var appId))
+                        continue;
+
+                    // Determine newest modification in app folder
+                    DateTime appTime = Directory.GetLastWriteTime(appDir);
+                    var cnFile = Path.Combine(appDir, "cn.cloudredirect");
+                    if (File.Exists(cnFile))
+                    {
+                        var cnTime = File.GetLastWriteTime(cnFile);
+                        if (cnTime > appTime) appTime = cnTime;
+                    }
+
+                    if (appTime > latestTime)
+                    {
+                        latestTime = appTime;
+                        latestAppId = appId;
+                        latestAppDir = appDir;
+                    }
+                }
+            }
+
+            if (latestAppId == 0 || latestAppDir == null)
+                return null;
+
+            int fileCount = 0;
+            long totalBytes = 0;
+            string? firstSaveName = null;
+
+            var files = Directory.GetFiles(latestAppDir, "*", SearchOption.AllDirectories);
+            foreach (var f in files)
+            {
+                var fname = Path.GetFileName(f);
+                if (fname is "cn.cloudredirect" or "cn.dat" or "state.cloudredirect" or "manifest.cloudredirect" or "root_token.dat")
+                    continue;
+
+                fileCount++;
+                var fi = new FileInfo(f);
+                totalBytes += fi.Length;
+                firstSaveName ??= fname;
+            }
+
+            var gameName = GetGameName(steamPath, latestAppId);
+            return new LastBackupInfo(latestAppId, gameName, latestTime, fileCount, totalBytes, firstSaveName);
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }
+
+public sealed record LastBackupInfo(
+    uint AppId,
+    string GameName,
+    DateTime BackupTime,
+    int FileCount,
+    long TotalBytes,
+    string? PrimaryFileName);
 
 /// <summary>
 /// Parsed contents of cloud_redirect/config.json.

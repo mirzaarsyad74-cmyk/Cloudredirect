@@ -97,9 +97,7 @@ public partial class CloudProviderPage : Page
         if (snap.Config == null)
         {
             AuthStatus.Text = S.Get("CloudProvider_NoConfigFound");
-            ProviderCombo.SelectedIndex = 2; // Folder / Mapped Drive (default local path)
-            if (!string.IsNullOrEmpty(snap.DefaultLocalPath))
-                TokenPathBox.Text = snap.DefaultLocalPath;
+            ProviderCombo.SelectedIndex = 0; // Google Drive (default)
             UpdateProviderUI();
             return;
         }

@@ -1712,6 +1712,9 @@ Esto puede causar pérdida de datos en algunos casos.
   <data name="Settings_LanguageSimplifiedChinese" xml:space="preserve">
     <value>简体中文</value>
   </data>
+  <data name="Settings_LanguageMalay" xml:space="preserve">
+    <value>Malayo (Bahasa Melayu)</value>
+  </data>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- News Page                                                           -->
@@ -1949,5 +1952,17 @@ Esto puede causar pérdida de datos en algunos casos.
   </data>
   <data name="Migration_ScanningSource" xml:space="preserve">
     <value>Escaneando proveedor de origen...</value>
+  </data>
+  <data name="Settings_CustomCloudIcon" xml:space="preserve">
+    <value>Icono de estado de Steam Cloud</value>
+  </data>
+  <data name="Settings_CustomCloudIconHint" xml:space="preserve">
+    <value>Reemplaza el icono de estado de la nube de Steam con el de CloudRedirect solo para juegos Lua (los juegos propios originales conservan el icono predeterminado).</value>
+  </data>
+  <data name="Settings_CustomCloudIconSuccess" xml:space="preserve">
+    <value>¡Icono de CloudRedirect inyectado en Steam! Reinicie Steam o presione F5 en la Biblioteca de Steam para ver el icono actualizado.</value>
+  </data>
+  <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
+    <value>Icono de estado de Steam Cloud restaurado a los valores predeterminados. Reinicie Steam o presione F5 en la Biblioteca de Steam.</value>
   </data>
 </root>

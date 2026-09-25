@@ -41,6 +41,14 @@ std::string CmdSyncAllRemoteApps(const std::string& provider, const std::string&
 std::string CmdPruneLocalLegacyMetadata(const std::string& cloudRoot);
 std::string CmdPublishFullManifest(const std::string& provider, const std::string& accountId, const std::string& appId,
                                    const std::string& cloudRoot);
+std::string CmdSaveUpload(const std::string& provider, const std::string& accountId,
+                          const std::string& appId, const std::string& gameName,
+                          const std::string& sourceDirectory);
+std::string CmdSaveDownload(const std::string& provider, const std::string& accountId,
+                            const std::string& appId, const std::string& gameName,
+                            const std::string& outputDirectory);
+std::string CmdSaveList(const std::string& provider, const std::string& accountId,
+                        const std::string& appId, const std::string& gameName);
 
 } // namespace CloudRedirectCli
 

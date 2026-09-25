@@ -30,8 +30,6 @@ CloudRedirect for Windows consists of a C++ DLL and a WPF companion app:
 2. The DLL hooks Steam's internal cloud save RPC handlers via ~~vtable interception~~ black magic.
 3. When a lua game attempts to read or write cloud save data, the DLL intercepts the calls and redirects it. If the game is owned, the game uses normal Steam Cloud as expected. If a lua is present that only unlocks DLC, the game will use normal Steam Cloud.
 4. More dark magic occurs. Saves sync. Bytes flow. This all is visible in the Steam UI and looks identical to normal Steam Cloud functionality.
-
-Same rough idea on Linux, but involving a flatpak application and a library that is loaded on steam startup instead. 
    
 ## Supported cloud providers
 
@@ -43,7 +41,7 @@ Same rough idea on Linux, but involving a flatpak application and a library that
 
 With more to come over time. 
 
-## Usage (Windows)
+## Usage
 
 Grab the latest release from the [Releases page](https://github.com/Selectively11/CloudRedirect/releases).
 
@@ -51,20 +49,7 @@ Run the EXE. Pick your mode - STfixer mode for fixes to ST bugs, CloudRedirect m
 
 That's it. Go launch Steam and watch the magic.
 
-## Usage (Linux)
-
-Edit your SLSsteam config, set DisableCloud to No. 
-
-
-```curl -fsSL headcrab.pages.dev | bash```
-
-Open the CloudRedirect app, sign into a provider.
-
-Edit your SLS config. The games you want to sync must be specified under AdditionalApps in your SLS config. This requirement will go away in the future. 
-
-Now launch Steam and watch your games sync!
-
-## Building from source (Windows)
+## Building from source
 
 ### Prerequisites
 
@@ -79,20 +64,6 @@ cmake --build build --config Release
 ```
 
 This builds both the C++ DLL (`build/Release/cloud_redirect.dll`) and publishes the WPF app (`ui/bin/publish/CloudRedirect.exe`). The DLL is automatically embedded into the executable.
-
-Or don't build it? Building Windows apps is pain.
-
-## Building from source (Linux)
-
-Oooooh boy. Yeah. Have fun. 
-
-You need to build against glibc 2.31 or older. Ubuntu 20.04 would work, if you dislike yourself. There's also an ancient version of Fedora that fits the bill. Or Debian 11. Distrobox is the way, here. Don't even bother trying to build under whatever distro you daily, you'll wind up fighting it for no reason. Distrobox exists for a reason. 
-
-If you are building under Ubuntu 20.04, GCC 12 is needed along with the 32-bit multilib stuff. System cmake is ancient garbage, you'll have to update it.
-
-Then specify -DLINUX_32BIT=ON and wham bam.
-
-Isn't building for weird distros _fun?_
 
 ## Contibuting
 
