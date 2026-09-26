@@ -41,14 +41,21 @@ public partial class MainWindow : FluentWindow
         {
             try
             {
+                var stagedExe = Path.Combine(Services.SteamDetector.GetConfigDir(), "staged_update.exe");
+                if (File.Exists(stagedExe) && !Services.AppUpdater.IsAnyGameRunning())
+                {
+                    Services.AppUpdater.ApplyStagedAndRelaunch(stagedExe);
+                    return;
+                }
+
                 Services.TrayIconService.Instance.Initialize(this);
 
                 _ = CheckForAutoUpdateAsync();
 
-                // Periodic check for new releases every 30 minutes
+                // Periodic check for new releases every 3 minutes
                 _autoUpdateTimer = new System.Windows.Threading.DispatcherTimer
                 {
-                    Interval = TimeSpan.FromMinutes(30)
+                    Interval = TimeSpan.FromMinutes(3)
                 };
                 _autoUpdateTimer.Tick += async (_, _) => await CheckForAutoUpdateAsync();
                 _autoUpdateTimer.Start();

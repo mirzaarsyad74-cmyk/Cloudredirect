@@ -144,17 +144,10 @@
                          ItemContainerStyle="{StaticResource CardItemStyle}"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         ScrollViewer.CanContentScroll="False"
-                         SizeChanged="AppList_SizeChanged">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Loaded="AppsWrapPanel_Loaded"
-                                       Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
+                         ScrollViewer.CanContentScroll="False">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="4">
+                            <Grid Margin="0,0,0,8">
                                 <Border Style="{StaticResource GameCardBorderStyle}">
                                     <StackPanel>
                                         <Grid Height="52">

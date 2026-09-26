@@ -243,36 +243,36 @@ internal static class AppUpdater
                     return "Downloaded file is not a valid executable";
             }
 
-            onProgress?.Invoke(-1, "Installing update...");
+            var stagedDir = SteamDetector.GetConfigDir();
+            var stagedPath = Path.Combine(stagedDir, "staged_update.exe");
 
-            var currentExe = Environment.ProcessPath;
-            if (string.IsNullOrEmpty(currentExe))
-                return "Could not determine current executable path";
-
-            var backupPath = currentExe + ".old";
-
-            // Swap: rename current -> .old, move downloaded -> current
             try
             {
-                if (File.Exists(backupPath))
-                    File.Delete(backupPath);
-                File.Move(currentExe, backupPath);
-                File.Move(tempPath, currentExe);
+                if (!Directory.Exists(stagedDir))
+                    Directory.CreateDirectory(stagedDir);
+                if (File.Exists(stagedPath))
+                    File.Delete(stagedPath);
+                File.Move(tempPath, stagedPath);
             }
             catch (Exception ex)
             {
-                // Attempt rollback if the rename partially succeeded
-                if (!File.Exists(currentExe) && File.Exists(backupPath))
-                    File.Move(backupPath, currentExe);
-                return $"Could not replace exe: {ex.Message}";
+                return $"Could not stage update file: {ex.Message}";
             }
 
-            // Relaunch
-            onProgress?.Invoke(100, "Relaunching...");
-            Process.Start(new ProcessStartInfo(currentExe) { UseShellExecute = true });
-            Environment.Exit(0);
+            // If a game is currently playing, wait for it to exit before auto-restarting
+            if (IsAnyGameRunning())
+            {
+                onProgress?.Invoke(100, "Update ready. Waiting for game to close before restarting...");
+                TrayIconService.Instance.ShowNotification(
+                    "CloudRedirect Update Ready",
+                    "Update is downloaded. CloudRedirect will automatically restart once your active game closes.");
 
-            return null; // unreachable, but satisfies compiler
+                ActiveGameTrackerService.OnActiveGameChanged += HandleGameExitForUpdate;
+                return null;
+            }
+
+            onProgress?.Invoke(100, "Applying update and restarting...");
+            return ApplyStagedAndRelaunch(stagedPath);
         }
         catch (Exception ex)
         {
@@ -281,6 +281,77 @@ internal static class AppUpdater
         finally
         {
             try { if (File.Exists(tempPath)) File.Delete(tempPath); } catch { }
+        }
+    }
+
+    public static bool IsAnyGameRunning()
+    {
+        if (ActiveGameTrackerService.CurrentGame != null)
+            return true;
+
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam", false);
+            var val = key?.GetValue("RunningAppId");
+            if (val is int intVal && intVal > 0) return true;
+            if (val is long longVal && longVal > 0) return true;
+        }
+        catch { }
+
+        return false;
+    }
+
+    private static void HandleGameExitForUpdate(ActiveGameInfo? game)
+    {
+        if (game == null && !IsAnyGameRunning())
+        {
+            ActiveGameTrackerService.OnActiveGameChanged -= HandleGameExitForUpdate;
+
+            // Wait 2.5s for save sync to complete cleanly before restarting
+            Task.Delay(2500).ContinueWith(_ =>
+            {
+                var stagedPath = Path.Combine(SteamDetector.GetConfigDir(), "staged_update.exe");
+                if (File.Exists(stagedPath) && !IsAnyGameRunning())
+                {
+                    ApplyStagedAndRelaunch(stagedPath);
+                }
+            });
+        }
+    }
+
+    public static string? ApplyStagedAndRelaunch(string stagedExePath)
+    {
+        try
+        {
+            var currentExe = Environment.ProcessPath;
+            if (string.IsNullOrEmpty(currentExe))
+                return "Could not determine current executable path";
+
+            var backupPath = currentExe + ".old";
+
+            // Swap: rename current -> .old, move staged -> current
+            try
+            {
+                if (File.Exists(backupPath))
+                    File.Delete(backupPath);
+                File.Move(currentExe, backupPath);
+                File.Move(stagedExePath, currentExe);
+            }
+            catch (Exception ex)
+            {
+                if (!File.Exists(currentExe) && File.Exists(backupPath))
+                    File.Move(backupPath, currentExe);
+                return $"Could not replace exe: {ex.Message}";
+            }
+
+            // Relaunch the new executable
+            Process.Start(new ProcessStartInfo(currentExe) { UseShellExecute = true });
+            Environment.Exit(0);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            return $"Failed to apply update: {ex.Message}";
         }
     }
 

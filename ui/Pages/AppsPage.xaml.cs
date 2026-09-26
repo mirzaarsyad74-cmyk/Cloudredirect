@@ -26,8 +26,6 @@ public partial class AppsPage : Page
 
     // Full lists for search filtering
     private List<AppInfo>? _allApps;
-    private WrapPanel? _appsWrapPanel;
-    private ScrollViewer? _appListScrollViewer;
 
     public AppsPage()
     {
@@ -44,75 +42,6 @@ public partial class AppsPage : Page
             try { await LoadAppsAsync(); }
             catch { }
         };
-    }
-
-    private void AppsWrapPanel_Loaded(object sender, RoutedEventArgs e)
-    {
-        _appsWrapPanel = sender as WrapPanel;
-        UpdateGridColumns();
-    }
-
-    private void AppList_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        UpdateGridColumns();
-    }
-
-    private void UpdateGridColumns()
-    {
-        if (_appsWrapPanel == null) return;
-
-        if (_appListScrollViewer == null)
-        {
-            _appListScrollViewer = FindVisualChild<ScrollViewer>(AppList);
-            if (_appListScrollViewer != null)
-            {
-                _appListScrollViewer.ScrollChanged += (_, e) =>
-                {
-                    if (e.ViewportWidthChange != 0)
-                        UpdateGridColumns();
-                };
-            }
-        }
-
-        double availableWidth = 0;
-        if (_appListScrollViewer != null && _appListScrollViewer.ViewportWidth > 0)
-        {
-            availableWidth = _appListScrollViewer.ViewportWidth;
-        }
-        else
-        {
-            availableWidth = AppList.ActualWidth;
-            if (availableWidth > 20)
-                availableWidth -= 18; // scrollbar allowance
-        }
-
-        if (availableWidth < 100) return;
-
-        // Reserve 2px to guard against sub-pixel rounding pushing an item to the next line
-        double usableWidth = Math.Max(100, availableWidth - 2);
-
-        // Auto-grid breakpoint: minimum card width ~360px
-        const double minCardWidth = 360.0;
-        int columns = Math.Max(1, (int)Math.Floor(usableWidth / minCardWidth));
-        double itemWidth = Math.Floor(usableWidth / columns);
-
-        if (Math.Abs(_appsWrapPanel.ItemWidth - itemWidth) > 0.5)
-        {
-            _appsWrapPanel.ItemWidth = itemWidth;
-        }
-    }
-
-    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
-    {
-        int count = VisualTreeHelper.GetChildrenCount(parent);
-        for (int i = 0; i < count; i++)
-        {
-            var child = VisualTreeHelper.GetChild(parent, i);
-            if (child is T typedChild) return typedChild;
-            var descendant = FindVisualChild<T>(child);
-            if (descendant != null) return descendant;
-        }
-        return null;
     }
 
     private void RestoreSavesButton_Click(object sender, RoutedEventArgs e)
@@ -279,7 +208,6 @@ public partial class AppsPage : Page
         {
             _appsView.Refresh();
         }
-        UpdateGridColumns();
     }
 
     private bool AppFilter(object item)
