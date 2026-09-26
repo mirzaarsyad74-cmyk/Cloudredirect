@@ -64,6 +64,21 @@ public partial class MainWindow : FluentWindow
 
                 Services.ActiveGameTrackerService.Start();
 
+                Services.UiZoomManager.Instance.Initialize(this, ContentAreaHost, RootFrame, GuiScaleTransform);
+                Services.UiZoomManager.Instance.OnZoomChanged += (scale, isAuto) =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        ZoomPercentText.Text = isAuto ? $"Auto ({Math.Round(scale * 100)}%)" : $"{Math.Round(scale * 100)}%";
+                        ZoomPercentText.Foreground = new System.Windows.Media.SolidColorBrush(
+                            isAuto ? System.Windows.Media.Color.FromRgb(0x66, 0xC0, 0xF4) : System.Windows.Media.Color.FromRgb(0xC6, 0xD4, 0xDF));
+                        AutoFitBtn.Background = new System.Windows.Media.SolidColorBrush(
+                            isAuto ? System.Windows.Media.Color.FromRgb(0x1C, 0x35, 0x4A) : System.Windows.Media.Colors.Transparent);
+                        AutoFitBtn.Foreground = new System.Windows.Media.SolidColorBrush(
+                            isAuto ? System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07) : System.Windows.Media.Color.FromRgb(0x8F, 0x98, 0xA0));
+                    });
+                };
+
                 var mode = await Task.Run(() => MigrateLegacyMode());
                 ApplyMode(mode);
 
@@ -480,5 +495,25 @@ public partial class MainWindow : FluentWindow
             })?.Dispose();
         }
         catch { }
+    }
+
+    private void ZoomOut_Click(object sender, RoutedEventArgs e)
+    {
+        Services.UiZoomManager.Instance.ZoomOut();
+    }
+
+    private void ZoomIn_Click(object sender, RoutedEventArgs e)
+    {
+        Services.UiZoomManager.Instance.ZoomIn();
+    }
+
+    private void AutoFit_Click(object sender, RoutedEventArgs e)
+    {
+        Services.UiZoomManager.Instance.ToggleAutoFit();
+    }
+
+    private void ZoomPercent_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        Services.UiZoomManager.Instance.ToggleAutoFit();
     }
 }

@@ -221,17 +221,24 @@ public partial class DashboardPage : Page
                 ActiveGameTitle.Text = game.Name;
                 if (game.IsUniversal)
                 {
-                    ActiveGameSubtitle.Text = $"Universal Safe Mode • Process: {game.ProcessName} • Out-of-Process Save Watcher Active";
+                    ActiveGameBadgeText.Text = "NON-CLOUD / SAFE MODE GAME";
+                    ActiveGameSubtitle.Text = $"Universal Safe Mode • Process: {game.ProcessName} • Anti-Cheat & Hypervisor Safe";
+                    ActiveGameStatusPill.Text = "Safe Mode Active";
                 }
                 else
                 {
-                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Redirection Active & Armed";
+                    ActiveGameBadgeText.Text = "STEAM GAME ACTIVE";
+                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Automatic Cloud Redirection Hooked";
+                    ActiveGameStatusPill.Text = "Steam Cloud Active";
                 }
             }
             else
             {
                 ActiveGameCard.Visibility = Visibility.Collapsed;
             }
+
+            // Trigger zoom recalculation when banner appears/disappears
+            Services.UiZoomManager.Instance.TriggerAutoFitRecalculation();
         });
     }
 

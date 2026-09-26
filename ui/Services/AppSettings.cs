@@ -72,6 +72,18 @@ public static class AppSettings
         set => WriteBool("show_sync_notifications", value);
     }
 
+    public static bool AutoFitZoom
+    {
+        get => ReadBool("auto_fit_zoom", true);
+        set => WriteBool("auto_fit_zoom", value);
+    }
+
+    public static double ZoomScale
+    {
+        get => ReadDouble("zoom_scale", 1.0);
+        set => WriteDouble("zoom_scale", value);
+    }
+
     private static bool ReadBool(string keyName, bool defaultValue)
     {
         try
@@ -117,6 +129,72 @@ public static class AppSettings
             {
                 writer.WriteStartObject();
                 writer.WriteBoolean(keyName, value);
+
+                if (existing.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var prop in existing.EnumerateObject())
+                    {
+                        if (prop.NameEquals(keyName)) continue;
+                        prop.WriteTo(writer);
+                    }
+                }
+
+                writer.WriteEndObject();
+            }
+
+            File.WriteAllBytes(path, ms.ToArray());
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to write setting {keyName}: {ex}");
+        }
+    }
+
+    private static double ReadDouble(string keyName, double defaultValue)
+    {
+        try
+        {
+            var path = GetSettingsPath();
+            if (!File.Exists(path)) return defaultValue;
+
+            var json = File.ReadAllText(path);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty(keyName, out var prop))
+            {
+                if (prop.ValueKind == JsonValueKind.Number)
+                    return prop.GetDouble();
+            }
+        }
+        catch { }
+        return defaultValue;
+    }
+
+    public static void WriteDouble(string keyName, double value)
+    {
+        try
+        {
+            var path = GetSettingsPath();
+            var dir = Path.GetDirectoryName(path)!;
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            JsonElement existing = default;
+            if (File.Exists(path))
+            {
+                try
+                {
+                    var oldJson = File.ReadAllText(path);
+                    using var doc = JsonDocument.Parse(oldJson);
+                    existing = doc.RootElement.Clone();
+                }
+                catch { }
+            }
+
+            using var ms = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true }))
+            {
+                writer.WriteStartObject();
+                writer.WriteNumber(keyName, value);
 
                 if (existing.ValueKind == JsonValueKind.Object)
                 {

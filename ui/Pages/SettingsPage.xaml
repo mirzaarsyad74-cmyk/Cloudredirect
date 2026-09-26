@@ -114,6 +114,23 @@
                                                  Checked="AppSettingsToggle_Changed"
                                                  Unchecked="AppSettingsToggle_Changed" />
                             </ui:CardControl>
+
+                            <!-- Auto-Fit Window (No Scrolling) -->
+                            <ui:CardControl Margin="0,8,0,0">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Auto-Fit Window (Single Interface / No Scrolling)"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="Automatically scale the interface so all cards and controls fit without requiring vertical scrolling."
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="AutoFitZoomToggle"
+                                                 Checked="AutoFitZoomToggle_Changed"
+                                                 Unchecked="AutoFitZoomToggle_Changed" />
+                            </ui:CardControl>
                         </StackPanel>
                     </StackPanel>
 

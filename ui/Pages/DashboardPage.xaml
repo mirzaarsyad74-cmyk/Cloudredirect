@@ -5,14 +5,14 @@
       xmlns:res="clr-namespace:CloudRedirect.Resources"
       ScrollViewer.CanContentScroll="False">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,14">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,10">
         <DockPanel LastChildFill="True">
 
             <!-- Hidden banner kept for backward compatibility if needed -->
             <Border x:Name="UpdateBanner" Visibility="Collapsed" />
 
             <!-- Header with Title & Active Status Badge -->
-            <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -125,7 +125,8 @@
                                     </EventTrigger>
                                 </Ellipse.Triggers>
                             </Ellipse>
-                            <TextBlock Text="CURRENTLY PLAYING"
+                            <TextBlock x:Name="ActiveGameBadgeText"
+                                       Text="CURRENTLY PLAYING"
                                        FontSize="10" FontWeight="Bold"
                                        Foreground="#A4D007" />
                         </StackPanel>
@@ -144,7 +145,8 @@
                     <Border Grid.Column="2"
                             Background="#142B1A" BorderBrush="#3D681C" BorderThickness="1"
                             CornerRadius="12" Padding="12,5" VerticalAlignment="Center" Margin="12,0,0,0">
-                        <TextBlock Text="Sync Active" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock x:Name="ActiveGameStatusPill"
+                                   Text="Sync Active" FontSize="11" FontWeight="SemiBold"
                                    Foreground="#A4D007" />
                     </Border>
                 </Grid>

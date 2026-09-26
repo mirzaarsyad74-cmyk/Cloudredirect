@@ -121,6 +121,16 @@ public static class UniversalSaveWatcherService
             {
                 var json = File.ReadAllText(path);
                 _profiles = JsonSerializer.Deserialize<List<UniversalGameProfile>>(json) ?? [];
+
+                // Sanitize: remove any spurious system processes
+                int countBefore = _profiles.Count;
+                _profiles.RemoveAll(p => GameSaveAutoDetector.IsSystemProcess(p.ProcessName) ||
+                                         p.GameName.Equals("Windows Input Experience", StringComparison.OrdinalIgnoreCase));
+                if (_profiles.Count != countBefore)
+                {
+                    SaveProfiles();
+                }
+
                 return _profiles;
             }
         }
@@ -154,6 +164,12 @@ public static class UniversalSaveWatcherService
 
     public static void AddProfile(UniversalGameProfile profile)
     {
+        if (GameSaveAutoDetector.IsSystemProcess(profile.ProcessName) ||
+            profile.GameName.Equals("Windows Input Experience", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
         var list = GetProfiles();
         if (list.Any(p => p.GameName.Equals(profile.GameName, StringComparison.OrdinalIgnoreCase)))
             return;

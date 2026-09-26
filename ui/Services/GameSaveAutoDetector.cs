@@ -420,7 +420,9 @@ public static class GameSaveAutoDetector
         {
             "explorer", "devenv", "chrome", "firefox", "msedge", "brave", "code", "steam",
             "taskmgr", "cmd", "powershell", "CloudRedirect", "discord", "spotify", "slack",
-            "system", "idle", "svchost", "csrss", "dwm", "runtimebroker", "searchhost"
+            "system", "idle", "svchost", "csrss", "dwm", "runtimebroker", "searchhost",
+            "textinputhost", "shellexperiencehost", "applicationframehost", "startmenuexperiencehost",
+            "widgets", "ctfmon", "conhost", "sihost", "fontdrvhost"
         };
         return sys.Any(s => s.Equals(procName, StringComparison.OrdinalIgnoreCase));
     }

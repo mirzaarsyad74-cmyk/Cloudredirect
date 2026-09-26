@@ -74,6 +74,7 @@ public partial class SettingsPage : Page
             StartWithWindowsToggle.IsChecked = AppSettings.StartWithWindows;
             MinimizeToTrayToggle.IsChecked = AppSettings.MinimizeToTrayOnClose;
             ShowNotificationsToggle.IsChecked = AppSettings.ShowSyncNotifications;
+            AutoFitZoomToggle.IsChecked = AppSettings.AutoFitZoom;
         }
         finally
         {
@@ -87,6 +88,14 @@ public partial class SettingsPage : Page
         AppSettings.StartWithWindows = StartWithWindowsToggle.IsChecked == true;
         AppSettings.MinimizeToTrayOnClose = MinimizeToTrayToggle.IsChecked == true;
         AppSettings.ShowSyncNotifications = ShowNotificationsToggle.IsChecked == true;
+    }
+
+    private void AutoFitZoomToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_syncLoading) return;
+        bool isEnabled = AutoFitZoomToggle.IsChecked == true;
+        AppSettings.AutoFitZoom = isEnabled;
+        UiZoomManager.Instance.SetAutoFit(isEnabled);
     }
 
     /// <summary>Reads sync toggles from config.json (called inside Task.Run).</summary>
