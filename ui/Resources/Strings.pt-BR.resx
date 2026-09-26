@@ -2246,4 +2246,52 @@ Tem certeza?</value>
   <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
     <value>Guia Interativo</value>
   </data>
+  <data name="Dashboard_ActiveGame_BadgeLua" xml:space="preserve">
+    <value>JOGO LUA ATIVO</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubLua" xml:space="preserve">
+    <value>Steam AppID: {0} • CloudRedirect Ativo (Lua Desbloqueado)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillHooked" xml:space="preserve">
+    <value>CloudRedirect Conectado</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuineNoCloud" xml:space="preserve">
+    <value>JOGO STEAM ORIGINAL (SEM STEAM CLOUD)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineNoCloud" xml:space="preserve">
+    <value>Steam AppID: {0} • Jogo original sem Steam Cloud • Protegido automaticamente pelo Universal Saves</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillUniversal" xml:space="preserve">
+    <value>Proteção em Nuvem Universal</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeUniversal" xml:space="preserve">
+    <value>JOGO EM MODO SEGURO UNIVERSAL</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubUniversal" xml:space="preserve">
+    <value>Modo de segurança universal • Processo: {0} • Seguro contra anti-cheat e hipervisor</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillSafeMode" xml:space="preserve">
+    <value>Modo seguro ativo</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuine" xml:space="preserve">
+    <value>JOGO STEAM ORIGINAL</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineSteam" xml:space="preserve">
+    <value>Steam AppID: {0} • Usando o Steam Cloud nativo original (intocado)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillOriginalCloud" xml:space="preserve">
+    <value>Steam Cloud original</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeSteam" xml:space="preserve">
+    <value>JOGO STEAM ATIVO</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubSteam" xml:space="preserve">
+    <value>Steam AppID: {0}</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillRunning" xml:space="preserve">
+    <value>Jogo Steam em execução</value>
+  </data>
+  <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
+    <value>Nenhum save ainda</value>
+  </data>
 </root>

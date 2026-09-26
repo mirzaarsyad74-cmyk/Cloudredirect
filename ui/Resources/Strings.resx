@@ -2294,4 +2294,52 @@ Are you sure?</value>
   <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
     <value>Interactive Guide</value>
   </data>
+  <data name="Dashboard_ActiveGame_BadgeLua" xml:space="preserve">
+    <value>LUA GAME ACTIVE</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubLua" xml:space="preserve">
+    <value>Steam AppID: {0} • CloudRedirect Active (Lua Unlocked)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillHooked" xml:space="preserve">
+    <value>CloudRedirect Hooked</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuineNoCloud" xml:space="preserve">
+    <value>GENUINE STEAM GAME (NO STEAM CLOUD)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineNoCloud" xml:space="preserve">
+    <value>Steam AppID: {0} • Genuine Game Lacks Steam Cloud • Auto-Protected by Universal Saves</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillUniversal" xml:space="preserve">
+    <value>Universal Cloud Protection</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeUniversal" xml:space="preserve">
+    <value>UNIVERSAL SAFE MODE GAME</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubUniversal" xml:space="preserve">
+    <value>Universal Safe Mode • Process: {0} • Anti-Cheat &amp; Hypervisor Safe</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillSafeMode" xml:space="preserve">
+    <value>Safe Mode Active</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuine" xml:space="preserve">
+    <value>GENUINE STEAM GAME</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineSteam" xml:space="preserve">
+    <value>Steam AppID: {0} • Using Original Steam Native Cloud (Untouched)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillOriginalCloud" xml:space="preserve">
+    <value>Original Steam Cloud</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeSteam" xml:space="preserve">
+    <value>STEAM GAME ACTIVE</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubSteam" xml:space="preserve">
+    <value>Steam AppID: {0}</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillRunning" xml:space="preserve">
+    <value>Steam Game Running</value>
+  </data>
+  <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
+    <value>No Saves Yet</value>
+  </data>
 </root>

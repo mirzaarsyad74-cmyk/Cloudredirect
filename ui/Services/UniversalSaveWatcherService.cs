@@ -31,6 +31,7 @@ public class UniversalGameProfile : System.ComponentModel.INotifyPropertyChanged
             {
                 _status = value;
                 OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(LocalizedStatus));
             }
         }
     }
@@ -74,6 +75,8 @@ public class UniversalGameProfile : System.ComponentModel.INotifyPropertyChanged
                 return S.Get("UniversalSaves_Status_Syncing");
             if (Status.Contains("Game Running", StringComparison.OrdinalIgnoreCase))
                 return S.Get("UniversalSaves_Status_GameRunning");
+            if (string.Equals(Status, "No Saves Yet", StringComparison.OrdinalIgnoreCase))
+                return S.Get("UniversalSaves_Status_NoSavesYet");
             return Status;
         }
     }
@@ -348,6 +351,14 @@ public static class UniversalSaveWatcherService
             if (!Directory.Exists(saveDir))
             {
                 UpdateProfileStatus(profile, "Folder Not Found");
+                return false;
+            }
+
+            var saveFiles = Directory.GetFiles(saveDir, "*", SearchOption.AllDirectories);
+            if (saveFiles.Length == 0)
+            {
+                UpdateProfileStatus(profile, "No Saves Yet");
+                TrayIconService.Instance.ShowNotification("Universal Cloud Saves", $"{profile.GameName}: Save folder is currently empty. Play the game and save first.");
                 return false;
             }
 

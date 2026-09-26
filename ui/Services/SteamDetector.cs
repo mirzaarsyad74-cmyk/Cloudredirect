@@ -459,18 +459,18 @@ public static class SteamDetector
         try
         {
             var configPath = GetConfigFilePath();
-            if (!File.Exists(configPath)) return (true, true, true);
+            if (!File.Exists(configPath)) return (true, true, false);
             var json = File.ReadAllText(configPath);
             using var doc = System.Text.Json.JsonDocument.Parse(json);
             var root = doc.RootElement;
             bool syncLuas = !root.TryGetProperty("sync_luas", out var sl) || sl.ValueKind != System.Text.Json.JsonValueKind.False;
             bool backup = !root.TryGetProperty("sync_luas_backup", out var b) || b.ValueKind != System.Text.Json.JsonValueKind.False;
-            bool restore = !root.TryGetProperty("sync_luas_restore", out var r) || r.ValueKind != System.Text.Json.JsonValueKind.False;
+            bool restore = root.TryGetProperty("sync_luas_restore", out var r) && r.ValueKind == System.Text.Json.JsonValueKind.True;
             return (syncLuas, backup, restore);
         }
         catch
         {
-            return (true, true, true);
+            return (true, true, false);
         }
     }
 

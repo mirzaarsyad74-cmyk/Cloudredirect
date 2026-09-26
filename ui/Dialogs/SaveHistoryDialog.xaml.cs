@@ -48,6 +48,17 @@ public partial class SaveHistoryDialog : Wpf.Ui.Controls.FluentWindow
 
     private async void OpenDriveFolder_Click(object sender, RoutedEventArgs e)
     {
+        var driveLink = await UniversalCloudSyncService.GetGameDriveFolderWebLinkAsync(_gameIdentifier);
+        if (!string.IsNullOrEmpty(driveLink))
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(driveLink) { UseShellExecute = true })?.Dispose();
+                return;
+            }
+            catch { }
+        }
+
         if (!string.IsNullOrEmpty(_appId))
         {
             var acctId = !string.IsNullOrEmpty(_accountId) ? _accountId : "0";

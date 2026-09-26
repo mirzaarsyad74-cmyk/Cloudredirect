@@ -265,34 +265,34 @@ public partial class DashboardPage : Page
                 {
                     if (game.IsGenuineOwned)
                     {
-                        ActiveGameBadgeText.Text = "GENUINE STEAM GAME (NO CLOUD)";
-                        ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Genuine Game Lacks Steam Cloud • Auto-Protected by Universal Saves";
-                        ActiveGameStatusPill.Text = "Universal Cloud Protection";
+                        ActiveGameBadgeText.Text = S.Get("Dashboard_ActiveGame_BadgeGenuineNoCloud");
+                        ActiveGameSubtitle.Text = string.Format(S.Get("Dashboard_ActiveGame_SubGenuineNoCloud"), game.AppId);
+                        ActiveGameStatusPill.Text = S.Get("Dashboard_ActiveGame_PillUniversal");
                     }
                     else
                     {
-                        ActiveGameBadgeText.Text = "UNIVERSAL SAFE MODE GAME";
-                        ActiveGameSubtitle.Text = $"Universal Safe Mode • Process: {game.ProcessName} • Anti-Cheat & Hypervisor Safe";
-                        ActiveGameStatusPill.Text = "Safe Mode Active";
+                        ActiveGameBadgeText.Text = S.Get("Dashboard_ActiveGame_BadgeUniversal");
+                        ActiveGameSubtitle.Text = string.Format(S.Get("Dashboard_ActiveGame_SubUniversal"), game.ProcessName);
+                        ActiveGameStatusPill.Text = S.Get("Dashboard_ActiveGame_PillSafeMode");
                     }
                 }
                 else if (game.IsLuaGame)
                 {
-                    ActiveGameBadgeText.Text = "LUA GAME ACTIVE";
-                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • CloudRedirect Active (Lua Unlocked)";
-                    ActiveGameStatusPill.Text = "CloudRedirect Hooked";
+                    ActiveGameBadgeText.Text = S.Get("Dashboard_ActiveGame_BadgeLua");
+                    ActiveGameSubtitle.Text = string.Format(S.Get("Dashboard_ActiveGame_SubLua"), game.AppId);
+                    ActiveGameStatusPill.Text = S.Get("Dashboard_ActiveGame_PillHooked");
                 }
                 else if (game.IsGenuineOwned && game.HasSteamCloud)
                 {
-                    ActiveGameBadgeText.Text = "GENUINE STEAM GAME";
-                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Using Original Steam Native Cloud (Untouched)";
-                    ActiveGameStatusPill.Text = "Original Steam Cloud";
+                    ActiveGameBadgeText.Text = S.Get("Dashboard_ActiveGame_BadgeGenuine");
+                    ActiveGameSubtitle.Text = string.Format(S.Get("Dashboard_ActiveGame_SubGenuineSteam"), game.AppId);
+                    ActiveGameStatusPill.Text = S.Get("Dashboard_ActiveGame_PillOriginalCloud");
                 }
                 else
                 {
-                    ActiveGameBadgeText.Text = "STEAM GAME ACTIVE";
-                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId}";
-                    ActiveGameStatusPill.Text = "Steam Game Running";
+                    ActiveGameBadgeText.Text = S.Get("Dashboard_ActiveGame_BadgeSteam");
+                    ActiveGameSubtitle.Text = string.Format(S.Get("Dashboard_ActiveGame_SubSteam"), game.AppId);
+                    ActiveGameStatusPill.Text = S.Get("Dashboard_ActiveGame_PillRunning");
                 }
             }
             else

@@ -2267,6 +2267,54 @@
   <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
     <value>交互式功能向导</value>
   </data>
+  <data name="Dashboard_ActiveGame_BadgeLua" xml:space="preserve">
+    <value>LUA 游戏运行中</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubLua" xml:space="preserve">
+    <value>Steam AppID: {0} • CloudRedirect 已激活 (Lua 已解锁)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillHooked" xml:space="preserve">
+    <value>CloudRedirect 已注入</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuineNoCloud" xml:space="preserve">
+    <value>正版 STEAM 游戏 (无 STEAM 云)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineNoCloud" xml:space="preserve">
+    <value>Steam AppID: {0} • 正版游戏无 Steam 云 • 由通用云存档自动保护</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillUniversal" xml:space="preserve">
+    <value>通用云保护</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeUniversal" xml:space="preserve">
+    <value>通用安全模式游戏</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubUniversal" xml:space="preserve">
+    <value>通用安全模式 • 进程: {0} • 反作弊与虚拟机安全</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillSafeMode" xml:space="preserve">
+    <value>安全模式已激活</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuine" xml:space="preserve">
+    <value>正版 STEAM 游戏</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineSteam" xml:space="preserve">
+    <value>Steam AppID: {0} • 使用原生 Steam 云 (未修改)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillOriginalCloud" xml:space="preserve">
+    <value>原生 Steam 云</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeSteam" xml:space="preserve">
+    <value>STEAM 游戏运行中</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubSteam" xml:space="preserve">
+    <value>Steam AppID: {0}</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillRunning" xml:space="preserve">
+    <value>Steam 游戏运行中</value>
+  </data>
+  <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
+    <value>暂无存档</value>
+  </data>
 </root>
 
 

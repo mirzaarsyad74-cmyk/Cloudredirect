@@ -417,8 +417,30 @@ public partial class UniversalSavesPage : Page
     {
         if (sender is FrameworkElement fe && fe.Tag is UniversalGameProfile profile)
         {
-            await UniversalSaveWatcherService.SyncProfileNowAsync(profile, "Manual Sync");
-            RefreshList();
+            if (fe is Wpf.Ui.Controls.Button btn) btn.IsEnabled = false;
+            try
+            {
+                var saveDir = profile.ExpandedSavePath;
+                if (!Directory.Exists(saveDir) || Directory.GetFiles(saveDir, "*", SearchOption.AllDirectories).Length == 0)
+                {
+                    var alert = new Wpf.Ui.Controls.MessageBox
+                    {
+                        Title = "No Save Files Yet",
+                        Content = $"No save files were found in:\n{saveDir}\n\nPlease play the game and create a save inside the game first, then click Sync.",
+                        CloseButtonText = "OK"
+                    };
+                    await alert.ShowDialogAsync();
+                    UniversalSaveWatcherService.UpdateProfileStatus(profile, "No Saves Yet");
+                    return;
+                }
+
+                await UniversalSaveWatcherService.SyncProfileNowAsync(profile, "Manual Sync");
+            }
+            finally
+            {
+                if (fe is Wpf.Ui.Controls.Button actionBtn) actionBtn.IsEnabled = true;
+                RefreshList();
+            }
         }
     }
 
@@ -426,6 +448,19 @@ public partial class UniversalSavesPage : Page
     {
         if (sender is FrameworkElement fe && fe.Tag is UniversalGameProfile profile)
         {
+            // 1. Try to open the exact Universal Cloud Saves folder on Google Drive
+            var driveLink = await UniversalCloudSyncService.GetGameDriveFolderWebLinkAsync(profile.GameName);
+            if (!string.IsNullOrEmpty(driveLink))
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(driveLink) { UseShellExecute = true })?.Dispose();
+                    return;
+                }
+                catch { }
+            }
+
+            // 2. Fall back to generic cloud location handler
             var acctId = "0";
             var appIdOrName = profile.SteamAppId > 0 ? profile.SteamAppId.ToString() : profile.GameName;
             await CloudLocationService.OpenCloudLocationAsync(acctId, appIdOrName, profile.GameName);

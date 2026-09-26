@@ -2162,4 +2162,52 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
   <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
     <value>Panduan Interaktif</value>
   </data>
+  <data name="Dashboard_ActiveGame_BadgeLua" xml:space="preserve">
+    <value>PERMAINAN LUA AKTIF</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubLua" xml:space="preserve">
+    <value>Steam AppID: {0} • CloudRedirect Aktif (Lua Dinyahkunci)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillHooked" xml:space="preserve">
+    <value>CloudRedirect Disambung</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuineNoCloud" xml:space="preserve">
+    <value>PERMAINAN STEAM TULEN (TIADA STEAM CLOUD)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineNoCloud" xml:space="preserve">
+    <value>Steam AppID: {0} • Permainan Tulen Tiada Steam Cloud • Dilindungi Automatik oleh Universal Saves</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillUniversal" xml:space="preserve">
+    <value>Perlindungan Awan Universal</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeUniversal" xml:space="preserve">
+    <value>PERMAINAN MOD SELAMAT UNIVERSAL</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubUniversal" xml:space="preserve">
+    <value>Mod Selamat Universal • Proses: {0} • Selamat Anti-Cheat &amp; Hypervisor</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillSafeMode" xml:space="preserve">
+    <value>Mod Selamat Aktif</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeGenuine" xml:space="preserve">
+    <value>PERMAINAN STEAM TULEN</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubGenuineSteam" xml:space="preserve">
+    <value>Steam AppID: {0} • Menggunakan Steam Cloud Asal (Tidak disentuh)</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillOriginalCloud" xml:space="preserve">
+    <value>Steam Cloud Asal</value>
+  </data>
+  <data name="Dashboard_ActiveGame_BadgeSteam" xml:space="preserve">
+    <value>PERMAINAN STEAM AKTIF</value>
+  </data>
+  <data name="Dashboard_ActiveGame_SubSteam" xml:space="preserve">
+    <value>Steam AppID: {0}</value>
+  </data>
+  <data name="Dashboard_ActiveGame_PillRunning" xml:space="preserve">
+    <value>Permainan Steam Sedang Berjalan</value>
+  </data>
+  <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
+    <value>Belum Ada Simpanan</value>
+  </data>
 </root>

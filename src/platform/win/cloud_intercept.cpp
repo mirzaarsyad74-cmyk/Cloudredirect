@@ -4680,7 +4680,7 @@ void Init(const std::string& steamPath, bool cloudSaveOnly, CR_NotifyFn notifyCa
         if (cfg["sync_luas_restore"].type == Json::Type::Bool) {
             MetadataSync::syncLuasRestore = cfg["sync_luas_restore"].boolean();
         } else {
-            MetadataSync::syncLuasRestore = MetadataSync::syncLuas.load();
+            MetadataSync::syncLuasRestore = false;
         }
         LOG("[NS] Lua sync gates: backup=%d, restore=%d",
             MetadataSync::syncLuasBackup.load() ? 1 : 0,

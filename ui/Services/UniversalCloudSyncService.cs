@@ -32,7 +32,7 @@ public static class UniversalCloudSyncService
         var saveFiles = Directory.GetFiles(saveDir, "*", SearchOption.AllDirectories);
         if (saveFiles.Length == 0)
         {
-            return new SyncResult(true, 0, 0, "Save directory is empty, nothing to upload.");
+            return new SyncResult(false, 0, 0, "No save files found in directory yet. Please play the game and save first.");
         }
 
         var config = SteamDetector.ReadConfig();
@@ -281,6 +281,42 @@ public static class UniversalCloudSyncService
         }
         catch { }
         return $"https://drive.google.com/drive/folders/{folderId}";
+    }
+
+    /// <summary>
+    /// Resolves the direct Google Drive web URL for a game's Universal Cloud Saves folder.
+    /// Returns null if provider is not gdrive or folder cannot be resolved.
+    /// </summary>
+    public static async Task<string?> GetGameDriveFolderWebLinkAsync(string gameName)
+    {
+        try
+        {
+            var config = SteamDetector.ReadConfig();
+            if (config == null || config.Provider != "gdrive") return null;
+
+            var tokenPath = config.TokenPath ?? Path.Combine(SteamDetector.GetConfigDir(), "google_tokens.json");
+            var accessToken = await OAuthService.GetValidAccessTokenAsync("gdrive", tokenPath);
+            if (string.IsNullOrEmpty(accessToken)) return null;
+
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var rootFolderId = await EnsureDriveFolderAsync(http, "CloudRedirect", null);
+            if (string.IsNullOrEmpty(rootFolderId)) return null;
+
+            var universalFolderId = await EnsureDriveFolderAsync(http, "UniversalCloudSaves", rootFolderId);
+            if (string.IsNullOrEmpty(universalFolderId)) return null;
+
+            var sanitizedGameName = SaveHistoryManager.SanitizeFolderName(gameName);
+            var gameFolderId = await EnsureDriveFolderAsync(http, sanitizedGameName, universalFolderId);
+            if (string.IsNullOrEmpty(gameFolderId)) return null;
+
+            return await GetDriveFolderWebLinkAsync(http, gameFolderId);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private record DriveFileInfo(string Id, string Name, long Size);

@@ -52,7 +52,6 @@ public partial class SettingsPage : Page
     private void ApplySettingsSnapshot(SettingsSnapshot snap)
     {
         ShowNonSteamGameCard.Visibility = Visibility.Collapsed;
-        SyncLuasCard.Visibility = Visibility.Visible;
         ExtraSection.Visibility = Visibility.Visible;
 
         ApplySyncToggles(snap.SyncAchievements, snap.SyncPlaytime, snap.SyncLuas, snap.AutoUpdateDll,
@@ -67,7 +66,6 @@ public partial class SettingsPage : Page
         {
             if (achievements == true) SyncAchievementsToggle.IsChecked = true;
             if (playtime == true) SyncPlaytimeToggle.IsChecked = true;
-            if (luas == true) SyncLuasToggle.IsChecked = true;
             if (autoUpdateDll == true) AutoUpdateDllToggle.IsChecked = true;
             if (showNonSteamGame == true) ShowNonSteamGameToggle.IsChecked = true;
 
@@ -171,14 +169,16 @@ public partial class SettingsPage : Page
         // schema_fetch / experimental_schema_fetch are retired: stay in the strip list so a
         // saved config drops the stale keys, but no longer written back.
         Services.ConfigHelper.SaveConfig(path,
-            new[] { "sync_achievements", "sync_playtime", "sync_luas", "auto_update_dll",
+            new[] { "sync_achievements", "sync_playtime", "sync_luas", "sync_luas_backup", "sync_luas_restore", "auto_update_dll",
                     "show_non_steam_game", "custom_cloud_icon", "parental_ignore_playtime", "parental_bypass_playtime",
                     "schema_fetch", "experimental_schema_fetch" },
             writer =>
             {
                 writer.WriteBoolean("sync_achievements", SyncAchievementsToggle.IsChecked == true);
                 writer.WriteBoolean("sync_playtime", SyncPlaytimeToggle.IsChecked == true);
-                writer.WriteBoolean("sync_luas", SyncLuasToggle.IsChecked == true);
+                writer.WriteBoolean("sync_luas", true);
+                writer.WriteBoolean("sync_luas_backup", true);
+                writer.WriteBoolean("sync_luas_restore", false);
                 writer.WriteBoolean("auto_update_dll", AutoUpdateDllToggle.IsChecked == true);
                 writer.WriteBoolean("show_non_steam_game", ShowNonSteamGameToggle.IsChecked == true);
                 writer.WriteBoolean("custom_cloud_icon", true);
