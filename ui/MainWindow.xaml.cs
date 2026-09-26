@@ -62,10 +62,17 @@ public partial class MainWindow : FluentWindow
                     Services.SteamWebUiPatcher.StartWatcher();
                 });
 
+                Services.ActiveGameTrackerService.Start();
+
                 var mode = await Task.Run(() => MigrateLegacyMode());
                 ApplyMode(mode);
 
                 NavigateTo(typeof(Pages.DashboardPage));
+
+                if (App.StartMinimized)
+                {
+                    Services.TrayIconService.Instance.MinimizeToTray();
+                }
             }
             catch { }
         };
@@ -92,6 +99,12 @@ public partial class MainWindow : FluentWindow
         }
 
         e.Cancel = true;
+
+        if (Services.AppSettings.MinimizeToTrayOnClose)
+        {
+            Services.TrayIconService.Instance.MinimizeToTray();
+            return;
+        }
 
         if (_isPromptingExit) return;
         _isPromptingExit = true;
@@ -367,6 +380,7 @@ public partial class MainWindow : FluentWindow
                 nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
                 nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
                 nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
+                nameof(Pages.UniversalSavesPage) => S.Get("Nav_UniversalSaves"),
                 _ => ""
             };
         }

@@ -248,6 +248,23 @@ public sealed class TrayIconService : IDisposable
         }
     }
 
+    public void ShowNotification(string title, string message)
+    {
+        if (!_isCreated || !AppSettings.ShowSyncNotifications) return;
+
+        var nid = new NOTIFYICONDATA
+        {
+            cbSize = Marshal.SizeOf<NOTIFYICONDATA>(),
+            hWnd = _hwnd,
+            uID = 1001,
+            uFlags = NIF_INFO,
+            szInfo = message.Length > 255 ? message.Substring(0, 252) + "..." : message,
+            szInfoTitle = title.Length > 63 ? title.Substring(0, 60) + "..." : title,
+            dwInfoFlags = NIIF_INFO
+        };
+        Shell_NotifyIcon(NIM_MODIFY, ref nid);
+    }
+
     public void RestoreFromTray()
     {
         if (_mainWindow == null) return;

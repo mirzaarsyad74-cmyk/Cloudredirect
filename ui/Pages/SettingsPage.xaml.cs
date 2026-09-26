@@ -70,11 +70,23 @@ public partial class SettingsPage : Page
             if (luas == true) SyncLuasToggle.IsChecked = true;
             if (autoUpdateDll == true) AutoUpdateDllToggle.IsChecked = true;
             if (showNonSteamGame == true) ShowNonSteamGameToggle.IsChecked = true;
+
+            StartWithWindowsToggle.IsChecked = AppSettings.StartWithWindows;
+            MinimizeToTrayToggle.IsChecked = AppSettings.MinimizeToTrayOnClose;
+            ShowNotificationsToggle.IsChecked = AppSettings.ShowSyncNotifications;
         }
         finally
         {
             _syncLoading = false;
         }
+    }
+
+    private void AppSettingsToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_syncLoading) return;
+        AppSettings.StartWithWindows = StartWithWindowsToggle.IsChecked == true;
+        AppSettings.MinimizeToTrayOnClose = MinimizeToTrayToggle.IsChecked == true;
+        AppSettings.ShowSyncNotifications = ShowNotificationsToggle.IsChecked == true;
     }
 
     /// <summary>Reads sync toggles from config.json (called inside Task.Run).</summary>

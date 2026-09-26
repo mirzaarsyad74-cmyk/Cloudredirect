@@ -63,6 +63,57 @@
                                                  Checked="SyncToggle_Changed"
                                                  Unchecked="SyncToggle_Changed" />
                             </ui:CardControl>
+
+                            <!-- Start with Windows -->
+                            <ui:CardControl Margin="0,8,0,0">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Start with Windows"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="Launch CloudRedirect automatically on Windows startup (minimized to system tray)."
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="StartWithWindowsToggle"
+                                                 Checked="AppSettingsToggle_Changed"
+                                                 Unchecked="AppSettingsToggle_Changed" />
+                            </ui:CardControl>
+
+                            <!-- Minimize to Tray on Close -->
+                            <ui:CardControl Margin="0,8,0,0">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Minimize to Tray on Close"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="Closing the window keeps CloudRedirect running in the background system tray."
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="MinimizeToTrayToggle"
+                                                 Checked="AppSettingsToggle_Changed"
+                                                 Unchecked="AppSettingsToggle_Changed" />
+                            </ui:CardControl>
+
+                            <!-- Sync Notifications -->
+                            <ui:CardControl Margin="0,8,0,0">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Save Sync Desktop Notifications"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="Show system tray notification balloons when save backups and cloud synchronization complete."
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="ShowNotificationsToggle"
+                                                 Checked="AppSettingsToggle_Changed"
+                                                 Unchecked="AppSettingsToggle_Changed" />
+                            </ui:CardControl>
                         </StackPanel>
                     </StackPanel>
 

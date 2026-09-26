@@ -73,6 +73,9 @@
   <data name="Nav_Stats" xml:space="preserve">
     <value>Statistik</value>
   </data>
+  <data name="Nav_UniversalSaves" xml:space="preserve">
+    <value>Simpanan Awan Sejagat (Mod Selamat)</value>
+  </data>
   <data name="Stats_Hint" xml:space="preserve">
     <value>View current cloud Pencapaian/Masa Bermain data for your injected Aplikasi.</value>
   </data>

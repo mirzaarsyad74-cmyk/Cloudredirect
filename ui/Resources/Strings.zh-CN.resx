@@ -73,6 +73,9 @@
   <data name="Nav_Stats" xml:space="preserve">
     <value>成就与游戏时长</value>
   </data>
+  <data name="Nav_UniversalSaves" xml:space="preserve">
+    <value>通用云存档 (安全模式)</value>
+  </data>
   <data name="Stats_Hint" xml:space="preserve">
     <value>查看已注入应用的云成就/游戏时长数据。</value>
   </data>

@@ -73,6 +73,9 @@
   <data name="Nav_Stats" xml:space="preserve">
     <value>도전 과제 및 플레이 시간</value>
   </data>
+  <data name="Nav_UniversalSaves" xml:space="preserve">
+    <value>범용 클라우드 세이브 (안전 모드)</value>
+  </data>
   <data name="Stats_Hint" xml:space="preserve">
     <value>주입된 앱의 현재 클라우드 도전 과제/플레이 시간 데이터를 확인합니다.</value>
   </data>

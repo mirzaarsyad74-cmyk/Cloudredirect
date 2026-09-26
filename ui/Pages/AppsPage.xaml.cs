@@ -538,6 +538,18 @@ public partial class AppsPage : Page
             app.OrphansExpanded = !app.OrphansExpanded;
     }
 
+    private void SaveHistory_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AppInfo app })
+        {
+            var dialog = new Dialogs.SaveHistoryDialog(app.DisplayName, null)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            dialog.ShowDialog();
+        }
+    }
+
     /// <summary>
     /// Scan every local app's cloud blobs for orphans. Serialized to respect
     /// provider rate limits; Steam-closed gate is checked once upfront so

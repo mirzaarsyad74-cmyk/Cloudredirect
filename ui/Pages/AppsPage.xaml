@@ -283,6 +283,17 @@
                                                            Click="OrphansToggle_Click"
                                                            Visibility="{Binding HasOrphans, Converter={StaticResource BoolToVis}}"
                                                            Margin="0,0,6,0" />
+                                                <ui:Button Appearance="Secondary"
+                                                           VerticalAlignment="Center"
+                                                           Click="SaveHistory_Click"
+                                                           ToolTip="View Save Version History &amp; 1-Click Rollback"
+                                                           Margin="0,0,6,0"
+                                                           Padding="8,5">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <ui:SymbolIcon Symbol="History24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
+                                                        <TextBlock Text="History" FontSize="11" />
+                                                    </StackPanel>
+                                                </ui:Button>
                                                 <Button Click="DeleteApp_Click"
                                                         ToolTip="{res:Loc Apps_DeleteTooltip}"
                                                         Width="30" Height="30"

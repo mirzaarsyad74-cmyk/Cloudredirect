@@ -1552,6 +1552,9 @@ Esto puede causar pérdida de datos en algunos casos.
   <data name="Nav_Stats" xml:space="preserve">
     <value>Logros y tiempo de juego</value>
   </data>
+  <data name="Nav_UniversalSaves" xml:space="preserve">
+    <value>Guardados en la Nube Universales</value>
+  </data>
   <data name="Settings_Experimental" xml:space="preserve">
     <value>Funciones experimentales</value>
   </data>

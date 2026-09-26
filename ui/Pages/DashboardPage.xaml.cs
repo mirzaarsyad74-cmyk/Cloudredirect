@@ -28,6 +28,8 @@ public partial class DashboardPage : Page
             InitializeLanguageSelector();
             Services.SaveUploadWatcherService.Start();
             Services.SaveUploadWatcherService.OnSaveActivity += HandleSaveActivity;
+            Services.ActiveGameTrackerService.OnActiveGameChanged += HandleActiveGameChanged;
+            HandleActiveGameChanged(Services.ActiveGameTrackerService.CurrentGame);
 
             try { await LoadStatusAsync(); }
             catch { }
@@ -47,6 +49,7 @@ public partial class DashboardPage : Page
         Unloaded += (_, _) =>
         {
             Services.SaveUploadWatcherService.OnSaveActivity -= HandleSaveActivity;
+            Services.ActiveGameTrackerService.OnActiveGameChanged -= HandleActiveGameChanged;
             _autoRefreshTimer?.Stop();
             _autoRefreshTimer = null;
         };
@@ -197,11 +200,46 @@ public partial class DashboardPage : Page
                     System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
                 ActivityProgressBar.Visibility = Visibility.Collapsed;
             }
+
+            var uniCount = Services.UniversalSaveWatcherService.GetProfiles().Count;
+            UniversalSavesCountText.Text = $"Configured Games: {uniCount}";
         }
         }
         finally
         {
             _isLoadingStatus = false;
+        }
+    }
+
+    private void HandleActiveGameChanged(Services.ActiveGameInfo? game)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (game != null)
+            {
+                ActiveGameCard.Visibility = Visibility.Visible;
+                ActiveGameTitle.Text = game.Name;
+                if (game.IsUniversal)
+                {
+                    ActiveGameSubtitle.Text = $"Universal Safe Mode • Process: {game.ProcessName} • Out-of-Process Save Watcher Active";
+                }
+                else
+                {
+                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Redirection Active & Armed";
+                }
+            }
+            else
+            {
+                ActiveGameCard.Visibility = Visibility.Collapsed;
+            }
+        });
+    }
+
+    private void UniversalSavesCard_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (Window.GetWindow(this) is MainWindow mw)
+        {
+            mw.NavigateTo(typeof(UniversalSavesPage));
         }
     }
 

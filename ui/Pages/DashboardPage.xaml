@@ -86,6 +86,70 @@
                 </StackPanel>
             </Grid>
 
+            <!-- LIVE ACTIVE GAME BANNER (Auto-Detect Active Game) -->
+            <Border DockPanel.Dock="Top"
+                    x:Name="ActiveGameCard"
+                    Visibility="Collapsed"
+                    Background="#192A1A"
+                    BorderBrush="#4C7815"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="14,10"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Green Pulse Icon -->
+                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20"
+                            Background="#223B1E" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="Games24" FontSize="22"
+                                       Foreground="#A4D007" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- Active Game Details -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="8" Height="8" Fill="#A4D007" Margin="0,0,6,0">
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                 From="1.0" To="0.2" Duration="0:0:0.8" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                            <TextBlock Text="CURRENTLY PLAYING"
+                                       FontSize="10" FontWeight="Bold"
+                                       Foreground="#A4D007" />
+                        </StackPanel>
+                        <TextBlock x:Name="ActiveGameTitle"
+                                   Text="Game Name"
+                                   FontWeight="Bold" FontSize="15"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Margin="0,2,0,0" />
+                        <TextBlock x:Name="ActiveGameSubtitle"
+                                   Text="AppID: 1245620 • Cloud Save Watcher Armed"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+
+                    <!-- Status Pill -->
+                    <Border Grid.Column="2"
+                            Background="#142B1A" BorderBrush="#3D681C" BorderThickness="1"
+                            CornerRadius="12" Padding="12,5" VerticalAlignment="Center" Margin="12,0,0,0">
+                        <TextBlock Text="Sync Active" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#A4D007" />
+                    </Border>
+                </Grid>
+            </Border>
+
             <!-- Real-Time Auto-Save Activity / Progress Notification Banner -->
             <Border DockPanel.Dock="Top"
                     x:Name="SaveActivityCard"
@@ -334,6 +398,41 @@
                         <ui:SymbolIcon x:Name="DllIcon" Symbol="PlugConnected24" FontSize="20"
                                        Foreground="#FFA4D007" VerticalAlignment="Center" />
                     </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- CARD 6: Universal Cloud Saves (Safe Mode / Hypervisor) -->
+            <Border DockPanel.Dock="Top"
+                    Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                    CornerRadius="8" Padding="14,10" Margin="0,0,0,12"
+                    Cursor="Hand" MouseLeftButtonUp="UniversalSavesCard_Click">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Universal Cloud Saves (Safe Mode)"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Foreground="#FF8F98A0" />
+                            <TextBlock Text="Non-Cloud &amp; Anti-Cheat Games"
+                                       FontSize="11" Foreground="#FF66C0F4" Margin="6,0,0,0" />
+                        </StackPanel>
+                        <TextBlock x:Name="UniversalSavesCountText"
+                                   Text="Configured Games: 0"
+                                   FontSize="15" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Margin="0,3,0,3" />
+                        <TextBlock Text="Zero-injection save backup &amp; sync for games like Elden Ring, Baldur's Gate 3, and indie games."
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
+                            Background="#182E40" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="20"
+                                       Foreground="#FF66C0F4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
                 </Grid>
             </Border>
 

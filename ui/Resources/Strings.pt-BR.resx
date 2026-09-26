@@ -1552,6 +1552,9 @@ Tem certeza?</value>
   <data name="Nav_Stats" xml:space="preserve">
     <value>Conquistas e tempo de jogo</value>
   </data>
+  <data name="Nav_UniversalSaves" xml:space="preserve">
+    <value>Nuvem Universal de Jogos</value>
+  </data>
   <data name="Settings_Experimental" xml:space="preserve">
     <value>Recursos experimentais</value>
   </data>

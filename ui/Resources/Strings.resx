@@ -73,6 +73,9 @@
   <data name="Nav_Stats" xml:space="preserve">
     <value>Achievements &amp; Playtime</value>
   </data>
+  <data name="Nav_UniversalSaves" xml:space="preserve">
+    <value>Universal Cloud Saves</value>
+  </data>
   <data name="Stats_Hint" xml:space="preserve">
     <value>View current cloud achievement/playtime data for your injected apps.</value>
   </data>
