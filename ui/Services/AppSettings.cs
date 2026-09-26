@@ -90,6 +90,18 @@ public static class AppSettings
         set => WriteDouble("zoom_scale", value);
     }
 
+    public static bool GlobalHotkeyEnabled
+    {
+        get => ReadBool("global_hotkey_enabled", true);
+        set => WriteBool("global_hotkey_enabled", value);
+    }
+
+    public static string GlobalHotkey
+    {
+        get => ReadString("global_hotkey", "Ctrl+Shift+C");
+        set => WriteString("global_hotkey", value);
+    }
+
     private static bool ReadBool(string keyName, bool defaultValue)
     {
         try
@@ -201,6 +213,75 @@ public static class AppSettings
             {
                 writer.WriteStartObject();
                 writer.WriteNumber(keyName, value);
+
+                if (existing.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var prop in existing.EnumerateObject())
+                    {
+                        if (prop.NameEquals(keyName)) continue;
+                        prop.WriteTo(writer);
+                    }
+                }
+
+                writer.WriteEndObject();
+            }
+
+            File.WriteAllBytes(path, ms.ToArray());
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to write setting {keyName}: {ex}");
+        }
+    }
+
+    private static string ReadString(string keyName, string defaultValue)
+    {
+        try
+        {
+            var path = GetSettingsPath();
+            if (!File.Exists(path)) return defaultValue;
+
+            var json = File.ReadAllText(path);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty(keyName, out var prop))
+            {
+                if (prop.ValueKind == JsonValueKind.String)
+                {
+                    var val = prop.GetString();
+                    if (!string.IsNullOrEmpty(val)) return val;
+                }
+            }
+        }
+        catch { }
+        return defaultValue;
+    }
+
+    public static void WriteString(string keyName, string value)
+    {
+        try
+        {
+            var path = GetSettingsPath();
+            var dir = Path.GetDirectoryName(path)!;
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            JsonElement existing = default;
+            if (File.Exists(path))
+            {
+                try
+                {
+                    var oldJson = File.ReadAllText(path);
+                    using var doc = JsonDocument.Parse(oldJson);
+                    existing = doc.RootElement.Clone();
+                }
+                catch { }
+            }
+
+            using var ms = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true }))
+            {
+                writer.WriteStartObject();
+                writer.WriteString(keyName, value);
 
                 if (existing.ValueKind == JsonValueKind.Object)
                 {

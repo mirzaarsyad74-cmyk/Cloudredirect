@@ -72,12 +72,66 @@ public partial class SettingsPage : Page
             StartWithWindowsToggle.IsChecked = AppSettings.StartWithWindows;
             MinimizeToTrayToggle.IsChecked = AppSettings.MinimizeToTrayOnClose;
             ShowNotificationsToggle.IsChecked = AppSettings.ShowSyncNotifications;
+            GlobalHotkeyToggle.IsChecked = AppSettings.GlobalHotkeyEnabled;
+            PopulateHotkeyPresets();
             AutoProtectNonCloudToggle.IsChecked = AppSettings.AutoProtectNonCloudGames;
             AutoFitZoomToggle.IsChecked = AppSettings.AutoFitZoom;
         }
         finally
         {
             _syncLoading = false;
+        }
+    }
+
+    private void PopulateHotkeyPresets()
+    {
+        var current = AppSettings.GlobalHotkey;
+        var presets = new[] { "Ctrl+Shift+C", "Ctrl+Alt+C", "Ctrl+Shift+R", "Ctrl+Shift+S", "Alt+Shift+C", "Ctrl+~" };
+        HotkeyPresetCombo.Items.Clear();
+        foreach (var p in presets)
+        {
+            HotkeyPresetCombo.Items.Add(p);
+        }
+
+        if (!HotkeyPresetCombo.Items.Contains(current))
+        {
+            HotkeyPresetCombo.Items.Add(current);
+        }
+
+        HotkeyPresetCombo.SelectedItem = current;
+        HotkeyBadgeText.Text = current;
+    }
+
+    private void HotkeyPresetCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncLoading) return;
+        if (HotkeyPresetCombo.SelectedItem is string selected && !string.IsNullOrEmpty(selected))
+        {
+            HotkeyBadgeText.Text = selected;
+            if (GlobalHotkeyToggle.IsChecked == true)
+            {
+                GlobalHotkeyService.Instance.Register(selected);
+            }
+            else
+            {
+                AppSettings.GlobalHotkey = selected;
+            }
+        }
+    }
+
+    private void GlobalHotkeyToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_syncLoading) return;
+        bool isEnabled = GlobalHotkeyToggle.IsChecked == true;
+        AppSettings.GlobalHotkeyEnabled = isEnabled;
+        if (isEnabled)
+        {
+            var shortcut = HotkeyPresetCombo.SelectedItem as string ?? AppSettings.GlobalHotkey;
+            GlobalHotkeyService.Instance.Register(shortcut);
+        }
+        else
+        {
+            GlobalHotkeyService.Instance.Unregister();
         }
     }
 

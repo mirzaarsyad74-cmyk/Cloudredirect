@@ -1,0 +1,241 @@
+using System;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
+
+namespace CloudRedirect.Services;
+
+/// <summary>
+/// Manages global system-wide keyboard shortcuts (e.g. Ctrl+Shift+C) using Win32 RegisterHotKey.
+/// Allows summoning, focusing, or toggling CloudRedirect anytime from any application or game.
+/// </summary>
+public sealed class GlobalHotkeyService : IDisposable
+{
+    private static GlobalHotkeyService? _instance;
+    public static GlobalHotkeyService Instance => _instance ??= new GlobalHotkeyService();
+
+    private const int WM_HOTKEY = 0x0312;
+    private const int HOTKEY_ID = 0xCD01;
+
+    // Modifiers
+    private const uint MOD_ALT = 0x0001;
+    private const uint MOD_CONTROL = 0x0002;
+    private const uint MOD_SHIFT = 0x0004;
+    private const uint MOD_WIN = 0x0008;
+    private const uint MOD_NOREPEAT = 0x4000;
+
+    // ShowWindow commands
+    private const int SW_RESTORE = 9;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    private MainWindow? _mainWindow;
+    private IntPtr _hwnd;
+    private bool _isRegistered;
+    private string _currentShortcut = "Ctrl+Shift+C";
+
+    public string CurrentShortcut => _currentShortcut;
+    public bool IsRegistered => _isRegistered;
+
+    public event Action<string, bool>? OnHotkeyRegistrationChanged;
+
+    public void Initialize(MainWindow mainWindow)
+    {
+        _mainWindow = mainWindow;
+        var helper = new WindowInteropHelper(mainWindow);
+        _hwnd = helper.EnsureHandle();
+
+        var source = HwndSource.FromHwnd(_hwnd);
+        source?.AddHook(WndProc);
+
+        if (AppSettings.GlobalHotkeyEnabled)
+        {
+            Register(AppSettings.GlobalHotkey);
+        }
+    }
+
+    public bool Register(string shortcut)
+    {
+        if (_hwnd == IntPtr.Zero) return false;
+
+        Unregister();
+
+        if (string.IsNullOrWhiteSpace(shortcut))
+        {
+            shortcut = "Ctrl+Shift+C";
+        }
+
+        if (!ParseShortcut(shortcut, out uint modifiers, out uint vk))
+        {
+            return false;
+        }
+
+        // Register with MOD_NOREPEAT so holding the shortcut doesn't spam WM_HOTKEY
+        bool success = RegisterHotKey(_hwnd, HOTKEY_ID, modifiers | MOD_NOREPEAT, vk);
+        if (!success)
+        {
+            // Fallback without MOD_NOREPEAT if unsupported
+            success = RegisterHotKey(_hwnd, HOTKEY_ID, modifiers, vk);
+        }
+
+        if (success)
+        {
+            _isRegistered = true;
+            _currentShortcut = shortcut;
+            AppSettings.GlobalHotkey = shortcut;
+            AppSettings.GlobalHotkeyEnabled = true;
+        }
+        else
+        {
+            _isRegistered = false;
+        }
+
+        OnHotkeyRegistrationChanged?.Invoke(_currentShortcut, _isRegistered);
+        return success;
+    }
+
+    public void Unregister()
+    {
+        if (_isRegistered && _hwnd != IntPtr.Zero)
+        {
+            UnregisterHotKey(_hwnd, HOTKEY_ID);
+            _isRegistered = false;
+            OnHotkeyRegistrationChanged?.Invoke(_currentShortcut, false);
+        }
+    }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_HOTKEY && wParam.ToInt32() == HOTKEY_ID)
+        {
+            HandleHotkeyPressed();
+            handled = true;
+        }
+        return IntPtr.Zero;
+    }
+
+    public void HandleHotkeyPressed()
+    {
+        if (_mainWindow == null) return;
+
+        _mainWindow.Dispatcher.Invoke(() =>
+        {
+            // If window is currently open, visible, not minimized, and is active: toggle back to tray
+            if (_mainWindow.IsVisible && _mainWindow.WindowState != WindowState.Minimized && _mainWindow.IsActive)
+            {
+                TrayIconService.Instance.MinimizeToTray();
+                return;
+            }
+
+            // Otherwise summon and restore to foreground
+            if (!_mainWindow.IsVisible)
+            {
+                _mainWindow.Show();
+            }
+
+            _mainWindow.ShowInTaskbar = true;
+
+            if (_mainWindow.WindowState == WindowState.Minimized)
+            {
+                _mainWindow.WindowState = WindowState.Normal;
+            }
+
+            ShowWindow(_hwnd, SW_RESTORE);
+            SetForegroundWindow(_hwnd);
+            _mainWindow.Activate();
+            _mainWindow.Focus();
+        });
+    }
+
+    private static bool ParseShortcut(string text, out uint modifiers, out uint vk)
+    {
+        modifiers = 0;
+        vk = 0;
+
+        var parts = text.Split(new[] { '+', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0) return false;
+
+        string keyPart = "";
+        foreach (var p in parts)
+        {
+            var part = p.Trim();
+            if (part.Equals("Ctrl", StringComparison.OrdinalIgnoreCase) || part.Equals("Control", StringComparison.OrdinalIgnoreCase))
+            {
+                modifiers |= MOD_CONTROL;
+            }
+            else if (part.Equals("Shift", StringComparison.OrdinalIgnoreCase))
+            {
+                modifiers |= MOD_SHIFT;
+            }
+            else if (part.Equals("Alt", StringComparison.OrdinalIgnoreCase))
+            {
+                modifiers |= MOD_ALT;
+            }
+            else if (part.Equals("Win", StringComparison.OrdinalIgnoreCase) || part.Equals("Windows", StringComparison.OrdinalIgnoreCase))
+            {
+                modifiers |= MOD_WIN;
+            }
+            else
+            {
+                keyPart = part;
+            }
+        }
+
+        if (string.IsNullOrEmpty(keyPart)) return false;
+
+        if (keyPart.Length == 1)
+        {
+            char c = char.ToUpperInvariant(keyPart[0]);
+            if (c >= 'A' && c <= 'Z')
+            {
+                vk = (uint)c;
+                return true;
+            }
+            if (c >= '0' && c <= '9')
+            {
+                vk = (uint)c;
+                return true;
+            }
+            if (c == '~' || c == '`')
+            {
+                vk = 0xC0; // VK_OEM_3
+                return true;
+            }
+        }
+
+        if (keyPart.Equals("F1", StringComparison.OrdinalIgnoreCase)) vk = 0x70;
+        else if (keyPart.Equals("F2", StringComparison.OrdinalIgnoreCase)) vk = 0x71;
+        else if (keyPart.Equals("F3", StringComparison.OrdinalIgnoreCase)) vk = 0x72;
+        else if (keyPart.Equals("F4", StringComparison.OrdinalIgnoreCase)) vk = 0x73;
+        else if (keyPart.Equals("F5", StringComparison.OrdinalIgnoreCase)) vk = 0x74;
+        else if (keyPart.Equals("F6", StringComparison.OrdinalIgnoreCase)) vk = 0x75;
+        else if (keyPart.Equals("F7", StringComparison.OrdinalIgnoreCase)) vk = 0x76;
+        else if (keyPart.Equals("F8", StringComparison.OrdinalIgnoreCase)) vk = 0x77;
+        else if (keyPart.Equals("F9", StringComparison.OrdinalIgnoreCase)) vk = 0x78;
+        else if (keyPart.Equals("F10", StringComparison.OrdinalIgnoreCase)) vk = 0x79;
+        else if (keyPart.Equals("F11", StringComparison.OrdinalIgnoreCase)) vk = 0x7A;
+        else if (keyPart.Equals("F12", StringComparison.OrdinalIgnoreCase)) vk = 0x7B;
+        else if (keyPart.Equals("Space", StringComparison.OrdinalIgnoreCase)) vk = 0x20;
+        else if (keyPart.Equals("Tab", StringComparison.OrdinalIgnoreCase)) vk = 0x09;
+        else return false;
+
+        return true;
+    }
+
+    public void Dispose()
+    {
+        Unregister();
+    }
+}

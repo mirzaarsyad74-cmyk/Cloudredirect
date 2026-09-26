@@ -161,6 +161,8 @@ public sealed class TrayIconService : IDisposable
         return GetClassLongPtr(hwnd, GCLP_HICON);
     }
 
+    private MenuItem? _openMenuItem;
+
     private void BuildContextMenu()
     {
         _contextMenu = new ContextMenu
@@ -168,12 +170,28 @@ public sealed class TrayIconService : IDisposable
             Placement = PlacementMode.MousePoint
         };
 
-        var openItem = new MenuItem
+        var shortcutSuffix = GlobalHotkeyService.Instance.IsRegistered
+            ? $" ({GlobalHotkeyService.Instance.CurrentShortcut})"
+            : "";
+
+        _openMenuItem = new MenuItem
         {
-            Header = "Open CloudRedirect",
+            Header = $"Open CloudRedirect{shortcutSuffix}",
             FontWeight = FontWeights.Bold
         };
-        openItem.Click += (_, _) => RestoreFromTray();
+        _openMenuItem.Click += (_, _) => RestoreFromTray();
+
+        GlobalHotkeyService.Instance.OnHotkeyRegistrationChanged += (shortcut, registered) =>
+        {
+            _mainWindow?.Dispatcher.Invoke(() =>
+            {
+                if (_openMenuItem != null)
+                {
+                    var suffix = registered ? $" ({shortcut})" : "";
+                    _openMenuItem.Header = $"Open CloudRedirect{suffix}";
+                }
+            });
+        };
 
         var minimizeItem = new MenuItem
         {
@@ -187,7 +205,7 @@ public sealed class TrayIconService : IDisposable
         };
         exitItem.Click += (_, _) => ExitApplication();
 
-        _contextMenu.Items.Add(openItem);
+        _contextMenu.Items.Add(_openMenuItem);
         _contextMenu.Items.Add(minimizeItem);
         _contextMenu.Items.Add(new Separator());
         _contextMenu.Items.Add(exitItem);
@@ -273,6 +291,21 @@ public sealed class TrayIconService : IDisposable
         _mainWindow.ShowInTaskbar = true;
         _mainWindow.WindowState = WindowState.Normal;
         _mainWindow.Activate();
+    }
+
+    public void ToggleOrRestoreWindow()
+    {
+        if (_mainWindow == null) return;
+
+        if (_mainWindow.IsVisible && _mainWindow.WindowState != WindowState.Minimized && _mainWindow.IsActive)
+        {
+            MinimizeToTray();
+        }
+        else
+        {
+            RestoreFromTray();
+            SetForegroundWindow(_hwnd);
+        }
     }
 
     public void ExitApplication()

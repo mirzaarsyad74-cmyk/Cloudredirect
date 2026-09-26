@@ -203,29 +203,12 @@ public partial class DashboardPage : Page
 
             var uniCount = Services.UniversalSaveWatcherService.GetProfiles().Count;
             UniversalSavesCountText.Text = S.Format("Dashboard_UniversalSavesConfiguredFormat", uniCount);
-
-            if (!_quickSetupDismissed)
-            {
-                bool isConfigured = (data.config?.IsLocal == true) ||
-                                    (data.config?.IsFolder == true && data.config.SyncPath != null && Directory.Exists(data.config.SyncPath)) ||
-                                    (data.tokenStatus?.IsAuthenticated == true);
-                QuickSetupBanner.Visibility = isConfigured ? Visibility.Collapsed : Visibility.Visible;
-                QuickSetupSteamText.Text = data.steamPath != null ? "Detected ✓" : "Not Found";
-            }
         }
         }
         finally
         {
             _isLoadingStatus = false;
         }
-    }
-
-    private bool _quickSetupDismissed;
-
-    private void DismissQuickSetup_Click(object sender, RoutedEventArgs e)
-    {
-        _quickSetupDismissed = true;
-        QuickSetupBanner.Visibility = Visibility.Collapsed;
     }
 
     private Services.ActiveGameInfo? _currentActiveGame;

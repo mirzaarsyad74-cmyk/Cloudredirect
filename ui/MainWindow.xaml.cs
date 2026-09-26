@@ -96,8 +96,7 @@ public partial class MainWindow : FluentWindow
                 };
 
                 Services.SaveUploadWatcherService.Start();
-                Services.SaveUploadWatcherService.OnSaveActivity += HandleGlobalSaveActivity;
-                Services.UniversalSaveWatcherService.OnProfileStatusChanged += HandleProfileStatusChanged;
+                Services.GlobalHotkeyService.Instance.Initialize(this);
 
                 var mode = await Task.Run(() => MigrateLegacyMode());
                 ApplyMode(mode);
@@ -121,6 +120,7 @@ public partial class MainWindow : FluentWindow
     public void ForceExit()
     {
         _isExplicitExit = true;
+        Services.GlobalHotkeyService.Instance.Dispose();
         Services.TrayIconService.Instance.Dispose();
         Close();
     }
@@ -402,97 +402,28 @@ public partial class MainWindow : FluentWindow
         var page = Activator.CreateInstance(pageType);
         RootFrame.Navigate(page);
 
-        UpdateActiveNavTab(pageType);
-    }
-
-    private void UpdateActiveNavTab(Type pageType)
-    {
-        if (NavDashboardTab == null) return;
-
-        NavDashboardTab.IsChecked = pageType == typeof(Pages.DashboardPage);
-        NavUniversalSavesTab.IsChecked = pageType == typeof(Pages.UniversalSavesPage);
-        NavAppsTab.IsChecked = pageType == typeof(Pages.AppsPage);
-        NavCloudProviderTab.IsChecked = pageType == typeof(Pages.CloudProviderPage);
-        NavStatsTab.IsChecked = pageType == typeof(Pages.StatsPage);
-        NavCleanupTab.IsChecked = pageType == typeof(Pages.CleanupPage) || pageType == typeof(Pages.MigrationPage);
-        NavSettingsTab.IsChecked = pageType == typeof(Pages.SettingsPage);
-    }
-
-    private void NavTab_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is RadioButton { Tag: string tag })
+        bool isDashboard = pageType == typeof(Pages.DashboardPage);
+        TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
+        if (!isDashboard)
         {
-            Type targetPage = tag switch
+            BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
+            CurrentPageTitle.Text = pageType.Name switch
             {
-                "Dashboard" => typeof(Pages.DashboardPage),
-                "UniversalSaves" => typeof(Pages.UniversalSavesPage),
-                "Apps" => typeof(Pages.AppsPage),
-                "CloudProvider" => typeof(Pages.CloudProviderPage),
-                "Stats" => typeof(Pages.StatsPage),
-                "Cleanup" => typeof(Pages.CleanupPage),
-                "Settings" => typeof(Pages.SettingsPage),
-                _ => typeof(Pages.DashboardPage)
+                nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
+                nameof(Pages.AppsPage) => S.Get("Nav_Apps"),
+                nameof(Pages.CleanupPage) => S.Get("Nav_Cleanup"),
+                nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
+                nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
+                nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
+                nameof(Pages.UniversalSavesPage) => S.Get("Nav_UniversalSaves"),
+                _ => ""
             };
-
-            NavigateTo(targetPage);
         }
     }
 
-    private void GlobalSyncPill_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void BackToDashboard_Click(object sender, RoutedEventArgs e)
     {
-        NavigateTo(typeof(Pages.UniversalSavesPage));
-    }
-
-    private void OpenQuickGuide_Click(object sender, RoutedEventArgs e)
-    {
-        var dlg = new Dialogs.InteractiveGuideDialog
-        {
-            Owner = this
-        };
-        dlg.ShowDialog();
-    }
-
-    private void HandleGlobalSaveActivity(Services.SaveUploadEvent ev)
-    {
-        Dispatcher.Invoke(() =>
-        {
-            if (ev.IsUploading)
-            {
-                GlobalSyncDot.Visibility = Visibility.Collapsed;
-                GlobalSyncIcon.Visibility = Visibility.Visible;
-                GlobalSyncPill.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1B, 0x33, 0x47));
-                GlobalSyncPill.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1A, 0x9F, 0xFF));
-                GlobalSyncText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x66, 0xC0, 0xF4));
-                GlobalSyncText.Text = $"Syncing {ev.GameName}...";
-                GlobalSyncPill.ToolTip = $"Uploading {ev.FileName} to cloud ({ev.Bytes:N0} bytes)";
-            }
-            else
-            {
-                GlobalSyncDot.Visibility = Visibility.Visible;
-                GlobalSyncIcon.Visibility = Visibility.Collapsed;
-                GlobalSyncPill.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x16, 0x23, 0x32));
-                GlobalSyncPill.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x25, 0x42, 0x5F));
-                GlobalSyncText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xA4, 0xD0, 0x07));
-                GlobalSyncText.Text = "Cloud Ready";
-                GlobalSyncPill.ToolTip = $"All saves synchronized (Last sync: {ev.Timestamp:t})";
-            }
-        });
-    }
-
-    private void HandleProfileStatusChanged(Services.UniversalGameProfile profile)
-    {
-        if (profile.Status == "Syncing...")
-        {
-            Dispatcher.Invoke(() =>
-            {
-                GlobalSyncDot.Visibility = Visibility.Collapsed;
-                GlobalSyncIcon.Visibility = Visibility.Visible;
-                GlobalSyncPill.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1B, 0x33, 0x47));
-                GlobalSyncPill.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1A, 0x9F, 0xFF));
-                GlobalSyncText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x66, 0xC0, 0xF4));
-                GlobalSyncText.Text = $"Syncing {profile.GameName}...";
-            });
-        }
+        NavigateTo(typeof(Pages.DashboardPage));
     }
 
     private void OnLanguageChanged()
@@ -504,19 +435,7 @@ public partial class MainWindow : FluentWindow
             UpdateSkipButton.Content = S.Get("AppUpdate_Skip");
             UpdateNowButton.Content = S.Get("AppUpdate_UpdateNow");
             UpdateReleaseNotesButton.Content = S.Get("AppUpdate_ReleaseNotes");
-
-            if (NavDashboardTab != null) NavDashboardTab.Content = S.Get("Nav_Dashboard");
-            if (NavUniversalSavesTab != null) NavUniversalSavesTab.Content = S.Get("Nav_UniversalSaves");
-            if (NavAppsTab != null) NavAppsTab.Content = S.Get("Nav_Apps");
-            if (NavCloudProviderTab != null) NavCloudProviderTab.Content = S.Get("Nav_CloudProvider");
-            if (NavStatsTab != null) NavStatsTab.Content = S.Get("Nav_Stats");
-            if (NavCleanupTab != null) NavCleanupTab.Content = S.Get("Nav_Cleanup");
-            if (NavSettingsTab != null) NavSettingsTab.Content = S.Get("Nav_Settings");
-            if (QuickGuideNavBtn != null)
-            {
-                QuickGuideNavBtn.Content = S.Get("Dashboard_GuideBtn");
-                QuickGuideNavBtn.ToolTip = S.Get("Dashboard_GuideTooltip");
-            }
+            BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
 
             RefreshCurrentPage();
         });
@@ -529,8 +448,31 @@ public partial class MainWindow : FluentWindow
             var pageType = currentPage.GetType();
             var newPage = Activator.CreateInstance(pageType);
             RootFrame.Navigate(newPage);
-            UpdateActiveNavTab(pageType);
+
+            bool isDashboard = pageType == typeof(Pages.DashboardPage);
+            TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
+            if (!isDashboard)
+            {
+                BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
+                CurrentPageTitle.Text = pageType.Name switch
+                {
+                    nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
+                    nameof(Pages.AppsPage) => S.Get("Nav_Apps"),
+                    nameof(Pages.CleanupPage) => S.Get("Nav_Cleanup"),
+                    nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
+                    nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
+                    nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
+                    nameof(Pages.UniversalSavesPage) => S.Get("Nav_UniversalSaves"),
+                    _ => ""
+                };
+            }
         }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        Services.GlobalHotkeyService.Instance.Dispose();
+        base.OnClosed(e);
     }
 
     public void ShowRestartSteam()
