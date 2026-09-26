@@ -14,7 +14,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                         <ui:Button Content="Scan Steam Library"
                                    Appearance="Primary"
-                                   Icon="{ui:SymbolIcon Gamepad24}"
+                                   Icon="{ui:SymbolIcon Games24}"
                                    Click="ScanSteamLibrary_Click"
                                    Margin="0,0,8,0" />
                         <ui:Button Content="Auto-Scan PC for Saves"
