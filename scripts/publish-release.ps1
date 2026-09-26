@@ -119,9 +119,4 @@ function Upload-Asset($filePath, $assetName, $contentType) {
 Upload-Asset $exePath "CloudRedirect.exe" "application/octet-stream"
 Upload-Asset $shaPath "CloudRedirect.exe.sha256" "text/plain"
 
-$setupExePath = Join-Path $PSScriptRoot "..\ui\bin\publish\CloudRedirect-Setup.exe"
-if (Test-Path $setupExePath) {
-    Upload-Asset $setupExePath "CloudRedirect-Setup.exe" "application/octet-stream"
-}
-
 Write-Host "Release $tagName published successfully with assets!"

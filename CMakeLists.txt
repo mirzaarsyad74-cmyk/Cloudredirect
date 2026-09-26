@@ -329,7 +329,8 @@ add_custom_target(ui ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:cloud_redirect_cli>"
         "${CMAKE_SOURCE_DIR}/build/Release/cloud_redirect_cli.exe"
-    COMMAND dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o bin/publish
+    COMMAND dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:AssemblyName=CloudRedirect.Core -o bin/publish
+    COMMAND C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe /target:winexe /platform:x64 /win32icon:${CMAKE_SOURCE_DIR}/ui/steam_logo3.ico /res:bin/publish/CloudRedirect.Core.exe,MainAppPayload /out:bin/publish/CloudRedirect.exe /r:System.dll,System.Windows.Forms.dll,System.Drawing.dll,System.Core.dll ${CMAKE_SOURCE_DIR}/src/launcher/CloudRedirectLauncher.cs
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ui
     COMMENT "Publishing CloudRedirect UI"
     DEPENDS cloud_redirect cloud_redirect_cli

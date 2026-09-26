@@ -133,7 +133,7 @@ internal static class AppUpdater
                     var remoteHash = (await Http.GetStringAsync(sha256Url)).Trim();
                     if (remoteHash.Length == 64)
                     {
-                        var localExePath = Environment.ProcessPath;
+                        var localExePath = GetAppExecutablePath();
                         if (!string.IsNullOrEmpty(localExePath) && File.Exists(localExePath))
                         {
                             var localHash = ComputeFileSHA256(localExePath);
@@ -319,11 +319,19 @@ internal static class AppUpdater
         }
     }
 
+    public static string? GetAppExecutablePath()
+    {
+        var launcherPath = Environment.GetEnvironmentVariable("CLOUDREDIRECT_LAUNCHER_PATH");
+        if (!string.IsNullOrEmpty(launcherPath) && File.Exists(launcherPath))
+            return launcherPath;
+        return Environment.ProcessPath;
+    }
+
     public static string? ApplyStagedAndRelaunch(string stagedExePath)
     {
         try
         {
-            var currentExe = Environment.ProcessPath;
+            var currentExe = GetAppExecutablePath();
             if (string.IsNullOrEmpty(currentExe))
                 return "Could not determine current executable path";
 

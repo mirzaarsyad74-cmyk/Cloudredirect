@@ -4,8 +4,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -17,32 +17,135 @@ namespace CloudRedirectLauncher
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
+        private static string[] _savedArgs;
+
         [STAThread]
         private static void Main(string[] args)
         {
+            _savedArgs = args;
             try { SetProcessDPIAware(); } catch { }
+
+            // Store the path of this outer executable so the application and in-app updater know where it is located
+            try
+            {
+                Environment.SetEnvironmentVariable("CLOUDREDIRECT_LAUNCHER_PATH", Application.ExecutablePath, EnvironmentVariableTarget.Process);
+            }
+            catch { }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // If .NET 8 Desktop Runtime is already installed AND CloudRedirect.exe exists locally,
-            // launch it immediately without showing any setup window!
-            string localExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.exe");
-            if (RuntimeChecker.IsDotNet8DesktopInstalled() && File.Exists(localExe))
+            // 1. If .NET 8 Desktop Runtime is already installed on this PC:
+            // Extract the embedded payload if needed and launch immediately!
+            if (RuntimeChecker.IsDotNet8DesktopInstalled())
             {
-                try
+                if (LaunchMainApp(args))
                 {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = localExe,
-                        WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
-                    });
                     return;
                 }
-                catch { }
             }
 
-            // Otherwise, show the Steam-themed Setup window with custom progress bar
-            Application.Run(new LauncherForm());
+            // 2. If .NET 8 Desktop Runtime is NOT installed:
+            // Show the Steam-styled dark Setup window with custom progress bar to download & install runtime
+            Application.Run(new LauncherForm(args));
+        }
+
+        public static string GetTargetAppPath()
+        {
+            string appDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudRedirect", "app");
+            return Path.Combine(appDir, "CloudRedirect.Core.exe");
+        }
+
+        public static bool EnsurePayloadExtracted()
+        {
+            try
+            {
+                string targetExe = GetTargetAppPath();
+                var assembly = Assembly.GetExecutingAssembly();
+                using (var stream = assembly.GetManifestResourceStream("MainAppPayload"))
+                {
+                    if (stream == null)
+                    {
+                        // Fallback: check if CloudRedirect.Core.exe exists next to launcher
+                        string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
+                        return File.Exists(sideBySide);
+                    }
+
+                    if (File.Exists(targetExe))
+                    {
+                        var fi = new FileInfo(targetExe);
+                        if (fi.Length == stream.Length)
+                        {
+                            return true;
+                        }
+                    }
+
+                    string dir = Path.GetDirectoryName(targetExe);
+                    if (!Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+
+                    string tempTarget = targetExe + ".tmp";
+                    using (var fs = new FileStream(tempTarget, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        byte[] buffer = new byte[81920];
+                        int read;
+                        while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            fs.Write(buffer, 0, read);
+                        }
+                    }
+
+                    if (File.Exists(targetExe))
+                    {
+                        try { File.Delete(targetExe); } catch { }
+                    }
+                    File.Move(tempTarget, targetExe);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Extraction error: " + ex.Message);
+                return File.Exists(GetTargetAppPath());
+            }
+        }
+
+        public static bool LaunchMainApp(string[] args)
+        {
+            try
+            {
+                if (!EnsurePayloadExtracted())
+                {
+                    return false;
+                }
+
+                string targetExe = GetTargetAppPath();
+                if (!File.Exists(targetExe))
+                {
+                    string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
+                    if (File.Exists(sideBySide)) targetExe = sideBySide;
+                    else return false;
+                }
+
+                string arguments = args != null && args.Length > 0 ? string.Join(" ", args) : "";
+
+                var psi = new ProcessStartInfo
+                {
+                    FileName = targetExe,
+                    Arguments = arguments,
+                    WorkingDirectory = Path.GetDirectoryName(targetExe),
+                    UseShellExecute = false
+                };
+
+                psi.EnvironmentVariables["CLOUDREDIRECT_LAUNCHER_PATH"] = Application.ExecutablePath;
+
+                Process.Start(psi);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 
@@ -144,13 +247,11 @@ namespace CloudRedirectLauncher
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            // Background
             using (var brush = new SolidBrush(BackColor))
             {
                 g.FillRectangle(brush, ClientRectangle);
             }
 
-            // Fill
             if (_value > 0)
             {
                 float pct = (float)_value / _maximum;
@@ -165,7 +266,6 @@ namespace CloudRedirectLauncher
                 }
             }
 
-            // Border
             using (var pen = new Pen(Color.FromArgb(42, 71, 94), 1))
             {
                 g.DrawRectangle(pen, 0, 0, ClientRectangle.Width - 1, Height - 1);
@@ -175,6 +275,7 @@ namespace CloudRedirectLauncher
 
     public class LauncherForm : Form
     {
+        private string[] _args;
         private Label _titleLabel;
         private Label _subtitleLabel;
         private Label _statusLabel;
@@ -183,8 +284,9 @@ namespace CloudRedirectLauncher
         private Button _actionButton;
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public LauncherForm()
+        public LauncherForm(string[] args)
         {
+            _args = args;
             InitializeUi();
             Shown += (s, e) => StartSetupWorkflow();
         }
@@ -200,7 +302,6 @@ namespace CloudRedirectLauncher
             ForeColor = Color.FromArgb(198, 212, 223);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular);
 
-            // Header Banner
             var headerPanel = new Panel
             {
                 Dock = DockStyle.Top,
@@ -231,7 +332,6 @@ namespace CloudRedirectLauncher
             headerPanel.Controls.Add(_subtitleLabel);
             Controls.Add(headerPanel);
 
-            // Status label
             _statusLabel = new Label
             {
                 Text = "Checking system requirements...",
@@ -242,7 +342,6 @@ namespace CloudRedirectLauncher
             };
             Controls.Add(_statusLabel);
 
-            // Progress Bar
             _progressBar = new SteamProgressBar
             {
                 Location = new Point(24, 114),
@@ -252,7 +351,6 @@ namespace CloudRedirectLauncher
             };
             Controls.Add(_progressBar);
 
-            // Details label (MB, speed, status details)
             _detailsLabel = new Label
             {
                 Text = "Initializing...",
@@ -263,7 +361,6 @@ namespace CloudRedirectLauncher
             };
             Controls.Add(_detailsLabel);
 
-            // Bottom Buttons
             _actionButton = new Button
             {
                 Text = "Cancel",
@@ -288,7 +385,7 @@ namespace CloudRedirectLauncher
         {
             try
             {
-                // 1. Check .NET 8 Desktop Runtime
+                // 1. Check & Install .NET 8 Desktop Runtime (x64)
                 if (!RuntimeChecker.IsDotNet8DesktopInstalled())
                 {
                     UpdateStatus("Downloading .NET 8 Desktop Runtime (x64)...", "Downloading official Microsoft component...");
@@ -315,7 +412,7 @@ namespace CloudRedirectLauncher
                     });
                 }
 
-                // 2. Check VC++ Redistributable (x64)
+                // 2. Check & Install Visual C++ Redistributable (x64)
                 if (!RuntimeChecker.IsVCRedistInstalled())
                 {
                     UpdateStatus("Downloading Visual C++ Redistributable (x64)...", "Downloading official Microsoft component...");
@@ -343,34 +440,12 @@ namespace CloudRedirectLauncher
                     });
                 }
 
-                // 3. Check for CloudRedirect.exe in current directory
-                string appExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.exe");
-                if (!File.Exists(appExe))
-                {
-                    UpdateStatus("Downloading CloudRedirect Application...", "Fetching latest version from GitHub...");
-                    _progressBar.Value = 0;
-
-                    string downloadUrl = await GetLatestReleaseDownloadUrlAsync();
-                    if (!string.IsNullOrEmpty(downloadUrl))
-                    {
-                        await DownloadFileWithProgress(downloadUrl, appExe);
-                    }
-                }
-
-                // 4. Finished! Launch application
+                // 3. Launch application
                 UpdateStatus("Setup Complete!", "Launching CloudRedirect...");
                 _progressBar.Value = 100;
-                await System.Threading.Tasks.Task.Delay(800);
+                await System.Threading.Tasks.Task.Delay(500);
 
-                if (File.Exists(appExe))
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = appExe,
-                        WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
-                    });
-                }
-
+                Program.LaunchMainApp(_args);
                 Close();
             }
             catch (OperationCanceledException)
@@ -422,29 +497,6 @@ namespace CloudRedirectLauncher
                 _cts.Token.Register(() => client.CancelAsync());
                 await client.DownloadFileTaskAsync(new Uri(url), destination);
             }
-        }
-
-        private async System.Threading.Tasks.Task<string> GetLatestReleaseDownloadUrlAsync()
-        {
-            return await System.Threading.Tasks.Task.Run(() =>
-            {
-                try
-                {
-                    using (var client = new WebClient())
-                    {
-                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                        client.Headers.Add("User-Agent", "CloudRedirect-Launcher");
-                        string json = client.DownloadString("https://api.github.com/repos/mirzaarsyad74-cmyk/Cloudredirect/releases/latest");
-                        var match = Regex.Match(json, @"""browser_download_url"":\s*""([^""]+CloudRedirect\.exe)""", RegexOptions.IgnoreCase);
-                        if (match.Success)
-                        {
-                            return match.Groups[1].Value;
-                        }
-                    }
-                }
-                catch { }
-                return "https://github.com/mirzaarsyad74-cmyk/Cloudredirect/releases/latest/download/CloudRedirect.exe";
-            });
         }
     }
 }
