@@ -43,23 +43,29 @@
                             Background="#182533"
                             BorderBrush="#293D54"
                             BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="8,4"
-                            Margin="4,4,4,10">
-                        <Grid>
+                            CornerRadius="5"
+                            Padding="8,2,6,2"
+                            Margin="4,2,4,12"
+                            MinHeight="36">
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <ui:SymbolIcon Symbol="Globe24" FontSize="15" Foreground="#66C0F4" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ui:SymbolIcon Symbol="Globe24" FontSize="16" Foreground="#66C0F4" VerticalAlignment="Center" Margin="2,0,8,0" />
                             <ComboBox x:Name="GuideLanguageComboBox"
                                       Grid.Column="1"
-                                      Height="26"
-                                      FontSize="12"
+                                      Height="32"
+                                      MinHeight="32"
+                                      FontSize="12.5"
                                       Background="Transparent"
                                       BorderThickness="0"
-                                      SelectionChanged="GuideLanguageComboBox_SelectionChanged"
-                                      VerticalAlignment="Center" />
+                                      Padding="4,2,24,2"
+                                      VerticalAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      MaxDropDownHeight="320"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      SelectionChanged="GuideLanguageComboBox_SelectionChanged" />
                         </Grid>
                     </Border>
 

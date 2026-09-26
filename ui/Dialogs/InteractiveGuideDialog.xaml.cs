@@ -56,19 +56,39 @@ public partial class InteractiveGuideDialog : FluentWindow
     private void PopulateLanguageSelector()
     {
         var currentPref = LanguageService.ReadLanguagePreference();
-        GuideLanguageComboBox.ItemsSource = LanguageService.SupportedLanguages;
-        GuideLanguageComboBox.DisplayMemberPath = "NativeName";
-        GuideLanguageComboBox.SelectedValuePath = "Code";
+        GuideLanguageComboBox.Items.Clear();
 
-        var selected = LanguageService.SupportedLanguages.FirstOrDefault(l => l.Code == currentPref)
-                       ?? LanguageService.SupportedLanguages.First();
-        GuideLanguageComboBox.SelectedItem = selected;
+        int selectedIndex = 0;
+        var languages = LanguageService.SupportedLanguages;
+        for (int i = 0; i < languages.Length; i++)
+        {
+            var lang = languages[i];
+            var itemText = lang.Code == "system"
+                ? S.Get(lang.ResourceKey)
+                : lang.DisplayName;
+
+            var cbi = new ComboBoxItem
+            {
+                Content = itemText,
+                Tag = lang,
+                FontSize = 12.5,
+                Padding = new Thickness(8, 6, 8, 6)
+            };
+            GuideLanguageComboBox.Items.Add(cbi);
+
+            if (string.Equals(lang.Code, currentPref, StringComparison.OrdinalIgnoreCase))
+            {
+                selectedIndex = i;
+            }
+        }
+
+        GuideLanguageComboBox.SelectedIndex = selectedIndex;
     }
 
     private void GuideLanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isInitializing) return;
-        if (GuideLanguageComboBox.SelectedItem is LanguageService.LanguageItem item)
+        if (GuideLanguageComboBox.SelectedItem is ComboBoxItem { Tag: LanguageService.LanguageItem item })
         {
             LanguageService.ApplyLanguage(item.Code, save: true);
             var prevIndex = FeatureTabsListBox.SelectedIndex;
@@ -853,24 +873,33 @@ public partial class InteractiveGuideDialog : FluentWindow
         HighlightsPanel.Children.Clear();
         foreach (var h in step.Highlights)
         {
-            var sp = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 6) };
-            sp.Children.Add(new SymbolIcon
+            var grid = new Grid { Margin = new Thickness(0, 0, 0, 8) };
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var icon = new SymbolIcon
             {
                 Symbol = Wpf.Ui.Controls.SymbolRegular.CheckmarkCircle24,
                 FontSize = 14,
                 Foreground = new SolidColorBrush(Color.FromRgb(0xA4, 0xD0, 0x07)),
                 Margin = new Thickness(0, 2, 8, 0),
                 VerticalAlignment = VerticalAlignment.Top
-            });
-            sp.Children.Add(new TextBlock
+            };
+            Grid.SetColumn(icon, 0);
+            grid.Children.Add(icon);
+
+            var tb = new TextBlock
             {
                 Text = h,
                 FontSize = 12,
                 Foreground = new SolidColorBrush(Color.FromRgb(0xC6, 0xD4, 0xDF)),
                 TextWrapping = TextWrapping.Wrap,
                 LineHeight = 17
-            });
-            HighlightsPanel.Children.Add(sp);
+            };
+            Grid.SetColumn(tb, 1);
+            grid.Children.Add(tb);
+
+            HighlightsPanel.Children.Add(grid);
         }
 
         int idx = FeatureTabsListBox.SelectedIndex;
