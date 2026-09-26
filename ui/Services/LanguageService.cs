@@ -23,6 +23,7 @@ public static class LanguageService
         new("pt-BR", "Português (Portuguese)", "Português", "Settings_LanguagePortuguese"),
         new("zh-CN", "简体中文 (Chinese)", "简体中文", "Settings_LanguageSimplifiedChinese"),
         new("ms", "Bahasa Melayu (Malay)", "Bahasa Melayu", "Settings_LanguageMalay"),
+        new("ko", "한국어 (Korean)", "한국어", "Settings_LanguageKorean"),
     ];
 
     public static event Action? OnLanguageChanged;

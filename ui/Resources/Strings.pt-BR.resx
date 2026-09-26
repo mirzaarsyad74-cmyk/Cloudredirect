@@ -1815,6 +1815,9 @@ Tem certeza?</value>
   <data name="Settings_LanguageMalay" xml:space="preserve">
     <value>Malaio (Bahasa Melayu)</value>
   </data>
+  <data name="Settings_LanguageKorean" xml:space="preserve">
+    <value>Coreano (한국어)</value>
+  </data>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- News Page                                                           -->

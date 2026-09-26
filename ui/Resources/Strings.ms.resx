@@ -1610,6 +1610,9 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
   <data name="Settings_LanguageMalay" xml:space="preserve">
     <value>Bahasa Melayu</value>
   </data>
+  <data name="Settings_LanguageKorean" xml:space="preserve">
+    <value>Bahasa Korea (한국어)</value>
+  </data>
   <data name="Settings_Sync" xml:space="preserve">
     <value>Penyegerakan</value>
   </data>

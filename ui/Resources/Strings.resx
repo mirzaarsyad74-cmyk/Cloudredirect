@@ -1694,6 +1694,9 @@ Are you sure?</value>
   <data name="Settings_LanguageMalay" xml:space="preserve">
     <value>Bahasa Melayu</value>
   </data>
+  <data name="Settings_LanguageKorean" xml:space="preserve">
+    <value>한국어</value>
+  </data>
   <data name="Settings_Sync" xml:space="preserve">
     <value>Sync</value>
   </data>
