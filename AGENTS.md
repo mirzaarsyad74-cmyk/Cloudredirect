@@ -3,11 +3,12 @@
 ## Post-Task Build & Release Directive
 **MANDATORY**: Whenever you make any changes or complete any task in this codebase, you **MUST** automatically:
 1. **Bump Version Number**: Increment `<ReleaseVersion>` in `Version.props` (e.g. `2.6.5` -> `2.6.6`) so that running instances of CloudRedirect can auto-detect the newer version and prompt/auto-install it.
-2. **Build and Publish the Windows Executable (`.exe`)**:
+2. **Build and Publish the Windows Executables (`.exe`)**:
    ```powershell
-   dotnet publish ui/CloudRedirect.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o ui/bin/publish
+   dotnet publish ui/CloudRedirect.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o ui/bin/publish
+   & "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /target:winexe /platform:x64 /win32icon:ui\steam_logo3.ico /out:ui\bin\publish\CloudRedirect-Setup.exe /r:System.dll,System.Windows.Forms.dll,System.Drawing.dll,System.Core.dll src\launcher\CloudRedirectLauncher.cs
    ```
-   The published executable will be at `ui/bin/publish/CloudRedirect.exe`.
+   The published executables will be at `ui/bin/publish/CloudRedirect.exe` (~10 MB) and `ui/bin/publish/CloudRedirect-Setup.exe` (~160 KB).
 3. **Commit & Push Code**:
    ```powershell
    git add -A

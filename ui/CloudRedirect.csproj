@@ -16,9 +16,7 @@
          metadata after '+' is stripped for display. -->
     <InformationalVersion>$(ReleaseVersion)$(ReleasePrerelease)+win.$(WindowsRevision)+core.$(CoreGeneration)</InformationalVersion>
     <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <!-- Suppress nullable reference warnings (CS8600-CS8625) - cosmetic, not bugs -->
     <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8619;CS8625</NoWarn>
