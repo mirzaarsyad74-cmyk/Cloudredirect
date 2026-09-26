@@ -67,6 +67,8 @@ public partial class App : System.Windows.Application
                 LogStartup("DispatcherUnhandledException: " + args.Exception);
             }
             catch { }
+            // Prevent non-fatal XAML rendering/binding errors from crashing the whole app
+            args.Handled = true;
         };
 
         bool isNewInstance;
@@ -103,7 +105,11 @@ public partial class App : System.Windows.Application
             if (signaled)
             {
                 LogStartup("Shutting down secondary instance.");
-                StartupUri = null;
+                // Do NOT set StartupUri = null (WPF throws ArgumentNullException).
+                // Instead, set ShutdownMode so Shutdown() works immediately without
+                // needing a MainWindow, and clear StartupUri via the XAML-declared
+                // value being overridden by creating no window.
+                ShutdownMode = ShutdownMode.OnExplicitShutdown;
                 Shutdown(0);
                 return;
             }

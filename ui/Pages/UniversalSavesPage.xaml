@@ -337,7 +337,7 @@
                                         <Border Background="Transparent"
                                                 Cursor="Hand"
                                                 ToolTip="Click to open save folder in File Explorer"
-                                                Tag="{Binding ExpandedSavePath}"
+                                                Tag="{Binding ExpandedSavePath, Mode=OneWay}"
                                                 MouseLeftButtonUp="SavePath_Click">
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                 <ui:SymbolIcon Symbol="Folder20" FontSize="11" Foreground="#66C0F4" Margin="0,0,4,0" VerticalAlignment="Center" />

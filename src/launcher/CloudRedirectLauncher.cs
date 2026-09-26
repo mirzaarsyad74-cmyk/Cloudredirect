@@ -13,8 +13,8 @@ using Microsoft.Win32;
 [assembly: AssemblyTitle("CloudRedirect")]
 [assembly: AssemblyDescription("CloudRedirect Steam Cloud Synchronization & Save Redirection Companion")]
 [assembly: AssemblyProduct("CloudRedirect")]
-[assembly: AssemblyVersion("2.9.12.0")]
-[assembly: AssemblyFileVersion("2.9.12.0")]
+[assembly: AssemblyVersion("2.9.13.0")]
+[assembly: AssemblyFileVersion("2.9.13.0")]
 
 namespace CloudRedirectLauncher
 {
@@ -77,23 +77,18 @@ namespace CloudRedirectLauncher
         {
             string currentExe = Application.ExecutablePath;
 
-            // 1. Check side-by-side CloudRedirect.Core.exe (only if it is NOT the running executable)
-            string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
-            if (File.Exists(sideBySide) && !string.Equals(Path.GetFullPath(sideBySide), Path.GetFullPath(currentExe), StringComparison.OrdinalIgnoreCase))
-            {
-                return sideBySide;
-            }
-
-            // 2. Standard location: %LocalAppData%\CloudRedirect\app\CloudRedirect.Core.exe
+            // 1. Standard location: %LocalAppData%\CloudRedirect\app\CloudRedirect.Core.exe
+            //    This is the canonical install path and should always be preferred.
             string appDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudRedirect", "app");
             string appTarget = Path.Combine(appDir, "CloudRedirect.Core.exe");
 
-            // If the running executable is itself CloudRedirect.Core.exe in appDir, avoid self-reference
+            // If the running executable IS the appTarget, avoid self-reference
             if (string.Equals(Path.GetFullPath(appTarget), Path.GetFullPath(currentExe), StringComparison.OrdinalIgnoreCase))
             {
                 return Path.Combine(appDir, "CloudRedirect.App.exe");
             }
 
+            // Prefer %LocalAppData% path (even if it doesn't exist yet — EnsurePayloadExtracted will create it)
             return appTarget;
         }
 
