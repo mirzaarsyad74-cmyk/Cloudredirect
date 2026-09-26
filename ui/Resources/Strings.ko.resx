@@ -2339,4 +2339,52 @@ Steam 클라우드가 활성화된 경우 Steam이 복원된 파일을 덮어쓸
   <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
     <value>저장 파일 없음</value>
   </data>
+  <data name="CloudExplorer_Title" xml:space="preserve">
+    <value>클라우드 스토리지 탐색기</value>
+  </data>
+  <data name="CloudExplorer_Subtitle" xml:space="preserve">
+    <value>클라우드 세이브 스토리지</value>
+  </data>
+  <data name="CloudExplorer_Breadcrumb_Drive" xml:space="preserve">
+    <value>Google Drive / CloudRedirect / UniversalCloudSaves</value>
+  </data>
+  <data name="CloudExplorer_Loading" xml:space="preserve">
+    <value>클라우드 스토리지에 연결 중...</value>
+  </data>
+  <data name="CloudExplorer_LoadingFiles" xml:space="preserve">
+    <value>클라우드 파일 불러오는 중...</value>
+  </data>
+  <data name="CloudExplorer_NoFilesTitle" xml:space="preserve">
+    <value>클라우드 세이브 파일을 찾을 수 없습니다</value>
+  </data>
+  <data name="CloudExplorer_NoFilesDesc" xml:space="preserve">
+    <value>이 게임은 아직 클라우드에 세이브 파일이 없습니다. 앱에서 '동기화'를 클릭하여 로컬 세이브 파일을 업로드하세요.</value>
+  </data>
+  <data name="CloudExplorer_BtnRefresh" xml:space="preserve">
+    <value>새로고침</value>
+  </data>
+  <data name="CloudExplorer_BtnLocalFolder" xml:space="preserve">
+    <value>로컬 폴더</value>
+  </data>
+  <data name="CloudExplorer_BtnOpenBrowser" xml:space="preserve">
+    <value>브라우저에서 열기</value>
+  </data>
+  <data name="CloudExplorer_BtnDownload" xml:space="preserve">
+    <value>다운로드</value>
+  </data>
+  <data name="CloudExplorer_BtnClose" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="CloudExplorer_StatusFooter" xml:space="preserve">
+    <value>앱 내 직접 Google Drive 탐색기</value>
+  </data>
+  <data name="CloudExplorer_ErrorTitle" xml:space="preserve">
+    <value>클라우드 스토리지를 불러올 수 없습니다</value>
+  </data>
+  <data name="CloudExplorer_ErrorDesc" xml:space="preserve">
+    <value>클라우드 설정을 확인해 주세요.</value>
+  </data>
+  <data name="CloudExplorer_Retry" xml:space="preserve">
+    <value>다시 시도</value>
+  </data>
 </root>

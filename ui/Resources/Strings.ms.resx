@@ -2210,4 +2210,52 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
   <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
     <value>Belum Ada Simpanan</value>
   </data>
+  <data name="CloudExplorer_Title" xml:space="preserve">
+    <value>Penjelajah Storan Awan</value>
+  </data>
+  <data name="CloudExplorer_Subtitle" xml:space="preserve">
+    <value>Storan Simpanan Awan</value>
+  </data>
+  <data name="CloudExplorer_Breadcrumb_Drive" xml:space="preserve">
+    <value>Google Drive / CloudRedirect / UniversalCloudSaves</value>
+  </data>
+  <data name="CloudExplorer_Loading" xml:space="preserve">
+    <value>Menyambung ke Storan Awan...</value>
+  </data>
+  <data name="CloudExplorer_LoadingFiles" xml:space="preserve">
+    <value>Memuatkan fail awan...</value>
+  </data>
+  <data name="CloudExplorer_NoFilesTitle" xml:space="preserve">
+    <value>Tiada fail simpanan awan ditemui</value>
+  </data>
+  <data name="CloudExplorer_NoFilesDesc" xml:space="preserve">
+    <value>Permainan ini belum mempunyai fail simpanan di awan. Klik 'Segerak' dalam aplikasi untuk memuat naik fail simpanan tempatan anda.</value>
+  </data>
+  <data name="CloudExplorer_BtnRefresh" xml:space="preserve">
+    <value>Segar Semula</value>
+  </data>
+  <data name="CloudExplorer_BtnLocalFolder" xml:space="preserve">
+    <value>Folder Tempatan</value>
+  </data>
+  <data name="CloudExplorer_BtnOpenBrowser" xml:space="preserve">
+    <value>Buka dalam Pelayar</value>
+  </data>
+  <data name="CloudExplorer_BtnDownload" xml:space="preserve">
+    <value>Muat Turun</value>
+  </data>
+  <data name="CloudExplorer_BtnClose" xml:space="preserve">
+    <value>Tutup</value>
+  </data>
+  <data name="CloudExplorer_StatusFooter" xml:space="preserve">
+    <value>Penjelajah Google Drive Terus Dalam Aplikasi</value>
+  </data>
+  <data name="CloudExplorer_ErrorTitle" xml:space="preserve">
+    <value>Tidak Dapat Memuatkan Storan Awan</value>
+  </data>
+  <data name="CloudExplorer_ErrorDesc" xml:space="preserve">
+    <value>Sila semak konfigurasi awan anda.</value>
+  </data>
+  <data name="CloudExplorer_Retry" xml:space="preserve">
+    <value>Cuba Lagi</value>
+  </data>
 </root>

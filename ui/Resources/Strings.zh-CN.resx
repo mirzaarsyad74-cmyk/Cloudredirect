@@ -2315,6 +2315,54 @@
   <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
     <value>暂无存档</value>
   </data>
+  <data name="CloudExplorer_Title" xml:space="preserve">
+    <value>云端存储资源管理器</value>
+  </data>
+  <data name="CloudExplorer_Subtitle" xml:space="preserve">
+    <value>云端存档存储</value>
+  </data>
+  <data name="CloudExplorer_Breadcrumb_Drive" xml:space="preserve">
+    <value>Google 云端硬盘 / CloudRedirect / UniversalCloudSaves</value>
+  </data>
+  <data name="CloudExplorer_Loading" xml:space="preserve">
+    <value>正在连接云端存储...</value>
+  </data>
+  <data name="CloudExplorer_LoadingFiles" xml:space="preserve">
+    <value>正在加载云端文件...</value>
+  </data>
+  <data name="CloudExplorer_NoFilesTitle" xml:space="preserve">
+    <value>未找到云端存档文件</value>
+  </data>
+  <data name="CloudExplorer_NoFilesDesc" xml:space="preserve">
+    <value>该游戏在云端尚无存档文件。请在应用中点击“同步”以立即上传本地存档。</value>
+  </data>
+  <data name="CloudExplorer_BtnRefresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="CloudExplorer_BtnLocalFolder" xml:space="preserve">
+    <value>本地文件夹</value>
+  </data>
+  <data name="CloudExplorer_BtnOpenBrowser" xml:space="preserve">
+    <value>在浏览器中打开</value>
+  </data>
+  <data name="CloudExplorer_BtnDownload" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="CloudExplorer_BtnClose" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="CloudExplorer_StatusFooter" xml:space="preserve">
+    <value>应用内直接 Google Drive 资源管理器</value>
+  </data>
+  <data name="CloudExplorer_ErrorTitle" xml:space="preserve">
+    <value>无法加载云端存储</value>
+  </data>
+  <data name="CloudExplorer_ErrorDesc" xml:space="preserve">
+    <value>请检查您的云端配置。</value>
+  </data>
+  <data name="CloudExplorer_Retry" xml:space="preserve">
+    <value>重试</value>
+  </data>
 </root>
 
 

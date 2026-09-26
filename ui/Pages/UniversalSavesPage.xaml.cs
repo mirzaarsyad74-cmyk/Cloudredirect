@@ -444,26 +444,15 @@ public partial class UniversalSavesPage : Page
         }
     }
 
-    private async void OpenDrive_Click(object sender, RoutedEventArgs e)
+    private void OpenDrive_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement fe && fe.Tag is UniversalGameProfile profile)
         {
-            // 1. Try to open the exact Universal Cloud Saves folder on Google Drive
-            var driveLink = await UniversalCloudSyncService.GetGameDriveFolderWebLinkAsync(profile.GameName);
-            if (!string.IsNullOrEmpty(driveLink))
+            var dlg = new Dialogs.CloudFolderBrowserDialog(profile.GameName, profile.ExpandedSavePath, profile.SteamAppId)
             {
-                try
-                {
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(driveLink) { UseShellExecute = true })?.Dispose();
-                    return;
-                }
-                catch { }
-            }
-
-            // 2. Fall back to generic cloud location handler
-            var acctId = "0";
-            var appIdOrName = profile.SteamAppId > 0 ? profile.SteamAppId.ToString() : profile.GameName;
-            await CloudLocationService.OpenCloudLocationAsync(acctId, appIdOrName, profile.GameName);
+                Owner = Window.GetWindow(this)
+            };
+            dlg.ShowDialog();
         }
     }
 

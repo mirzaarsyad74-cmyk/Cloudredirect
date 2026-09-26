@@ -10,15 +10,33 @@ using System.Windows;
 namespace CloudRedirect.Services;
 
 /// <summary>
-/// Service to locate and open game save locations (Google Drive web folders, local storage, userdata).
+/// Service to locate and open game save locations (Google Drive in-app explorer, local storage, userdata).
 /// </summary>
 public static class CloudLocationService
 {
     /// <summary>
-    /// Opens the cloud location (Google Drive web folder, OneDrive, or local sync folder) for an app.
-    /// Falls back to local storage folder or search query if direct folder resolution fails.
+    /// Opens the in-app cloud storage explorer for an app without an external browser.
     /// </summary>
     public static async Task OpenCloudLocationAsync(string accountId, string appId, string? displayName = null)
+    {
+        var title = !string.IsNullOrEmpty(displayName) ? displayName : appId;
+        uint.TryParse(appId, out uint parsedAppId);
+
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var dlg = new Dialogs.CloudFolderBrowserDialog(title, null, parsedAppId, accountId);
+            if (Application.Current.MainWindow != null && Application.Current.MainWindow.IsVisible)
+            {
+                dlg.Owner = Application.Current.MainWindow;
+            }
+            dlg.ShowDialog();
+        });
+    }
+
+    /// <summary>
+    /// Opens the external browser directly to Google Drive or cloud provider for this app.
+    /// </summary>
+    public static async Task OpenCloudLocationInBrowserAsync(string accountId, string appId, string? displayName = null)
     {
         var config = SteamDetector.ReadConfig();
 

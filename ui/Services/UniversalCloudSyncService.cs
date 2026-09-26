@@ -398,4 +398,329 @@ public static class UniversalCloudSyncService
         }
         catch { }
     }
+
+    public class CloudDriveFileInfo
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public long Size { get; set; }
+        public DateTime? ModifiedTime { get; set; }
+        public string? WebViewLink { get; set; }
+        public bool IsDirectory { get; set; }
+
+        public string FormattedSize => IsDirectory ? "-" : FileUtils.FormatSize(Size);
+        public string FormattedTime => ModifiedTime.HasValue
+            ? ModifiedTime.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+            : "-";
+        public string IconSymbol => IsDirectory ? "Folder24" : "Document24";
+    }
+
+    public class CloudFolderViewResult
+    {
+        public bool Success { get; set; }
+        public string GameName { get; set; } = "";
+        public string FolderPathDisplay { get; set; } = "";
+        public string? WebLink { get; set; }
+        public List<CloudDriveFileInfo> Files { get; set; } = new();
+        public string ErrorMessage { get; set; } = "";
+        public long TotalSizeBytes => Files.Where(f => !f.IsDirectory).Sum(f => f.Size);
+        public string FormattedTotalSize => FileUtils.FormatSize(TotalSizeBytes);
+    }
+
+    private static async Task<string?> FindDriveFolderByNameAndParentAsync(HttpClient http, string name, string? parentId)
+    {
+        try
+        {
+            var escapedName = name.Replace("'", "\\'");
+            var parentClause = string.IsNullOrEmpty(parentId)
+                ? "'root' in parents"
+                : $"'{parentId}' in parents";
+
+            var q = Uri.EscapeDataString($"name='{escapedName}' and mimeType='application/vnd.google-apps.folder' and {parentClause} and trashed=false");
+            var searchUrl = $"https://www.googleapis.com/drive/v3/files?q={q}&fields=files(id,name)&pageSize=1";
+
+            var resp = await http.GetAsync(searchUrl);
+            if (resp.IsSuccessStatusCode)
+            {
+                var json = await resp.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("files", out var files) && files.GetArrayLength() > 0)
+                {
+                    return files[0].GetProperty("id").GetString();
+                }
+            }
+        }
+        catch { }
+        return null;
+    }
+
+    private static async Task ListDriveFilesRecursivelyAsync(
+        HttpClient http,
+        string folderId,
+        string prefix,
+        List<CloudDriveFileInfo> resultList,
+        int maxDepth = 6)
+    {
+        if (maxDepth <= 0) return;
+        try
+        {
+            var q = Uri.EscapeDataString($"'{folderId}' in parents and trashed=false");
+            var url = $"https://www.googleapis.com/drive/v3/files?q={q}&fields=files(id,name,size,modifiedTime,webViewLink,mimeType)&pageSize=1000";
+            var resp = await http.GetAsync(url);
+            if (!resp.IsSuccessStatusCode) return;
+
+            var json = await resp.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            if (!doc.RootElement.TryGetProperty("files", out var filesArray)) return;
+
+            var subFolders = new List<(string Id, string Name)>();
+
+            foreach (var f in filesArray.EnumerateArray())
+            {
+                var id = f.GetProperty("id").GetString() ?? "";
+                var name = f.GetProperty("name").GetString() ?? "";
+                var mime = f.TryGetProperty("mimeType", out var m) ? m.GetString() : "";
+                bool isDir = mime == "application/vnd.google-apps.folder";
+
+                if (isDir)
+                {
+                    subFolders.Add((id, name));
+                }
+                else
+                {
+                    long size = 0;
+                    if (f.TryGetProperty("size", out var sProp))
+                    {
+                        long.TryParse(sProp.GetString(), out size);
+                    }
+
+                    DateTime? modTime = null;
+                    if (f.TryGetProperty("modifiedTime", out var mtProp) &&
+                        DateTime.TryParse(mtProp.GetString(), out var parsedMt))
+                    {
+                        modTime = parsedMt;
+                    }
+
+                    var webLink = f.TryGetProperty("webViewLink", out var wlProp) ? wlProp.GetString() : null;
+
+                    resultList.Add(new CloudDriveFileInfo
+                    {
+                        Id = id,
+                        Name = string.IsNullOrEmpty(prefix) ? name : $"{prefix}/{name}",
+                        Size = size,
+                        ModifiedTime = modTime,
+                        WebViewLink = webLink,
+                        IsDirectory = false
+                    });
+                }
+            }
+
+            foreach (var sub in subFolders)
+            {
+                var nextPrefix = string.IsNullOrEmpty(prefix) ? sub.Name : $"{prefix}/{sub.Name}";
+                await ListDriveFilesRecursivelyAsync(http, sub.Id, nextPrefix, resultList, maxDepth - 1);
+            }
+        }
+        catch { }
+    }
+
+    public static async Task<CloudFolderViewResult> GetCloudFolderViewAsync(string gameName, uint appId = 0, string? accountId = null)
+    {
+        var result = new CloudFolderViewResult { GameName = gameName };
+        try
+        {
+            var config = SteamDetector.ReadConfig();
+            if (config == null)
+            {
+                result.ErrorMessage = "No cloud provider is configured.";
+                return result;
+            }
+
+            if (config.Provider == "gdrive")
+            {
+                var tokenPath = config.TokenPath ?? Path.Combine(SteamDetector.GetConfigDir(), "google_tokens.json");
+                var accessToken = await OAuthService.GetValidAccessTokenAsync("gdrive", tokenPath);
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    result.ErrorMessage = "Google Drive authorization expired or not found. Please sign in under Cloud Settings.";
+                    return result;
+                }
+
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(25) };
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var rootFolderId = await EnsureDriveFolderAsync(http, "CloudRedirect", null);
+                if (string.IsNullOrEmpty(rootFolderId))
+                {
+                    result.ErrorMessage = "Could not locate 'CloudRedirect' root folder on Google Drive.";
+                    return result;
+                }
+
+                string? gameFolderId = null;
+                string folderDisplay = "";
+
+                // 1) First check UniversalCloudSaves/{sanitizedGameName}
+                var sanitizedGameName = SaveHistoryManager.SanitizeFolderName(gameName);
+                var universalFolderId = await EnsureDriveFolderAsync(http, "UniversalCloudSaves", rootFolderId);
+                if (!string.IsNullOrEmpty(universalFolderId))
+                {
+                    var foundId = await FindDriveFolderByNameAndParentAsync(http, sanitizedGameName, universalFolderId);
+                    if (!string.IsNullOrEmpty(foundId))
+                    {
+                        gameFolderId = foundId;
+                        folderDisplay = $"Google Drive ➔ CloudRedirect / UniversalCloudSaves / {sanitizedGameName}";
+                    }
+                }
+
+                // 2) If not found and appId > 0, check Steam redirection folder: CloudRedirect/{accountId}/{appId}
+                if (string.IsNullOrEmpty(gameFolderId) && appId > 0)
+                {
+                    if (!string.IsNullOrEmpty(accountId) && accountId != "0")
+                    {
+                        var acctFolderId = await FindDriveFolderByNameAndParentAsync(http, accountId, rootFolderId);
+                        if (!string.IsNullOrEmpty(acctFolderId))
+                        {
+                            var appFolderId = await FindDriveFolderByNameAndParentAsync(http, appId.ToString(), acctFolderId);
+                            if (!string.IsNullOrEmpty(appFolderId))
+                            {
+                                gameFolderId = appFolderId;
+                                folderDisplay = $"Google Drive ➔ CloudRedirect / {accountId} / {appId}";
+                            }
+                        }
+                    }
+
+                    // Also search anywhere under Drive/CloudRedirect for folder named appId
+                    if (string.IsNullOrEmpty(gameFolderId))
+                    {
+                        var qSearch = Uri.EscapeDataString($"name='{appId}' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+                        var searchResp = await http.GetAsync($"https://www.googleapis.com/drive/v3/files?q={qSearch}&fields=files(id,name,webViewLink)&pageSize=1");
+                        if (searchResp.IsSuccessStatusCode)
+                        {
+                            var sJson = await searchResp.Content.ReadAsStringAsync();
+                            using var sDoc = JsonDocument.Parse(sJson);
+                            if (sDoc.RootElement.TryGetProperty("files", out var fArray) && fArray.GetArrayLength() > 0)
+                            {
+                                gameFolderId = fArray[0].GetProperty("id").GetString();
+                                folderDisplay = $"Google Drive ➔ CloudRedirect / {appId}";
+                            }
+                        }
+                    }
+                }
+
+                // 3) Fallback: if not found, ensure folder under UniversalCloudSaves
+                if (string.IsNullOrEmpty(gameFolderId) && !string.IsNullOrEmpty(universalFolderId))
+                {
+                    gameFolderId = await EnsureDriveFolderAsync(http, sanitizedGameName, universalFolderId);
+                    folderDisplay = $"Google Drive ➔ CloudRedirect / UniversalCloudSaves / {sanitizedGameName}";
+                }
+
+                if (string.IsNullOrEmpty(gameFolderId))
+                {
+                    result.ErrorMessage = $"Could not locate cloud folder for '{gameName}'.";
+                    return result;
+                }
+
+                result.FolderPathDisplay = folderDisplay;
+                result.WebLink = await GetDriveFolderWebLinkAsync(http, gameFolderId);
+
+                // Fetch files recursively
+                var filesList = new List<CloudDriveFileInfo>();
+                await ListDriveFilesRecursivelyAsync(http, gameFolderId, "", filesList);
+
+                result.Files = filesList.OrderBy(f => f.Name).ToList();
+                result.Success = true;
+                return result;
+            }
+            else if (config.IsFolder || config.IsLocal || !string.IsNullOrEmpty(config.SyncPath))
+            {
+                var basePath = config.SyncPath ?? "";
+                var sanitizedGameName = SaveHistoryManager.SanitizeFolderName(gameName);
+                var targetDir = Path.Combine(basePath, "UniversalCloudSaves", sanitizedGameName);
+
+                if (!Directory.Exists(targetDir) && appId > 0)
+                {
+                    var acctDir = !string.IsNullOrEmpty(accountId) && accountId != "0"
+                        ? Path.Combine(basePath, accountId, appId.ToString())
+                        : Path.Combine(basePath, appId.ToString());
+                    if (Directory.Exists(acctDir))
+                    {
+                        targetDir = acctDir;
+                    }
+                }
+
+                result.FolderPathDisplay = $"Local Cloud Folder ➔ {targetDir}";
+                if (Directory.Exists(targetDir))
+                {
+                    var di = new DirectoryInfo(targetDir);
+                    foreach (var fi in di.GetFiles("*", SearchOption.AllDirectories))
+                    {
+                        var rel = Path.GetRelativePath(targetDir, fi.FullName).Replace('\\', '/');
+                        result.Files.Add(new CloudDriveFileInfo
+                        {
+                            Id = fi.FullName,
+                            Name = rel,
+                            Size = fi.Length,
+                            ModifiedTime = fi.LastWriteTimeUtc,
+                            IsDirectory = false
+                        });
+                    }
+                }
+                result.Files = result.Files.OrderBy(f => f.Name).ToList();
+                result.Success = true;
+                return result;
+            }
+            else
+            {
+                result.ErrorMessage = "In-app cloud explorer is supported for Google Drive and Local Folders.";
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            result.ErrorMessage = $"Error loading cloud folder: {ex.Message}";
+            return result;
+        }
+    }
+
+    public static async Task<bool> DownloadCloudFileAsync(CloudDriveFileInfo file, string destinationPath)
+    {
+        try
+        {
+            var config = SteamDetector.ReadConfig();
+            if (config?.Provider == "gdrive")
+            {
+                var tokenPath = config.TokenPath ?? Path.Combine(SteamDetector.GetConfigDir(), "google_tokens.json");
+                var accessToken = await OAuthService.GetValidAccessTokenAsync("gdrive", tokenPath);
+                if (string.IsNullOrEmpty(accessToken)) return false;
+
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var url = $"https://www.googleapis.com/drive/v3/files/{file.Id}?alt=media";
+                var resp = await http.GetAsync(url);
+                if (!resp.IsSuccessStatusCode) return false;
+
+                var dir = Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                await using var fs = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                await resp.Content.CopyToAsync(fs);
+                return true;
+            }
+            else if (File.Exists(file.Id))
+            {
+                var dir = Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                File.Copy(file.Id, destinationPath, true);
+                return true;
+            }
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

@@ -2342,4 +2342,52 @@ Are you sure?</value>
   <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
     <value>No Saves Yet</value>
   </data>
+  <data name="CloudExplorer_Title" xml:space="preserve">
+    <value>Cloud Storage Explorer</value>
+  </data>
+  <data name="CloudExplorer_Subtitle" xml:space="preserve">
+    <value>Cloud Save Storage</value>
+  </data>
+  <data name="CloudExplorer_Breadcrumb_Drive" xml:space="preserve">
+    <value>Google Drive / CloudRedirect / UniversalCloudSaves</value>
+  </data>
+  <data name="CloudExplorer_Loading" xml:space="preserve">
+    <value>Connecting to Cloud Storage...</value>
+  </data>
+  <data name="CloudExplorer_LoadingFiles" xml:space="preserve">
+    <value>Loading cloud files...</value>
+  </data>
+  <data name="CloudExplorer_NoFilesTitle" xml:space="preserve">
+    <value>No cloud save files found</value>
+  </data>
+  <data name="CloudExplorer_NoFilesDesc" xml:space="preserve">
+    <value>This game has no save files in the cloud yet. Click 'Sync' in the app to upload your local save files.</value>
+  </data>
+  <data name="CloudExplorer_BtnRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="CloudExplorer_BtnLocalFolder" xml:space="preserve">
+    <value>Local Folder</value>
+  </data>
+  <data name="CloudExplorer_BtnOpenBrowser" xml:space="preserve">
+    <value>Open in Browser</value>
+  </data>
+  <data name="CloudExplorer_BtnDownload" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="CloudExplorer_BtnClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloudExplorer_StatusFooter" xml:space="preserve">
+    <value>Direct In-App Google Drive Explorer</value>
+  </data>
+  <data name="CloudExplorer_ErrorTitle" xml:space="preserve">
+    <value>Could Not Load Cloud Storage</value>
+  </data>
+  <data name="CloudExplorer_ErrorDesc" xml:space="preserve">
+    <value>Please check your cloud configuration.</value>
+  </data>
+  <data name="CloudExplorer_Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
 </root>

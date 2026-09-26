@@ -46,33 +46,16 @@ public partial class SaveHistoryDialog : Wpf.Ui.Controls.FluentWindow
         LoadSnapshots();
     }
 
-    private async void OpenDriveFolder_Click(object sender, RoutedEventArgs e)
+    private void OpenDriveFolder_Click(object sender, RoutedEventArgs e)
     {
-        var driveLink = await UniversalCloudSyncService.GetGameDriveFolderWebLinkAsync(_gameIdentifier);
-        if (!string.IsNullOrEmpty(driveLink))
-        {
-            try
-            {
-                Process.Start(new ProcessStartInfo(driveLink) { UseShellExecute = true })?.Dispose();
-                return;
-            }
-            catch { }
-        }
+        uint appId = 0;
+        if (!string.IsNullOrEmpty(_appId)) uint.TryParse(_appId, out appId);
 
-        if (!string.IsNullOrEmpty(_appId))
+        var dlg = new CloudFolderBrowserDialog(_gameIdentifier, _targetSaveDir, appId)
         {
-            var acctId = !string.IsNullOrEmpty(_accountId) ? _accountId : "0";
-            await CloudLocationService.OpenCloudLocationAsync(acctId, _appId, _gameIdentifier);
-        }
-        else
-        {
-            var url = $"https://drive.google.com/drive/search?q={Uri.EscapeDataString(_gameIdentifier)}";
-            try
-            {
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
-            }
-            catch { }
-        }
+            Owner = this
+        };
+        dlg.ShowDialog();
     }
 
     private void OpenLocalFolder_Click(object sender, RoutedEventArgs e)

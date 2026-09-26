@@ -2294,4 +2294,52 @@ Tem certeza?</value>
   <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
     <value>Nenhum save ainda</value>
   </data>
+  <data name="CloudExplorer_Title" xml:space="preserve">
+    <value>Explorador de Armazenamento em Nuvem</value>
+  </data>
+  <data name="CloudExplorer_Subtitle" xml:space="preserve">
+    <value>Armazenamento em Nuvem de Saves</value>
+  </data>
+  <data name="CloudExplorer_Breadcrumb_Drive" xml:space="preserve">
+    <value>Google Drive / CloudRedirect / UniversalCloudSaves</value>
+  </data>
+  <data name="CloudExplorer_Loading" xml:space="preserve">
+    <value>Conectando ao armazenamento em nuvem...</value>
+  </data>
+  <data name="CloudExplorer_LoadingFiles" xml:space="preserve">
+    <value>Carregando arquivos em nuvem...</value>
+  </data>
+  <data name="CloudExplorer_NoFilesTitle" xml:space="preserve">
+    <value>Nenhum arquivo de save na nuvem encontrado</value>
+  </data>
+  <data name="CloudExplorer_NoFilesDesc" xml:space="preserve">
+    <value>Este jogo ainda não possui arquivos de save na nuvem. Clique em 'Sincronizar' no aplicativo para carregar seus arquivos locais.</value>
+  </data>
+  <data name="CloudExplorer_BtnRefresh" xml:space="preserve">
+    <value>Atualizar</value>
+  </data>
+  <data name="CloudExplorer_BtnLocalFolder" xml:space="preserve">
+    <value>Pasta Local</value>
+  </data>
+  <data name="CloudExplorer_BtnOpenBrowser" xml:space="preserve">
+    <value>Abrir no Navegador</value>
+  </data>
+  <data name="CloudExplorer_BtnDownload" xml:space="preserve">
+    <value>Baixar</value>
+  </data>
+  <data name="CloudExplorer_BtnClose" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
+  <data name="CloudExplorer_StatusFooter" xml:space="preserve">
+    <value>Explorador direto do Google Drive no aplicativo</value>
+  </data>
+  <data name="CloudExplorer_ErrorTitle" xml:space="preserve">
+    <value>Não Foi Possível Carregar o Armazenamento em Nuvem</value>
+  </data>
+  <data name="CloudExplorer_ErrorDesc" xml:space="preserve">
+    <value>Por favor verifique a configuração da sua nuvem.</value>
+  </data>
+  <data name="CloudExplorer_Retry" xml:space="preserve">
+    <value>Tentar Novamente</value>
+  </data>
 </root>

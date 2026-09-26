@@ -2289,4 +2289,52 @@ Esto puede causar pérdida de datos en algunos casos.
   <data name="UniversalSaves_Status_NoSavesYet" xml:space="preserve">
     <value>Sin partidas guardadas aún</value>
   </data>
+  <data name="CloudExplorer_Title" xml:space="preserve">
+    <value>Explorador de Almacenamiento en la Nube</value>
+  </data>
+  <data name="CloudExplorer_Subtitle" xml:space="preserve">
+    <value>Almacenamiento de Partidas en la Nube</value>
+  </data>
+  <data name="CloudExplorer_Breadcrumb_Drive" xml:space="preserve">
+    <value>Google Drive / CloudRedirect / UniversalCloudSaves</value>
+  </data>
+  <data name="CloudExplorer_Loading" xml:space="preserve">
+    <value>Conectando al almacenamiento en la nube...</value>
+  </data>
+  <data name="CloudExplorer_LoadingFiles" xml:space="preserve">
+    <value>Cargando archivos en la nube...</value>
+  </data>
+  <data name="CloudExplorer_NoFilesTitle" xml:space="preserve">
+    <value>No se encontraron archivos de guardado en la nube</value>
+  </data>
+  <data name="CloudExplorer_NoFilesDesc" xml:space="preserve">
+    <value>Este juego aún no tiene archivos guardados en la nube. Haz clic en 'Sincronizar' en la aplicación para subirlos.</value>
+  </data>
+  <data name="CloudExplorer_BtnRefresh" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="CloudExplorer_BtnLocalFolder" xml:space="preserve">
+    <value>Carpeta Local</value>
+  </data>
+  <data name="CloudExplorer_BtnOpenBrowser" xml:space="preserve">
+    <value>Abrir en el navegador</value>
+  </data>
+  <data name="CloudExplorer_BtnDownload" xml:space="preserve">
+    <value>Descargar</value>
+  </data>
+  <data name="CloudExplorer_BtnClose" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="CloudExplorer_StatusFooter" xml:space="preserve">
+    <value>Explorador directo de Google Drive en la aplicación</value>
+  </data>
+  <data name="CloudExplorer_ErrorTitle" xml:space="preserve">
+    <value>No se pudo cargar el almacenamiento en la nube</value>
+  </data>
+  <data name="CloudExplorer_ErrorDesc" xml:space="preserve">
+    <value>Por favor revise su configuración de la nube.</value>
+  </data>
+  <data name="CloudExplorer_Retry" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
 </root>

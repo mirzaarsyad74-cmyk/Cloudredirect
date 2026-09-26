@@ -66,6 +66,9 @@ namespace CloudRedirectLauncher
 
         public static string GetTargetAppPath()
         {
+            string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
+            if (File.Exists(sideBySide)) return sideBySide;
+
             string appDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudRedirect", "app");
             return Path.Combine(appDir, "CloudRedirect.Core.exe");
         }
@@ -74,14 +77,15 @@ namespace CloudRedirectLauncher
         {
             try
             {
+                string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
+                if (File.Exists(sideBySide)) return true;
+
                 string targetExe = GetTargetAppPath();
                 var assembly = Assembly.GetExecutingAssembly();
                 using (var stream = assembly.GetManifestResourceStream("MainAppPayload"))
                 {
                     if (stream == null)
                     {
-                        // Fallback: check if CloudRedirect.Core.exe exists next to launcher
-                        string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
                         return File.Exists(sideBySide);
                     }
 
@@ -92,6 +96,16 @@ namespace CloudRedirectLauncher
                         {
                             return true;
                         }
+
+                        // Different version or size: terminate lingering processes to allow overwrite
+                        try
+                        {
+                            foreach (var p in Process.GetProcessesByName("CloudRedirect.Core"))
+                            {
+                                try { p.Kill(); p.WaitForExit(1000); } catch { }
+                            }
+                        }
+                        catch { }
                     }
 
                     string dir = Path.GetDirectoryName(targetExe);
@@ -111,9 +125,28 @@ namespace CloudRedirectLauncher
 
                     if (File.Exists(targetExe))
                     {
-                        try { File.Delete(targetExe); } catch { }
+                        for (int attempt = 0; attempt < 5; attempt++)
+                        {
+                            try
+                            {
+                                File.Delete(targetExe);
+                                break;
+                            }
+                            catch
+                            {
+                                Thread.Sleep(100);
+                            }
+                        }
                     }
-                    File.Move(tempTarget, targetExe);
+
+                    if (File.Exists(tempTarget))
+                    {
+                        if (File.Exists(targetExe))
+                        {
+                            try { File.Delete(targetExe); } catch { }
+                        }
+                        File.Move(tempTarget, targetExe);
+                    }
                     return true;
                 }
             }
@@ -156,8 +189,9 @@ namespace CloudRedirectLauncher
                 Process.Start(psi);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show("Could not launch CloudRedirect:\n" + ex.Message, "CloudRedirect", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
