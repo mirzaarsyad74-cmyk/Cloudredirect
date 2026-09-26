@@ -10,6 +10,12 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
+[assembly: AssemblyTitle("CloudRedirect")]
+[assembly: AssemblyDescription("CloudRedirect Steam Cloud Synchronization & Save Redirection Companion")]
+[assembly: AssemblyProduct("CloudRedirect")]
+[assembly: AssemblyVersion("2.9.12.0")]
+[assembly: AssemblyFileVersion("2.9.12.0")]
+
 namespace CloudRedirectLauncher
 {
     internal static class Program
@@ -57,6 +63,9 @@ namespace CloudRedirectLauncher
                 {
                     return;
                 }
+                // Do NOT fall through to setup form if runtime is already installed;
+                // LaunchMainApp has already displayed the specific error message to the user.
+                return;
             }
 
             // 2. If .NET 8 Desktop Runtime is NOT installed (or --test-setup is used):
@@ -66,47 +75,84 @@ namespace CloudRedirectLauncher
 
         public static string GetTargetAppPath()
         {
-            string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
-            if (File.Exists(sideBySide)) return sideBySide;
+            string currentExe = Application.ExecutablePath;
 
+            // 1. Check side-by-side CloudRedirect.Core.exe (only if it is NOT the running executable)
+            string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
+            if (File.Exists(sideBySide) && !string.Equals(Path.GetFullPath(sideBySide), Path.GetFullPath(currentExe), StringComparison.OrdinalIgnoreCase))
+            {
+                return sideBySide;
+            }
+
+            // 2. Standard location: %LocalAppData%\CloudRedirect\app\CloudRedirect.Core.exe
             string appDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudRedirect", "app");
-            return Path.Combine(appDir, "CloudRedirect.Core.exe");
+            string appTarget = Path.Combine(appDir, "CloudRedirect.Core.exe");
+
+            // If the running executable is itself CloudRedirect.Core.exe in appDir, avoid self-reference
+            if (string.Equals(Path.GetFullPath(appTarget), Path.GetFullPath(currentExe), StringComparison.OrdinalIgnoreCase))
+            {
+                return Path.Combine(appDir, "CloudRedirect.App.exe");
+            }
+
+            return appTarget;
+        }
+
+        private static bool CompareStreamAndFileHash(Stream stream, string filePath)
+        {
+            try
+            {
+                using (var md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    stream.Position = 0;
+                    byte[] streamHash = md5.ComputeHash(stream);
+                    stream.Position = 0;
+
+                    using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        byte[] fileHash = md5.ComputeHash(fs);
+                        if (streamHash.Length != fileHash.Length) return false;
+                        for (int i = 0; i < streamHash.Length; i++)
+                        {
+                            if (streamHash[i] != fileHash[i]) return false;
+                        }
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static bool EnsurePayloadExtracted()
         {
             try
             {
-                string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
-                if (File.Exists(sideBySide)) return true;
-
                 string targetExe = GetTargetAppPath();
+                string currentExe = Application.ExecutablePath;
+
+                // Safety guard: target cannot be ourselves
+                if (string.Equals(Path.GetFullPath(targetExe), Path.GetFullPath(currentExe), StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
                 var assembly = Assembly.GetExecutingAssembly();
                 using (var stream = assembly.GetManifestResourceStream("MainAppPayload"))
                 {
                     if (stream == null)
                     {
-                        return File.Exists(sideBySide);
+                        return File.Exists(targetExe);
                     }
 
                     if (File.Exists(targetExe))
                     {
                         var fi = new FileInfo(targetExe);
-                        try
+                        // If file size and MD5 hash match embedded stream, target is already perfectly up to date!
+                        if (fi.Length == stream.Length && CompareStreamAndFileHash(stream, targetExe))
                         {
-                            var targetVi = FileVersionInfo.GetVersionInfo(targetExe);
-                            var launcherVi = FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
-                            if (fi.Length == stream.Length && string.Equals(targetVi.FileVersion, launcherVi.FileVersion, StringComparison.OrdinalIgnoreCase))
-                            {
-                                return true;
-                            }
-                        }
-                        catch
-                        {
-                            if (fi.Length == stream.Length)
-                            {
-                                return true;
-                            }
+                            return true;
                         }
 
                         // Different version or size: terminate lingering processes to allow overwrite
@@ -125,6 +171,7 @@ namespace CloudRedirectLauncher
                         Directory.CreateDirectory(dir);
 
                     string tempTarget = targetExe + ".tmp";
+                    stream.Position = 0;
                     using (var fs = new FileStream(tempTarget, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                         byte[] buffer = new byte[81920];
@@ -175,20 +222,59 @@ namespace CloudRedirectLauncher
             {
                 if (!EnsurePayloadExtracted())
                 {
+                    MessageBox.Show("Could not extract application payload.", "CloudRedirect", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
 
                 string targetExe = GetTargetAppPath();
-                if (!File.Exists(targetExe))
+                string currentExe = Application.ExecutablePath;
+
+                if (string.Equals(Path.GetFullPath(targetExe), Path.GetFullPath(currentExe), StringComparison.OrdinalIgnoreCase))
                 {
-                    string sideBySide = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CloudRedirect.Core.exe");
-                    if (File.Exists(sideBySide)) targetExe = sideBySide;
-                    else return false;
+                    MessageBox.Show("Configuration error: Launcher cannot launch itself recursively.", "CloudRedirect", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
 
-                string launcherPath = Application.ExecutablePath;
-                string launcherArg = "--launcher \"" + launcherPath + "\"";
-                string arguments = args != null && args.Length > 0 ? string.Join(" ", args) + " " + launcherArg : launcherArg;
+                if (!File.Exists(targetExe))
+                {
+                    MessageBox.Show("Application executable not found:\n" + targetExe, "CloudRedirect", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                // Clean and deduplicate arguments to prevent runaway command-line growth
+                var cleanArgs = new System.Collections.Generic.List<string>();
+                if (args != null)
+                {
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        string a = args[i];
+                        if (string.IsNullOrEmpty(a)) continue;
+
+                        if (string.Equals(a, "--launcher", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (i + 1 < args.Length && !args[i + 1].StartsWith("-"))
+                            {
+                                i++; // skip launcher path argument
+                            }
+                            continue;
+                        }
+                        if (a.StartsWith("--launcher=", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+                        if (string.Equals(a, "--test-setup", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(a, "-setup", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        cleanArgs.Add(a);
+                    }
+                }
+
+                cleanArgs.Add("--launcher");
+                cleanArgs.Add("\"" + currentExe + "\"");
+                string arguments = string.Join(" ", cleanArgs.ToArray());
 
                 var psi = new ProcessStartInfo
                 {
@@ -507,7 +593,12 @@ namespace CloudRedirectLauncher
                 _progressBar.Value = 100;
                 await System.Threading.Tasks.Task.Delay(500);
 
-                Program.LaunchMainApp(_args);
+                if (!Program.LaunchMainApp(_args))
+                {
+                    UpdateStatus("Launch Error", "Could not start CloudRedirect after setup.");
+                    _actionButton.Text = "Close";
+                    return;
+                }
                 Close();
             }
             catch (OperationCanceledException)

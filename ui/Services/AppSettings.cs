@@ -42,7 +42,7 @@ public static class AppSettings
 
                 if (value)
                 {
-                    var exePath = Environment.ProcessPath;
+                    var exePath = AppUpdater.GetAppExecutablePath() ?? Environment.ProcessPath;
                     if (!string.IsNullOrEmpty(exePath))
                     {
                         key.SetValue(AppName, $"\"{exePath}\" -minimized");

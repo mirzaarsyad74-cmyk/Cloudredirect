@@ -32,14 +32,28 @@ public partial class App : System.Windows.Application
 
     public static bool StartMinimized { get; private set; }
 
+    public static void LogStartup(string msg)
+    {
+        try
+        {
+            var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect");
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            File.AppendAllText(Path.Combine(dir, "startup.log"), $"[{DateTime.Now:HH:mm:ss.fff}] {msg}\n");
+        }
+        catch { }
+    }
+
     protected override void OnStartup(System.Windows.StartupEventArgs e)
     {
+        LogStartup("OnStartup started. Process: " + Environment.ProcessPath + " Args: " + string.Join(" ", e.Args));
+
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
             try
             {
                 var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect", "crash.log");
                 File.AppendAllText(logPath, $"[{DateTime.Now}] AppDomain UnhandledException:\n{args.ExceptionObject}\n\n");
+                LogStartup("AppDomain UnhandledException: " + args.ExceptionObject);
             }
             catch { }
         };
@@ -50,6 +64,7 @@ public partial class App : System.Windows.Application
             {
                 var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect", "crash.log");
                 File.AppendAllText(logPath, $"[{DateTime.Now}] DispatcherUnhandledException:\n{args.Exception}\n\n");
+                LogStartup("DispatcherUnhandledException: " + args.Exception);
             }
             catch { }
         };
@@ -63,6 +78,8 @@ public partial class App : System.Windows.Application
         {
             isNewInstance = true;
         }
+
+        LogStartup("SingleInstanceMutex isNewInstance=" + isNewInstance);
 
         if (!isNewInstance)
         {
@@ -80,9 +97,13 @@ public partial class App : System.Windows.Application
             }
             catch { }
 
+            LogStartup("Secondary instance signaling existing instance: signaled=" + signaled);
+
             // If another instance was actively listening and signaled, exit this instance.
             if (signaled)
             {
+                LogStartup("Shutting down secondary instance.");
+                StartupUri = null;
                 Shutdown(0);
                 return;
             }
@@ -151,6 +172,7 @@ public partial class App : System.Windows.Application
         Services.LanguageService.ApplyLanguage(Services.LanguageService.ReadLanguagePreference(), save: false);
         base.OnStartup(e);
         ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+        LogStartup("OnStartup completed. MainWindow: " + (MainWindow != null ? MainWindow.GetType().Name : "null"));
     }
 
     public static void BringToForeground()
@@ -190,6 +212,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        LogStartup($"OnExit called (ExitCode: {e.ApplicationExitCode}). StackTrace:\n{Environment.StackTrace}");
         try
         {
             var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect", "app_exit.log");

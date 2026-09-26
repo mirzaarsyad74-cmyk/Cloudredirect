@@ -72,6 +72,7 @@ internal static class AppUpdater
             if (releases.GetArrayLength() == 0) return null;
 
             var localVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            App.LogStartup($"AppUpdater.CheckAsync: localVersion={localVersion}");
             if (localVersion == null) return null;
 
             // First non-prerelease, non-draft release with a parseable version tag.
@@ -145,6 +146,7 @@ internal static class AppUpdater
                 catch { /* hash check failed, fall through to version comparison */ }
             }
 
+            App.LogStartup($"AppUpdater.CheckAsync: remoteVersion={remoteVersion}, localVersion={localVersion}, remote<=local: {remoteVersion <= localVersion}");
             // No hash file available, fall back to version comparison
             if (remoteVersion <= localVersion)
                 return new CheckResult { UpdateAvailable = false };
@@ -193,6 +195,7 @@ internal static class AppUpdater
     /// </summary>
     internal static async Task<string?> DownloadAndApplyAsync(string downloadUrl, Action<int, string>? onProgress = null)
     {
+        App.LogStartup($"DownloadAndApplyAsync started for: {downloadUrl}");
         var tempPath = Path.Combine(Path.GetTempPath(), $"CloudRedirect_{Guid.NewGuid():N}.exe");
         try
         {
@@ -322,38 +325,76 @@ internal static class AppUpdater
     public static string? GetAppExecutablePath()
     {
         var launcherPath = Environment.GetEnvironmentVariable("CLOUDREDIRECT_LAUNCHER_PATH");
-        if (!string.IsNullOrEmpty(launcherPath) && File.Exists(launcherPath))
+        if (!string.IsNullOrEmpty(launcherPath) && File.Exists(launcherPath) &&
+            launcherPath.EndsWith("CloudRedirect.exe", StringComparison.OrdinalIgnoreCase))
+        {
             return launcherPath;
-        return Environment.ProcessPath;
+        }
+
+        // Check if CloudRedirect.exe is side-by-side with the current process
+        var processDir = AppContext.BaseDirectory;
+        var sideBySideLauncher = Path.Combine(processDir, "CloudRedirect.exe");
+        if (File.Exists(sideBySideLauncher))
+        {
+            return sideBySideLauncher;
+        }
+
+        // Check user's Downloads\Programs folder
+        try
+        {
+            var downloadsLauncher = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "Downloads", "Programs", "CloudRedirect.exe");
+            if (File.Exists(downloadsLauncher))
+            {
+                return downloadsLauncher;
+            }
+        }
+        catch { }
+
+        // Fallback: Default to CloudRedirect.exe in the application base directory (never CloudRedirect.Core.exe)
+        return Path.Combine(AppContext.BaseDirectory, "CloudRedirect.exe");
     }
 
     public static string? ApplyStagedAndRelaunch(string stagedExePath)
     {
+        App.LogStartup($"ApplyStagedAndRelaunch called with: {stagedExePath}");
         try
         {
-            var currentExe = GetAppExecutablePath();
-            if (string.IsNullOrEmpty(currentExe))
-                return "Could not determine current executable path";
+            var targetLauncher = GetAppExecutablePath();
+            if (string.IsNullOrEmpty(targetLauncher))
+            {
+                targetLauncher = Path.Combine(AppContext.BaseDirectory, "CloudRedirect.exe");
+            }
 
-            var backupPath = currentExe + ".old";
+            // Safety guard: The downloaded release asset is always the launcher (CloudRedirect.exe).
+            // Under NO circumstance should we overwrite CloudRedirect.Core.exe with the launcher bundle!
+            if (targetLauncher.EndsWith("CloudRedirect.Core.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                targetLauncher = Path.Combine(Path.GetDirectoryName(targetLauncher) ?? AppContext.BaseDirectory, "CloudRedirect.exe");
+            }
 
-            // Swap: rename current -> .old, move staged -> current
+            var backupPath = targetLauncher + ".old";
+
+            // Swap: rename current launcher -> .old, move staged -> current launcher
             try
             {
                 if (File.Exists(backupPath))
                     File.Delete(backupPath);
-                File.Move(currentExe, backupPath);
-                File.Move(stagedExePath, currentExe);
+                if (File.Exists(targetLauncher))
+                    File.Move(targetLauncher, backupPath);
+                File.Move(stagedExePath, targetLauncher);
             }
             catch (Exception ex)
             {
-                if (!File.Exists(currentExe) && File.Exists(backupPath))
-                    File.Move(backupPath, currentExe);
+                if (!File.Exists(targetLauncher) && File.Exists(backupPath))
+                    File.Move(backupPath, targetLauncher);
                 return $"Could not replace exe: {ex.Message}";
             }
 
-            // Relaunch the new executable
-            Process.Start(new ProcessStartInfo(currentExe) { UseShellExecute = true });
+            // Relaunch the launcher (CloudRedirect.exe).
+            // It will unpack the updated CloudRedirect.Core.exe and start it cleanly.
+            Process.Start(new ProcessStartInfo(targetLauncher) { UseShellExecute = true });
             Environment.Exit(0);
             return null;
         }

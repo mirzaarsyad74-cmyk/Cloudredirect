@@ -20,7 +20,12 @@ public partial class MainWindow : FluentWindow
 
     public MainWindow()
     {
+        App.LogStartup("MainWindow constructor started");
+        Closing += (_, e) => App.LogStartup("MainWindow Closing event fired. Cancel=" + e.Cancel + " isExplicitExit=" + _isExplicitExit);
+        Closed += (_, _) => App.LogStartup("MainWindow Closed event fired.");
+
         InitializeComponent();
+        App.LogStartup("MainWindow InitializeComponent finished");
 
         var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         if (ver != null)
@@ -39,17 +44,21 @@ public partial class MainWindow : FluentWindow
 
         Loaded += async (_, _) =>
         {
+            App.LogStartup("MainWindow Loaded event fired");
             try
             {
                 var stagedExe = Path.Combine(Services.SteamDetector.GetConfigDir(), "staged_update.exe");
                 if (File.Exists(stagedExe) && !Services.AppUpdater.IsAnyGameRunning())
                 {
+                    App.LogStartup("stagedExe found! Calling ApplyStagedAndRelaunch");
                     Services.AppUpdater.ApplyStagedAndRelaunch(stagedExe);
                     return;
                 }
 
+                App.LogStartup("Loaded: Initializing TrayIconService");
                 Services.TrayIconService.Instance.Initialize(this);
 
+                App.LogStartup("Loaded: CheckForAutoUpdateAsync");
                 _ = CheckForAutoUpdateAsync();
 
                 // Periodic check for new releases every 3 minutes
@@ -61,6 +70,7 @@ public partial class MainWindow : FluentWindow
                 _autoUpdateTimer.Start();
 
                 // Auto-setup compatible unlock tools (OST, HubcapTools), deploy DLL and ensure default config
+                App.LogStartup("Loaded: AutoSetupService.RunAutoSetupAsync");
                 await Services.AutoSetupService.RunAutoSetupAsync();
 
                 _ = Task.Run(() =>
@@ -69,6 +79,7 @@ public partial class MainWindow : FluentWindow
                     Services.SteamWebUiPatcher.StartWatcher();
                 });
 
+                App.LogStartup("Loaded: ActiveGameTrackerService.Start");
                 Services.ActiveGameTrackerService.Start();
                 _ = Task.Run(async () =>
                 {
@@ -79,6 +90,7 @@ public partial class MainWindow : FluentWindow
                     catch { }
                 });
 
+                App.LogStartup("Loaded: UiZoomManager.Instance.Initialize");
                 Services.UiZoomManager.Instance.Initialize(this, ContentAreaHost, RootFrame, GuiScaleTransform);
                 Services.UiZoomManager.Instance.OnZoomChanged += (scale, isAuto) =>
                 {
@@ -95,20 +107,30 @@ public partial class MainWindow : FluentWindow
                     });
                 };
 
+                App.LogStartup("Loaded: SaveUploadWatcherService.Start");
                 Services.SaveUploadWatcherService.Start();
+
+                App.LogStartup("Loaded: GlobalHotkeyService.Instance.Initialize");
                 Services.GlobalHotkeyService.Instance.Initialize(this);
 
+                App.LogStartup("Loaded: MigrateLegacyMode");
                 var mode = await Task.Run(() => MigrateLegacyMode());
                 ApplyMode(mode);
 
+                App.LogStartup("Loaded: NavigateTo DashboardPage");
                 NavigateTo(typeof(Pages.DashboardPage));
+                App.LogStartup("Loaded: DashboardPage navigation succeeded");
 
                 if (App.StartMinimized)
                 {
+                    App.LogStartup("Loaded: MinimizeToTray because StartMinimized=true");
                     Services.TrayIconService.Instance.MinimizeToTray();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                App.LogStartup("MainWindow Loaded EXCEPTION: " + ex);
+            }
         };
 
         Services.LanguageService.OnLanguageChanged += OnLanguageChanged;
