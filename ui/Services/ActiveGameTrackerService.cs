@@ -84,6 +84,26 @@ public static class ActiveGameTrackerService
                     }
                     catch { }
 
+                    // Auto-detect save folder for Steam game if not already present
+                    var detectedSaveDir = GameSaveAutoDetector.DetectSaveFolder(name, null, runningAppId);
+                    if (!string.IsNullOrEmpty(detectedSaveDir))
+                    {
+                        var existing = UniversalSaveWatcherService.GetProfiles();
+                        if (!existing.Any(p => p.GameName.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            var newProfile = new UniversalGameProfile
+                            {
+                                GameName = name,
+                                ProcessName = "",
+                                SaveFolderPath = detectedSaveDir
+                            };
+                            UniversalSaveWatcherService.AddProfile(newProfile);
+                            TrayIconService.Instance.ShowNotification(
+                                "Save Folder Auto-Detected",
+                                $"{name}: Saves found at {detectedSaveDir}. Cloud backup armed!");
+                        }
+                    }
+
                     _currentGame = new ActiveGameInfo(
                         runningAppId,
                         name,
@@ -138,6 +158,46 @@ public static class ActiveGameTrackerService
                         return;
                     }
                 }
+            }
+
+            // 2b. Auto-detect any unconfigured running games on PC with existing save folders
+            var detectedGames = GameSaveAutoDetector.DetectFromRunningProcesses();
+            if (detectedGames.Count > 0)
+            {
+                var detected = detectedGames[0];
+                var existing = UniversalSaveWatcherService.GetProfiles();
+                var profile = existing.FirstOrDefault(p =>
+                    p.GameName.Equals(detected.GameName, StringComparison.OrdinalIgnoreCase) ||
+                    p.ProcessName.Equals(detected.ProcessName, StringComparison.OrdinalIgnoreCase));
+
+                if (profile == null)
+                {
+                    profile = new UniversalGameProfile
+                    {
+                        GameName = detected.GameName,
+                        ProcessName = detected.ProcessName,
+                        SaveFolderPath = detected.SaveFolderPath
+                    };
+                    UniversalSaveWatcherService.AddProfile(profile);
+
+                    TrayIconService.Instance.ShowNotification(
+                        "Game & Save Auto-Detected",
+                        $"Detected {detected.GameName}! Save folder: {detected.SaveFolderPath}. Cloud backup armed!");
+                }
+
+                _currentGame = new ActiveGameInfo(
+                    0,
+                    detected.GameName,
+                    null,
+                    detected.ProcessName,
+                    true,
+                    DateTime.Now
+                );
+                _lastMonitoredUniversalProcess = detected.ProcessName;
+                _lastActiveUniversalProfile = profile;
+                UniversalSaveWatcherService.UpdateProfileStatus(profile, "Game Running 🎮");
+                OnActiveGameChanged?.Invoke(_currentGame);
+                return;
             }
 
             // 3. If a game was active and now stopped:

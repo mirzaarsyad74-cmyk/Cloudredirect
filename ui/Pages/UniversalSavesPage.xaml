@@ -12,13 +12,18 @@
             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                        <ui:Button Content="Auto-Scan PC for Saves"
+                                   Appearance="Primary"
+                                   Icon="{ui:SymbolIcon Search24}"
+                                   Click="AutoScan_Click"
+                                   Margin="0,0,8,0" />
                         <ui:Button Content="Add Preset"
                                    Appearance="Secondary"
                                    Icon="{ui:SymbolIcon Sparkle24}"
                                    Click="AddPreset_Click"
                                    Margin="0,0,8,0" />
                         <ui:Button Content="Add Custom Game"
-                                   Appearance="Primary"
+                                   Appearance="Secondary"
                                    Icon="{ui:SymbolIcon Add24}"
                                    Click="AddCustomGame_Click" />
                     </StackPanel>
@@ -80,14 +85,21 @@
                                FontSize="16" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                HorizontalAlignment="Center" Margin="0,12,0,4" />
-                    <TextBlock Text="Add games like Elden Ring, Baldur's Gate 3, or any custom indie game using the buttons above to enable automatic cloud backup on game exit."
+                    <TextBlock Text="CloudRedirect can automatically scan your PC to find game save folders and monitor games as you play with zero configuration."
                                FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="500" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
-                        <ui:Button Content="Quick Add Popular Presets"
+                        <ui:Button Content="⚡ Auto-Detect &amp; Scan Game Saves on this PC"
                                    Appearance="Primary"
+                                   Icon="{ui:SymbolIcon Search24}"
+                                   Click="AutoScan_Click"
+                                   Padding="14,8"
+                                   Margin="0,0,8,0" />
+                        <ui:Button Content="Quick Add Popular Presets"
+                                   Appearance="Secondary"
                                    Icon="{ui:SymbolIcon Sparkle24}"
-                                   Click="AddPreset_Click" />
+                                   Click="AddPreset_Click"
+                                   Padding="14,8" />
                     </StackPanel>
                 </StackPanel>
             </Border>
