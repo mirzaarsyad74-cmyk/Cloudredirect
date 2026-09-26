@@ -156,25 +156,32 @@
 
                                 <!-- Action Buttons -->
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <ui:Button Content="Sync Now"
-                                               Appearance="Secondary"
-                                               Icon="{ui:SymbolIcon ArrowSync24}"
+                                    <ui:Button Appearance="Secondary"
                                                Click="SyncNow_Click"
                                                Tag="{Binding}"
                                                Margin="0,0,6,0"
-                                               Padding="10,6" />
-                                    <ui:Button Content="Save History"
-                                               Appearance="Primary"
-                                               Icon="{ui:SymbolIcon History24}"
+                                               Padding="10,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="ArrowSync24" FontSize="14" Margin="0,0,6,0" Foreground="#66C0F4" />
+                                            <TextBlock Text="Sync Now" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </ui:Button>
+                                    <ui:Button Appearance="Primary"
                                                Click="SaveHistory_Click"
                                                Tag="{Binding}"
                                                Margin="0,0,6,0"
-                                               Padding="12,6" />
+                                               Padding="12,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="History24" FontSize="14" Margin="0,0,6,0" />
+                                            <TextBlock Text="Save History" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </ui:Button>
                                     <ui:Button Appearance="Danger"
-                                               Icon="{ui:SymbolIcon Delete24}"
                                                Click="DeleteProfile_Click"
                                                Tag="{Binding}"
-                                               Padding="8,6" />
+                                               Padding="8,6">
+                                        <ui:SymbolIcon Symbol="Delete24" FontSize="14" />
+                                    </ui:Button>
                                 </StackPanel>
                             </Grid>
                         </Border>
