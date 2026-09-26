@@ -50,7 +50,30 @@ public static class SaveHistoryManager
         return string.IsNullOrEmpty(sanitized) ? "unknown_game" : sanitized;
     }
 
-    public static SnapshotInfo? CreateSnapshot(string gameIdentifier, string sourceDirectory, string triggerDescription)
+    public static string? FindAppStorageDir(string? steamPath, uint appId, string? accountId = null)
+    {
+        if (string.IsNullOrEmpty(steamPath) || appId == 0) return null;
+
+        var storageRoot = Path.Combine(steamPath, "cloud_redirect", "storage");
+        if (!Directory.Exists(storageRoot)) return null;
+
+        if (!string.IsNullOrEmpty(accountId) && accountId != "0")
+        {
+            var direct = Path.Combine(storageRoot, accountId, appId.ToString());
+            if (Directory.Exists(direct)) return direct;
+        }
+
+        foreach (var accDir in Directory.GetDirectories(storageRoot))
+        {
+            var candidate = Path.Combine(accDir, appId.ToString());
+            if (Directory.Exists(candidate))
+                return candidate;
+        }
+
+        return null;
+    }
+
+    public static SnapshotInfo? CreateSnapshot(string gameIdentifier, string sourceDirectory, string triggerDescription, string? appId = null)
     {
         try
         {
@@ -61,15 +84,33 @@ public static class SaveHistoryManager
             if (!Directory.Exists(gameSnapshotDir))
                 Directory.CreateDirectory(gameSnapshotDir);
 
+            var sourceFiles = Directory.GetFiles(sourceDirectory, "*", SearchOption.AllDirectories);
+            if (sourceFiles.Length == 0) return null;
+
+            long totalBytes = 0;
+            foreach (var f in sourceFiles)
+            {
+                totalBytes += new FileInfo(f).Length;
+            }
+
+            // Check the newest existing snapshot to prevent duplicate snapshots if nothing changed
+            var existingSnapshots = GetSnapshots(gameIdentifier, appId);
+            if (existingSnapshots.Count > 0)
+            {
+                var latest = existingSnapshots[0];
+                if ((DateTime.Now - latest.Timestamp).TotalSeconds < 20 &&
+                    latest.FileCount == sourceFiles.Length &&
+                    latest.TotalBytes == totalBytes)
+                {
+                    return latest;
+                }
+            }
+
             var now = DateTime.Now;
             var timestampStr = now.ToString("yyyyMMdd_HHmmss");
             var targetDir = Path.Combine(gameSnapshotDir, timestampStr);
 
-            var sourceFiles = Directory.GetFiles(sourceDirectory, "*", SearchOption.AllDirectories);
-            if (sourceFiles.Length == 0) return null;
-
             Directory.CreateDirectory(targetDir);
-            long totalBytes = 0;
 
             foreach (var file in sourceFiles)
             {
@@ -80,7 +121,6 @@ public static class SaveHistoryManager
                     Directory.CreateDirectory(destDir);
 
                 File.Copy(file, destPath, overwrite: true);
-                totalBytes += new FileInfo(file).Length;
             }
 
             var meta = new
@@ -88,7 +128,8 @@ public static class SaveHistoryManager
                 timestamp = now.ToString("o"),
                 trigger = triggerDescription,
                 fileCount = sourceFiles.Length,
-                totalBytes
+                totalBytes,
+                appId = appId ?? ""
             };
 
             var metaPath = Path.Combine(targetDir, "snapshot.json");
@@ -106,66 +147,116 @@ public static class SaveHistoryManager
         }
     }
 
-    public static List<SnapshotInfo> GetSnapshots(string gameIdentifier)
+    public static List<SnapshotInfo> GetSnapshots(string gameIdentifier, string? appId = null)
     {
         var result = new List<SnapshotInfo>();
+        var seenDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void ScanFolder(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return;
+            var safe = SanitizeFolderName(name);
+            var dir = Path.Combine(GetSnapshotsBaseDir(), safe);
+            if (!Directory.Exists(dir)) return;
+
+            var subDirs = Directory.GetDirectories(dir);
+            foreach (var sub in subDirs)
+            {
+                if (seenDirs.Add(sub))
+                {
+                    var info = LoadSnapshotFromDir(sub);
+                    if (info != null)
+                        result.Add(info);
+                }
+            }
+        }
+
+        ScanFolder(gameIdentifier);
+
+        if (!string.IsNullOrEmpty(appId) && !appId.Equals(gameIdentifier, StringComparison.OrdinalIgnoreCase))
+        {
+            ScanFolder(appId);
+        }
+
+        // If gameIdentifier is an appId, try finding its game name
+        if (uint.TryParse(gameIdentifier, out var parsedAppId))
+        {
+            var steamPath = SteamDetector.FindSteamPath();
+            var name = SteamDetector.GetGameName(steamPath, parsedAppId);
+            if (!string.IsNullOrEmpty(name))
+            {
+                ScanFolder(name);
+            }
+        }
+
+        return result.OrderByDescending(s => s.Timestamp).ToList();
+    }
+
+    private static SnapshotInfo? LoadSnapshotFromDir(string dir)
+    {
         try
         {
-            var safeName = SanitizeFolderName(gameIdentifier);
-            var gameSnapshotDir = Path.Combine(GetSnapshotsBaseDir(), safeName);
-            if (!Directory.Exists(gameSnapshotDir))
-                return result;
+            var folderName = Path.GetFileName(dir);
+            var metaPath = Path.Combine(dir, "snapshot.json");
 
-            var dirs = Directory.GetDirectories(gameSnapshotDir);
-            foreach (var dir in dirs)
+            DateTime timestamp = Directory.GetCreationTime(dir);
+            string trigger = "Save Backup";
+            int fileCount = 0;
+            long totalBytes = 0;
+
+            if (File.Exists(metaPath))
             {
-                var folderName = Path.GetFileName(dir);
-                var metaPath = Path.Combine(dir, "snapshot.json");
-
-                DateTime timestamp = Directory.GetCreationTime(dir);
-                string trigger = "Save Backup";
-                int fileCount = 0;
-                long totalBytes = 0;
-
-                if (File.Exists(metaPath))
+                try
                 {
-                    try
+                    var json = File.ReadAllText(metaPath);
+                    using var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("timestamp", out var tsProp) &&
+                        DateTime.TryParse(tsProp.GetString(), out var parsedTs))
                     {
-                        var json = File.ReadAllText(metaPath);
-                        using var doc = JsonDocument.Parse(json);
-                        if (doc.RootElement.TryGetProperty("timestamp", out var tsProp) &&
-                            DateTime.TryParse(tsProp.GetString(), out var parsedTs))
-                        {
-                            timestamp = parsedTs;
-                        }
-                        if (doc.RootElement.TryGetProperty("trigger", out var trigProp))
-                            trigger = trigProp.GetString() ?? trigger;
-                        if (doc.RootElement.TryGetProperty("fileCount", out var fcProp))
-                            fileCount = fcProp.GetInt32();
-                        if (doc.RootElement.TryGetProperty("totalBytes", out var tbProp))
-                            totalBytes = tbProp.GetInt64();
+                        timestamp = parsedTs;
                     }
-                    catch { }
+                    if (doc.RootElement.TryGetProperty("trigger", out var trigProp))
+                        trigger = trigProp.GetString() ?? trigger;
+                    if (doc.RootElement.TryGetProperty("fileCount", out var fcProp))
+                        fileCount = fcProp.GetInt32();
+                    if (doc.RootElement.TryGetProperty("totalBytes", out var tbProp))
+                        totalBytes = tbProp.GetInt64();
                 }
+                catch { }
+            }
 
-                if (fileCount == 0)
-                {
-                    var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories)
-                        .Where(f => !Path.GetFileName(f).Equals("snapshot.json", StringComparison.OrdinalIgnoreCase))
-                        .ToArray();
-                    fileCount = files.Length;
-                    totalBytes = files.Sum(f => new FileInfo(f).Length);
-                }
+            if (fileCount == 0)
+            {
+                var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories)
+                    .Where(f => !Path.GetFileName(f).Equals("snapshot.json", StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                fileCount = files.Length;
+                totalBytes = files.Sum(f => new FileInfo(f).Length);
+            }
 
-                result.Add(new SnapshotInfo(folderName, timestamp, trigger, fileCount, totalBytes, dir));
+            return new SnapshotInfo(folderName, timestamp, trigger, fileCount, totalBytes, dir);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static bool DeleteSnapshot(SnapshotInfo snapshot)
+    {
+        try
+        {
+            if (Directory.Exists(snapshot.DirectoryPath))
+            {
+                Directory.Delete(snapshot.DirectoryPath, true);
+                return true;
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to get snapshots: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Failed to delete snapshot: {ex}");
         }
-
-        return result.OrderByDescending(s => s.Timestamp).ToList();
+        return false;
     }
 
     public static bool RestoreSnapshot(string gameIdentifier, string targetDirectory, SnapshotInfo snapshot)

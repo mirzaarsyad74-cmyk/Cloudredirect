@@ -526,6 +526,14 @@ public partial class AppsPage : Page
                 ? Path.Combine(steamPath, "cloud_redirect", "storage", app.AccountId, app.AppId)
                 : null;
 
+            if (targetDir == null || !Directory.Exists(targetDir))
+            {
+                if (uint.TryParse(app.AppId, out var aid))
+                {
+                    targetDir = Services.SaveHistoryManager.FindAppStorageDir(steamPath, aid, app.AccountId) ?? targetDir;
+                }
+            }
+
             var dialog = new Dialogs.SaveHistoryDialog(app.DisplayName, targetDir, app.AppId, app.AccountId)
             {
                 Owner = Window.GetWindow(this)

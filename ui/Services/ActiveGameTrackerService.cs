@@ -245,32 +245,60 @@ public static class ActiveGameTrackerService
                 _currentGame = null;
                 OnActiveGameChanged?.Invoke(null);
 
-                // Auto-sync universal game if it just exited
-                if (exitedGame.UniversalProfile != null)
-                {
-                    var profileToSync = exitedGame.UniversalProfile;
-                    _lastActiveUniversalProfile = null;
-                    _lastMonitoredUniversalProcess = null;
+                var gameName = exitedGame.Name;
+                var appId = exitedGame.AppId;
+                var procName = exitedGame.ProcessName;
+                var universalProfile = exitedGame.UniversalProfile;
 
-                    _ = Task.Run(async () =>
-                    {
-                        await UniversalSaveWatcherService.SyncProfileNowAsync(profileToSync, "Auto-Backup on Game Exit");
-                    });
-                }
-                else if (exitedGame.IsLuaGame)
+                _ = Task.Run(async () =>
                 {
-                    // Lua game exited: CloudRedirect redirected it
-                    if (AppSettings.ShowSyncNotifications)
+                    try
                     {
-                        TrayIconService.Instance.ShowNotification(
-                            "CloudRedirect",
-                            $"{exitedGame.Name} closed. Cloud save redirection active.");
+                        if (universalProfile != null)
+                        {
+                            _lastActiveUniversalProfile = null;
+                            _lastMonitoredUniversalProcess = null;
+                            await UniversalSaveWatcherService.SyncProfileNowAsync(universalProfile, "Auto-Backup on Game Exit");
+                        }
+                        else
+                        {
+                            // Wait briefly for game process / Steam cloud to finish flushing saves
+                            await Task.Delay(2000);
+
+                            var steamPath = SteamDetector.FindSteamPath();
+                            string? saveDir = null;
+                            if (appId > 0)
+                            {
+                                saveDir = SaveHistoryManager.FindAppStorageDir(steamPath, appId);
+                            }
+
+                            if (saveDir == null)
+                            {
+                                saveDir = GameSaveAutoDetector.DetectSaveFolder(gameName, procName, appId);
+                            }
+
+                            if (saveDir != null && Directory.Exists(saveDir))
+                            {
+                                var snapshot = SaveHistoryManager.CreateSnapshot(
+                                    gameName,
+                                    saveDir,
+                                    "Auto-Backup on Game Exit",
+                                    appId > 0 ? appId.ToString() : null);
+
+                                if (snapshot != null && AppSettings.ShowSyncNotifications)
+                                {
+                                    TrayIconService.Instance.ShowNotification(
+                                        "Save Protection",
+                                        $"{gameName}: Save snapshot created upon game exit ({snapshot.FileCount} file(s), {snapshot.FormattedSize}).");
+                                }
+                            }
+                        }
                     }
-                }
-                else if (exitedGame.IsGenuineOwned && exitedGame.HasSteamCloud)
-                {
-                    // Genuine owned Steam game with native cloud: Steam handles it natively, CloudRedirect does not interfere.
-                }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Failed to auto-snapshot on exit for {gameName}: {ex}");
+                    }
+                });
             }
         }
         catch (Exception ex)

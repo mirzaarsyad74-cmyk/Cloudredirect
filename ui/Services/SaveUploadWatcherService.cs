@@ -51,6 +51,14 @@ public static class SaveUploadWatcherService
         @"\[AppState\]\s+PublishCloudState\s+app\s+(?<app>\d+):\s+published\s+CN=(?<cn>\d+),\s+(?<files>\d+)\s+files",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    private static readonly Regex AppExitSyncDoneRegex = new(
+        @"Cloud\.SignalAppExitSyncDone#\d+\s+app=(?<app>\d+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex ReleaseSessionRegex = new(
+        @"\[AppState\]\s+ReleaseCloudSession\s+app\s+(?<app>\d+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     public static void Start()
     {
         lock (_lock)
@@ -179,7 +187,30 @@ public static class SaveUploadWatcherService
             return;
         }
 
-        // 3. Check for PublishCloudState
+        // 3. Check for Game Exit & Save Sync Completion
+        var mExit = AppExitSyncDoneRegex.Match(line);
+        if (mExit.Success)
+        {
+            if (uint.TryParse(mExit.Groups["app"].Value, out var appId) && appId > 0)
+            {
+                _lastActiveAppId = appId;
+                TriggerAutoSnapshotForApp(appId, "Auto-Backup on Game Exit");
+            }
+            return;
+        }
+
+        var mRelease = ReleaseSessionRegex.Match(line);
+        if (mRelease.Success)
+        {
+            if (uint.TryParse(mRelease.Groups["app"].Value, out var appId) && appId > 0)
+            {
+                _lastActiveAppId = appId;
+                TriggerAutoSnapshotForApp(appId, "Auto-Backup on Game Exit");
+            }
+            return;
+        }
+
+        // 4. Check for PublishCloudState
         var mPublish = AppPublishRegex.Match(line);
         if (mPublish.Success)
         {
@@ -193,6 +224,11 @@ public static class SaveUploadWatcherService
                 ? SteamDetector.GetGameName(_steamPath, activeId)
                 : "Steam Game";
 
+            if (activeId > 0)
+            {
+                TriggerAutoSnapshotForApp(activeId, "Cloud Synchronization");
+            }
+
             EmitEvent(new SaveUploadEvent(
                 GameName: gameTitle,
                 AppId: activeId,
@@ -204,16 +240,20 @@ public static class SaveUploadWatcherService
             return;
         }
 
-        // 4. Check for CompleteBatch
+        // 5. Check for CompleteBatch
         var mComplete = AppCompleteRegex.Match(line);
         if (mComplete.Success)
         {
             uint.TryParse(mComplete.Groups["app"].Value, out var appId);
-            if (appId > 0) _lastActiveAppId = appId;
+            if (appId > 0)
+            {
+                _lastActiveAppId = appId;
+                TriggerAutoSnapshotForApp(appId, "Auto-Save Backup");
+            }
             return;
         }
 
-        // 5. Check for Batch upload
+        // 6. Check for Batch upload
         var mBatch = BatchUploadRegex.Match(line);
         if (mBatch.Success)
         {
@@ -231,6 +271,51 @@ public static class SaveUploadWatcherService
                 IsSuccess: true,
                 Timestamp: DateTime.Now));
         }
+    }
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<uint, DateTime> _lastSnapshotTimes = new();
+
+    public static void TriggerAutoSnapshotForApp(uint appId, string reason)
+    {
+        if (appId == 0) return;
+
+        var now = DateTime.Now;
+        if (_lastSnapshotTimes.TryGetValue(appId, out var lastTime) && (now - lastTime).TotalSeconds < 15)
+        {
+            // Debounce rapid duplicate events for same app
+            return;
+        }
+        _lastSnapshotTimes[appId] = now;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                // Brief pause to ensure all files in batch are completely flushed to disk by Steam
+                await Task.Delay(1500);
+
+                var steamPath = _steamPath ?? SteamDetector.FindSteamPath();
+                if (string.IsNullOrEmpty(steamPath)) return;
+
+                var appDir = SaveHistoryManager.FindAppStorageDir(steamPath, appId);
+                if (appDir == null || !Directory.Exists(appDir)) return;
+
+                var gameTitle = SteamDetector.GetGameName(steamPath, appId);
+                if (string.IsNullOrWhiteSpace(gameTitle))
+                    gameTitle = appId.ToString();
+                var snapshot = SaveHistoryManager.CreateSnapshot(gameTitle, appDir, reason, appId.ToString());
+                if (snapshot != null && AppSettings.ShowSyncNotifications)
+                {
+                    TrayIconService.Instance.ShowNotification(
+                        "CloudRedirect Save Protection",
+                        $"{gameTitle}: Save snapshot created ({snapshot.FileCount} file(s), {snapshot.FormattedSize}).");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed auto-snapshot for app {appId}: {ex}");
+            }
+        });
     }
 
     private static string CleanSaveName(string raw)

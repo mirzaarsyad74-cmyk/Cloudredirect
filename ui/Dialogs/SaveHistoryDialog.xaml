@@ -26,17 +26,34 @@
             </Grid.RowDefinitions>
 
             <!-- Header section -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock x:Name="GameTitleText"
-                           Text="Game Save History"
-                           FontSize="18" FontWeight="Bold"
-                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                <TextBlock x:Name="GameSubtitleText"
-                           Text="{res:Loc SaveHistory_Subtitle}"
-                           FontSize="12"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           Margin="0,3,0,0" />
-            </StackPanel>
+            <Grid Grid.Row="0" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="GameTitleText"
+                               Text="Game Save History"
+                               FontSize="18" FontWeight="Bold"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                    <TextBlock x:Name="GameSubtitleText"
+                               Text="{res:Loc SaveHistory_Subtitle}"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Margin="0,3,0,0" />
+                </StackPanel>
+
+                <ui:Button Grid.Column="1"
+                           Appearance="Primary"
+                           Click="CreateSnapshotNow_Click"
+                           VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Camera24" FontSize="14" Margin="0,0,6,0" />
+                        <TextBlock Text="Create Snapshot" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ui:Button>
+            </Grid>
 
             <!-- Empty state when no snapshots exist (Centered) -->
             <Border x:Name="EmptyStateBorder"
@@ -60,8 +77,16 @@
                                FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                TextWrapping="Wrap" TextAlignment="Center" MaxWidth="440" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                        <ui:Button Appearance="Primary"
+                                   Click="CreateSnapshotNow_Click"
+                                   Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Camera24" FontSize="14" Margin="0,0,6,0" />
+                                <TextBlock Text="Create Snapshot Now" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ui:Button>
                         <ui:Button Content="{res:Loc SaveHistory_BtnDrive}"
-                                   Appearance="Primary"
+                                   Appearance="Secondary"
                                    Icon="{ui:SymbolIcon Cloud24}"
                                    Click="OpenDriveFolder_Click"
                                    Margin="0,0,8,0" />
@@ -151,11 +176,19 @@
                                     <ui:Button Appearance="Primary"
                                                Click="RestoreSnapshot_Click"
                                                Tag="{Binding}"
+                                               Margin="0,0,6,0"
                                                Padding="12,5">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="14" Margin="0,0,6,0" />
                                             <TextBlock Text="{res:Loc SaveHistory_BtnRestore}" VerticalAlignment="Center" />
                                         </StackPanel>
+                                    </ui:Button>
+                                    <ui:Button Appearance="Secondary"
+                                               Click="DeleteSnapshot_Click"
+                                               Tag="{Binding}"
+                                               Padding="8,5"
+                                               ToolTip="Delete this snapshot">
+                                        <ui:SymbolIcon Symbol="Delete24" FontSize="14" Foreground="#FF6B6B" />
                                     </ui:Button>
                                 </StackPanel>
                             </Grid>

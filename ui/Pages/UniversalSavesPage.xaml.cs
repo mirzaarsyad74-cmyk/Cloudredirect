@@ -511,7 +511,8 @@ public partial class UniversalSavesPage : Page
     {
         if (sender is FrameworkElement fe && fe.Tag is UniversalGameProfile profile)
         {
-            var dialog = new SaveHistoryDialog(profile.GameName, profile.ExpandedSavePath)
+            var appId = profile.SteamAppId > 0 ? profile.SteamAppId.ToString() : null;
+            var dialog = new SaveHistoryDialog(profile.GameName, profile.ExpandedSavePath, appId)
             {
                 Owner = Window.GetWindow(this)
             };
