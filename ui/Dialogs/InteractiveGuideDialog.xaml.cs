@@ -107,15 +107,110 @@ public partial class InteractiveGuideDialog : FluentWindow
         FeatureTabsListBox.ItemsSource = null;
         FeatureTabsListBox.ItemsSource = _steps;
 
-        // Update dialog static strings
-        AppTitleBar.Title = S.Get("InteractiveGuide_TitleBar") is { Length: > 0 } tb ? tb : "CloudRedirect — Interactive Feature Guide";
-        PrevBtn.Content = S.Get("InteractiveGuide_Prev") is { Length: > 0 } pr ? pr : "Previous";
-        NextBtn.Content = S.Get("InteractiveGuide_Next") is { Length: > 0 } nx ? nx : "Next Step";
-        JumpToFeatureBtn.Content = S.Get("InteractiveGuide_Jump") is { Length: > 0 } jm ? jm : "Jump to Feature 🚀";
-        KeyHighlightsTitle.Text = S.Get("InteractiveGuide_Highlights") is { Length: > 0 } hl ? hl : "Key Highlights:";
-        HowItWorksHeader.Text = S.Get("InteractiveGuide_HowItWorks") is { Length: > 0 } hw ? hw : "How It Works Behind The Scenes";
-        ProTipHeader.Text = S.Get("InteractiveGuide_ProTip") is { Length: > 0 } pt ? pt : "Pro Tip";
-        GuideFooterText.Text = S.Get("InteractiveGuide_Footer") is { Length: > 0 } gf ? gf : "CloudRedirect: Authentic Steam Cloud Redirection & Universal Safe Mode Save Protection";
+        // Update dialog static strings with guaranteed localized fallbacks (never show raw keys)
+        var titleBar = lang switch
+        {
+            "ko" => "CloudRedirect — 인터랙티브 기능 가이드",
+            "zh-CN" => "CloudRedirect — 交互式功能向导",
+            "es" => "CloudRedirect — Guía Interactiva de Funciones",
+            "pt-BR" => "CloudRedirect — Guia Interativo de Recursos",
+            "ms" => "CloudRedirect — Panduan Ciri Interaktif",
+            _ => "CloudRedirect — Interactive Feature Guide"
+        };
+        var prev = lang switch
+        {
+            "ko" => "이전",
+            "zh-CN" => "上一步",
+            "es" => "Anterior",
+            "pt-BR" => "Anterior",
+            "ms" => "Sebelumnya",
+            _ => "Previous"
+        };
+        var next = lang switch
+        {
+            "ko" => "다음 단계",
+            "zh-CN" => "下一步",
+            "es" => "Siguiente Paso",
+            "pt-BR" => "Próximo Passo",
+            "ms" => "Langkah Seterusnya",
+            _ => "Next Step"
+        };
+        var jump = lang switch
+        {
+            "ko" => "기능으로 이동 🚀",
+            "zh-CN" => "立即前往该功能 🚀",
+            "es" => "Ir a la Función 🚀",
+            "pt-BR" => "Ir para o Recurso 🚀",
+            "ms" => "Pergi ke Ciri 🚀",
+            _ => "Jump to Feature 🚀"
+        };
+        var highlights = lang switch
+        {
+            "ko" => "주요 핵심 요약:",
+            "zh-CN" => "功能核心亮点:",
+            "es" => "Puntos Clave:",
+            "pt-BR" => "Destaques Principais:",
+            "ms" => "Sorotan Utama:",
+            _ => "Key Highlights:"
+        };
+        var howItWorks = lang switch
+        {
+            "ko" => "백그라운드 작동 원리",
+            "zh-CN" => "后台运作原理解析",
+            "es" => "Cómo Funciona Detrás de Escena",
+            "pt-BR" => "Como Funciona nos Bastidores",
+            "ms" => "Cara Ia Berfungsi Di Sebalik Tabir",
+            _ => "How It Works Behind The Scenes"
+        };
+        var proTip = lang switch
+        {
+            "ko" => "전문가 꿀팁",
+            "zh-CN" => "专业技巧",
+            "es" => "Consejo Pro",
+            "pt-BR" => "Dica Pro",
+            "ms" => "Petua Pro",
+            _ => "Pro Tip"
+        };
+        var footer = lang switch
+        {
+            "ko" => "CloudRedirect: 정품 Steam 클라우드 리디렉션 및 유니버설 안전 모드 세이브 보호",
+            "zh-CN" => "CloudRedirect: 原生 Steam 云存档重定向与通用安全模式存档保护",
+            "es" => "CloudRedirect: Redirección Auténtica de Steam Cloud y Protección en Modo Seguro",
+            "pt-BR" => "CloudRedirect: Redirecionamento Autêntico da Steam Cloud e Proteção em Modo Seguro",
+            "ms" => "CloudRedirect: Pelencongan Steam Cloud Tulen & Perlindungan Mod Selamat Sejagat",
+            _ => "CloudRedirect: Authentic Steam Cloud Redirection & Universal Safe Mode Save Protection"
+        };
+        var close = lang switch
+        {
+            "ko" => "가이드 닫기",
+            "zh-CN" => "关闭指南",
+            "es" => "Cerrar Guía",
+            "pt-BR" => "Fechar Guia",
+            "ms" => "Tutup Panduan",
+            _ => "Close Guide"
+        };
+
+        AppTitleBar.Title = ResolveLoc("InteractiveGuide_TitleBar", "InteractiveGuideTitleBar", titleBar);
+        PrevBtn.Content = ResolveLoc("InteractiveGuide_Prev", "InteractiveGuidePrev", prev);
+        NextBtn.Content = ResolveLoc("InteractiveGuide_Next", "InteractiveGuideNext", next);
+        JumpToFeatureBtn.Content = ResolveLoc("InteractiveGuide_Jump", "InteractiveGuideJump", jump);
+        KeyHighlightsTitle.Text = ResolveLoc("InteractiveGuide_Highlights", "InteractiveGuideHighlights", highlights);
+        HowItWorksHeader.Text = ResolveLoc("InteractiveGuide_HowItWorks", "InteractiveGuideHowItWorks", howItWorks);
+        ProTipHeader.Text = ResolveLoc("InteractiveGuide_ProTip", "InteractiveGuideProTip", proTip);
+        GuideFooterText.Text = ResolveLoc("InteractiveGuide_Footer", "InteractiveGuideFooter", footer);
+        if (CloseGuideBtn != null)
+        {
+            CloseGuideBtn.Content = ResolveLoc("InteractiveGuide_Close", "InteractiveGuideClose", close);
+        }
+    }
+
+    private static string ResolveLoc(string key1, string key2, string fallback)
+    {
+        var v1 = S.Get(key1);
+        if (!string.IsNullOrWhiteSpace(v1) && v1 != key1) return v1;
+        var v2 = S.Get(key2);
+        if (!string.IsNullOrWhiteSpace(v2) && v2 != key2) return v2;
+        return fallback;
     }
 
     private List<GuideFeatureStep> GetEnglishSteps()

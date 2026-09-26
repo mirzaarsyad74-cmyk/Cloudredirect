@@ -2171,6 +2171,90 @@
   <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
     <value>自定义</value>
   </data>
+  <data name="InteractiveGuide_TitleBar" xml:space="preserve">
+    <value>CloudRedirect — 交互式功能向导</value>
+  </data>
+  <data name="InteractiveGuideTitleBar" xml:space="preserve">
+    <value>CloudRedirect — 交互式功能向导</value>
+  </data>
+  <data name="InteractiveGuide_Highlights" xml:space="preserve">
+    <value>功能核心亮点:</value>
+  </data>
+  <data name="InteractiveGuideHighlights" xml:space="preserve">
+    <value>功能核心亮点:</value>
+  </data>
+  <data name="InteractiveGuide_HowItWorks" xml:space="preserve">
+    <value>后台运作原理解析</value>
+  </data>
+  <data name="InteractiveGuideHowItWorks" xml:space="preserve">
+    <value>后台运作原理解析</value>
+  </data>
+  <data name="InteractiveGuide_ProTip" xml:space="preserve">
+    <value>专业技巧</value>
+  </data>
+  <data name="InteractiveGuideProTip" xml:space="preserve">
+    <value>专业技巧</value>
+  </data>
+  <data name="InteractiveGuide_Prev" xml:space="preserve">
+    <value>上一步</value>
+  </data>
+  <data name="InteractiveGuidePrev" xml:space="preserve">
+    <value>上一步</value>
+  </data>
+  <data name="InteractiveGuide_Next" xml:space="preserve">
+    <value>下一步</value>
+  </data>
+  <data name="InteractiveGuideNext" xml:space="preserve">
+    <value>下一步</value>
+  </data>
+  <data name="InteractiveGuide_Jump" xml:space="preserve">
+    <value>立即前往该功能 🚀</value>
+  </data>
+  <data name="InteractiveGuideJump" xml:space="preserve">
+    <value>立即前往该功能 🚀</value>
+  </data>
+  <data name="InteractiveGuide_Footer" xml:space="preserve">
+    <value>CloudRedirect: 原生 Steam 云存档重定向与通用安全模式存档保护</value>
+  </data>
+  <data name="InteractiveGuideFooter" xml:space="preserve">
+    <value>CloudRedirect: 原生 Steam 云存档重定向与通用安全模式存档保护</value>
+  </data>
+  <data name="InteractiveGuide_Close" xml:space="preserve">
+    <value>关闭指南</value>
+  </data>
+  <data name="InteractiveGuideClose" xml:space="preserve">
+    <value>关闭指南</value>
+  </data>
+  <data name="SaveHistory_Title" xml:space="preserve">
+    <value>存档版本历史与回滚</value>
+  </data>
+  <data name="SaveHistory_Subtitle" xml:space="preserve">
+    <value>浏览不可篡改的时间戳历史快照，一键即可安全恢复到任意历史版本。</value>
+  </data>
+  <data name="SaveHistory_EmptyTitle" xml:space="preserve">
+    <value>暂无存档快照记录</value>
+  </data>
+  <data name="SaveHistory_EmptySubtitle" xml:space="preserve">
+    <value>每次退出游戏或云端同步前将自动创建时间戳存档快照。</value>
+  </data>
+  <data name="SaveHistory_BtnDrive" xml:space="preserve">
+    <value>在 Google 云端硬盘中打开</value>
+  </data>
+  <data name="SaveHistory_BtnFolder" xml:space="preserve">
+    <value>打开快照文件夹</value>
+  </data>
+  <data name="SaveHistory_BtnLocal" xml:space="preserve">
+    <value>打开本地存档位置</value>
+  </data>
+  <data name="SaveHistory_BtnClose" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="SaveHistory_BtnBrowse" xml:space="preserve">
+    <value>浏览</value>
+  </data>
+  <data name="SaveHistory_BtnRestore" xml:space="preserve">
+    <value>恢复此版本</value>
+  </data>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>自动</value>
   </data>

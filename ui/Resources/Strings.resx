@@ -2198,6 +2198,90 @@ Are you sure?</value>
   <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
     <value>Custom</value>
   </data>
+  <data name="InteractiveGuide_TitleBar" xml:space="preserve">
+    <value>CloudRedirect — Interactive Feature Guide</value>
+  </data>
+  <data name="InteractiveGuideTitleBar" xml:space="preserve">
+    <value>CloudRedirect — Interactive Feature Guide</value>
+  </data>
+  <data name="InteractiveGuide_Highlights" xml:space="preserve">
+    <value>Key Highlights:</value>
+  </data>
+  <data name="InteractiveGuideHighlights" xml:space="preserve">
+    <value>Key Highlights:</value>
+  </data>
+  <data name="InteractiveGuide_HowItWorks" xml:space="preserve">
+    <value>How It Works Behind The Scenes</value>
+  </data>
+  <data name="InteractiveGuideHowItWorks" xml:space="preserve">
+    <value>How It Works Behind The Scenes</value>
+  </data>
+  <data name="InteractiveGuide_ProTip" xml:space="preserve">
+    <value>Pro Tip</value>
+  </data>
+  <data name="InteractiveGuideProTip" xml:space="preserve">
+    <value>Pro Tip</value>
+  </data>
+  <data name="InteractiveGuide_Prev" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="InteractiveGuidePrev" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="InteractiveGuide_Next" xml:space="preserve">
+    <value>Next Step</value>
+  </data>
+  <data name="InteractiveGuideNext" xml:space="preserve">
+    <value>Next Step</value>
+  </data>
+  <data name="InteractiveGuide_Jump" xml:space="preserve">
+    <value>Jump to Feature 🚀</value>
+  </data>
+  <data name="InteractiveGuideJump" xml:space="preserve">
+    <value>Jump to Feature 🚀</value>
+  </data>
+  <data name="InteractiveGuide_Footer" xml:space="preserve">
+    <value>CloudRedirect: Authentic Steam Cloud Redirection &amp; Universal Safe Mode Save Protection</value>
+  </data>
+  <data name="InteractiveGuideFooter" xml:space="preserve">
+    <value>CloudRedirect: Authentic Steam Cloud Redirection &amp; Universal Safe Mode Save Protection</value>
+  </data>
+  <data name="InteractiveGuide_Close" xml:space="preserve">
+    <value>Close Guide</value>
+  </data>
+  <data name="InteractiveGuideClose" xml:space="preserve">
+    <value>Close Guide</value>
+  </data>
+  <data name="SaveHistory_Title" xml:space="preserve">
+    <value>Save Version History &amp; Rollback</value>
+  </data>
+  <data name="SaveHistory_Subtitle" xml:space="preserve">
+    <value>Browse immutable timestamped save snapshots. You can rollback to any previous version with 1 click.</value>
+  </data>
+  <data name="SaveHistory_EmptyTitle" xml:space="preserve">
+    <value>No save snapshots recorded yet</value>
+  </data>
+  <data name="SaveHistory_EmptySubtitle" xml:space="preserve">
+    <value>Snapshots are automatically created upon game exit or before cloud synchronization.</value>
+  </data>
+  <data name="SaveHistory_BtnDrive" xml:space="preserve">
+    <value>Open in Google Drive</value>
+  </data>
+  <data name="SaveHistory_BtnFolder" xml:space="preserve">
+    <value>Open Snapshots Folder</value>
+  </data>
+  <data name="SaveHistory_BtnLocal" xml:space="preserve">
+    <value>Open Local Storage</value>
+  </data>
+  <data name="SaveHistory_BtnClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="SaveHistory_BtnBrowse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="SaveHistory_BtnRestore" xml:space="preserve">
+    <value>Restore Version</value>
+  </data>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>

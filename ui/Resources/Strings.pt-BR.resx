@@ -2150,6 +2150,90 @@ Tem certeza?</value>
   <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
     <value>Personalizado</value>
   </data>
+  <data name="InteractiveGuide_TitleBar" xml:space="preserve">
+    <value>CloudRedirect — Guia Interativo de Recursos</value>
+  </data>
+  <data name="InteractiveGuideTitleBar" xml:space="preserve">
+    <value>CloudRedirect — Guia Interativo de Recursos</value>
+  </data>
+  <data name="InteractiveGuide_Highlights" xml:space="preserve">
+    <value>Destaques Principais:</value>
+  </data>
+  <data name="InteractiveGuideHighlights" xml:space="preserve">
+    <value>Destaques Principais:</value>
+  </data>
+  <data name="InteractiveGuide_HowItWorks" xml:space="preserve">
+    <value>Como Funciona nos Bastidores</value>
+  </data>
+  <data name="InteractiveGuideHowItWorks" xml:space="preserve">
+    <value>Como Funciona nos Bastidores</value>
+  </data>
+  <data name="InteractiveGuide_ProTip" xml:space="preserve">
+    <value>Dica Pro</value>
+  </data>
+  <data name="InteractiveGuideProTip" xml:space="preserve">
+    <value>Dica Pro</value>
+  </data>
+  <data name="InteractiveGuide_Prev" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="InteractiveGuidePrev" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="InteractiveGuide_Next" xml:space="preserve">
+    <value>Próximo Passo</value>
+  </data>
+  <data name="InteractiveGuideNext" xml:space="preserve">
+    <value>Próximo Passo</value>
+  </data>
+  <data name="InteractiveGuide_Jump" xml:space="preserve">
+    <value>Ir para o Recurso 🚀</value>
+  </data>
+  <data name="InteractiveGuideJump" xml:space="preserve">
+    <value>Ir para o Recurso 🚀</value>
+  </data>
+  <data name="InteractiveGuide_Footer" xml:space="preserve">
+    <value>CloudRedirect: Redirecionamento Autêntico da Steam Cloud e Proteção em Modo Seguro</value>
+  </data>
+  <data name="InteractiveGuideFooter" xml:space="preserve">
+    <value>CloudRedirect: Redirecionamento Autêntico da Steam Cloud e Proteção em Modo Seguro</value>
+  </data>
+  <data name="InteractiveGuide_Close" xml:space="preserve">
+    <value>Fechar Guia</value>
+  </data>
+  <data name="InteractiveGuideClose" xml:space="preserve">
+    <value>Fechar Guia</value>
+  </data>
+  <data name="SaveHistory_Title" xml:space="preserve">
+    <value>Histórico de Versões e Restauração</value>
+  </data>
+  <data name="SaveHistory_Subtitle" xml:space="preserve">
+    <value>Consulte backups com data e hora e restaure qualquer versão anterior com apenas 1 clique.</value>
+  </data>
+  <data name="SaveHistory_EmptyTitle" xml:space="preserve">
+    <value>Nenhum backup de save registrado ainda</value>
+  </data>
+  <data name="SaveHistory_EmptySubtitle" xml:space="preserve">
+    <value>Os backups são gerados automaticamente ao fechar o jogo ou antes de sincronizar com a nuvem.</value>
+  </data>
+  <data name="SaveHistory_BtnDrive" xml:space="preserve">
+    <value>Abrir no Google Drive</value>
+  </data>
+  <data name="SaveHistory_BtnFolder" xml:space="preserve">
+    <value>Abrir Pasta de Backups</value>
+  </data>
+  <data name="SaveHistory_BtnLocal" xml:space="preserve">
+    <value>Abrir Armazenamento Local</value>
+  </data>
+  <data name="SaveHistory_BtnClose" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
+  <data name="SaveHistory_BtnBrowse" xml:space="preserve">
+    <value>Explorar</value>
+  </data>
+  <data name="SaveHistory_BtnRestore" xml:space="preserve">
+    <value>Restaurar Versão</value>
+  </data>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>

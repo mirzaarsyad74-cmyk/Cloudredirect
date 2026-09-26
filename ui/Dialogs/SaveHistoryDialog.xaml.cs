@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using CloudRedirect.Resources;
 using CloudRedirect.Services;
 
 namespace CloudRedirect.Dialogs;
@@ -39,7 +40,9 @@ public partial class SaveHistoryDialog : Wpf.Ui.Controls.FluentWindow
             }
         }
 
-        GameTitleText.Text = $"{gameIdentifier} — Save History";
+        var historyLabel = S.Get("SaveHistory_Title");
+        if (string.IsNullOrWhiteSpace(historyLabel) || historyLabel == "SaveHistory_Title") historyLabel = "Save History";
+        GameTitleText.Text = $"{gameIdentifier} — {historyLabel}";
         LoadSnapshots();
     }
 

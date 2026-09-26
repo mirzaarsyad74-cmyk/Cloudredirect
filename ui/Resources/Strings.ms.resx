@@ -2066,6 +2066,90 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
   <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
     <value>Tersuai</value>
   </data>
+  <data name="InteractiveGuide_TitleBar" xml:space="preserve">
+    <value>CloudRedirect — Panduan Ciri Interaktif</value>
+  </data>
+  <data name="InteractiveGuideTitleBar" xml:space="preserve">
+    <value>CloudRedirect — Panduan Ciri Interaktif</value>
+  </data>
+  <data name="InteractiveGuide_Highlights" xml:space="preserve">
+    <value>Sorotan Utama:</value>
+  </data>
+  <data name="InteractiveGuideHighlights" xml:space="preserve">
+    <value>Sorotan Utama:</value>
+  </data>
+  <data name="InteractiveGuide_HowItWorks" xml:space="preserve">
+    <value>Cara Ia Berfungsi Di Sebalik Tabir</value>
+  </data>
+  <data name="InteractiveGuideHowItWorks" xml:space="preserve">
+    <value>Cara Ia Berfungsi Di Sebalik Tabir</value>
+  </data>
+  <data name="InteractiveGuide_ProTip" xml:space="preserve">
+    <value>Petua Pro</value>
+  </data>
+  <data name="InteractiveGuideProTip" xml:space="preserve">
+    <value>Petua Pro</value>
+  </data>
+  <data name="InteractiveGuide_Prev" xml:space="preserve">
+    <value>Sebelumnya</value>
+  </data>
+  <data name="InteractiveGuidePrev" xml:space="preserve">
+    <value>Sebelumnya</value>
+  </data>
+  <data name="InteractiveGuide_Next" xml:space="preserve">
+    <value>Langkah Seterusnya</value>
+  </data>
+  <data name="InteractiveGuideNext" xml:space="preserve">
+    <value>Langkah Seterusnya</value>
+  </data>
+  <data name="InteractiveGuide_Jump" xml:space="preserve">
+    <value>Pergi ke Ciri 🚀</value>
+  </data>
+  <data name="InteractiveGuideJump" xml:space="preserve">
+    <value>Pergi ke Ciri 🚀</value>
+  </data>
+  <data name="InteractiveGuide_Footer" xml:space="preserve">
+    <value>CloudRedirect: Pelencongan Steam Cloud Tulen &amp; Perlindungan Mod Selamat Sejagat</value>
+  </data>
+  <data name="InteractiveGuideFooter" xml:space="preserve">
+    <value>CloudRedirect: Pelencongan Steam Cloud Tulen &amp; Perlindungan Mod Selamat Sejagat</value>
+  </data>
+  <data name="InteractiveGuide_Close" xml:space="preserve">
+    <value>Tutup Panduan</value>
+  </data>
+  <data name="InteractiveGuideClose" xml:space="preserve">
+    <value>Tutup Panduan</value>
+  </data>
+  <data name="SaveHistory_Title" xml:space="preserve">
+    <value>Sejarah Versi Simpanan &amp; Pemulihan</value>
+  </data>
+  <data name="SaveHistory_Subtitle" xml:space="preserve">
+    <value>Semak salinan bertarikh dan pulihkan versi simpanan terdahulu dengan 1 klik mudah.</value>
+  </data>
+  <data name="SaveHistory_EmptyTitle" xml:space="preserve">
+    <value>Tiada salinan simpanan direkodkan lagi</value>
+  </data>
+  <data name="SaveHistory_EmptySubtitle" xml:space="preserve">
+    <value>Salinan dicipta secara automatik setiap kali permainan ditutup atau sebelum penyegerakan awan.</value>
+  </data>
+  <data name="SaveHistory_BtnDrive" xml:space="preserve">
+    <value>Buka di Google Drive</value>
+  </data>
+  <data name="SaveHistory_BtnFolder" xml:space="preserve">
+    <value>Buka Folder Salinan</value>
+  </data>
+  <data name="SaveHistory_BtnLocal" xml:space="preserve">
+    <value>Buka Storan Tempatan</value>
+  </data>
+  <data name="SaveHistory_BtnClose" xml:space="preserve">
+    <value>Tutup</value>
+  </data>
+  <data name="SaveHistory_BtnBrowse" xml:space="preserve">
+    <value>Semak Imbas</value>
+  </data>
+  <data name="SaveHistory_BtnRestore" xml:space="preserve">
+    <value>Pulihkan Versi</value>
+  </data>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>

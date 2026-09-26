@@ -240,7 +240,8 @@
                 <TextBlock x:Name="GuideFooterText"
                            Text="CloudRedirect: Authentic Steam Cloud Redirection &amp; Universal Safe Mode Save Protection"
                            FontSize="11" Foreground="#55697E" VerticalAlignment="Center" />
-                <ui:Button Content="Close Guide"
+                <ui:Button x:Name="CloseGuideBtn"
+                           Content="Close Guide"
                            Appearance="Secondary"
                            Click="Close_Click"
                            DockPanel.Dock="Right"

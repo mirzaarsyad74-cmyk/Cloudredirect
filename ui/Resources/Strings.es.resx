@@ -2145,6 +2145,90 @@ Esto puede causar pérdida de datos en algunos casos.
   <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
     <value>Personalizado</value>
   </data>
+  <data name="InteractiveGuide_TitleBar" xml:space="preserve">
+    <value>CloudRedirect — Guía Interactiva de Funciones</value>
+  </data>
+  <data name="InteractiveGuideTitleBar" xml:space="preserve">
+    <value>CloudRedirect — Guía Interactiva de Funciones</value>
+  </data>
+  <data name="InteractiveGuide_Highlights" xml:space="preserve">
+    <value>Puntos Clave:</value>
+  </data>
+  <data name="InteractiveGuideHighlights" xml:space="preserve">
+    <value>Puntos Clave:</value>
+  </data>
+  <data name="InteractiveGuide_HowItWorks" xml:space="preserve">
+    <value>Cómo Funciona Detrás de Escena</value>
+  </data>
+  <data name="InteractiveGuideHowItWorks" xml:space="preserve">
+    <value>Cómo Funciona Detrás de Escena</value>
+  </data>
+  <data name="InteractiveGuide_ProTip" xml:space="preserve">
+    <value>Consejo Pro</value>
+  </data>
+  <data name="InteractiveGuideProTip" xml:space="preserve">
+    <value>Consejo Pro</value>
+  </data>
+  <data name="InteractiveGuide_Prev" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="InteractiveGuidePrev" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="InteractiveGuide_Next" xml:space="preserve">
+    <value>Siguiente Paso</value>
+  </data>
+  <data name="InteractiveGuideNext" xml:space="preserve">
+    <value>Siguiente Paso</value>
+  </data>
+  <data name="InteractiveGuide_Jump" xml:space="preserve">
+    <value>Ir a la Función 🚀</value>
+  </data>
+  <data name="InteractiveGuideJump" xml:space="preserve">
+    <value>Ir a la Función 🚀</value>
+  </data>
+  <data name="InteractiveGuide_Footer" xml:space="preserve">
+    <value>CloudRedirect: Redirección Auténtica de Steam Cloud y Protección en Modo Seguro</value>
+  </data>
+  <data name="InteractiveGuideFooter" xml:space="preserve">
+    <value>CloudRedirect: Redirección Auténtica de Steam Cloud y Protección en Modo Seguro</value>
+  </data>
+  <data name="InteractiveGuide_Close" xml:space="preserve">
+    <value>Cerrar Guía</value>
+  </data>
+  <data name="InteractiveGuideClose" xml:space="preserve">
+    <value>Cerrar Guía</value>
+  </data>
+  <data name="SaveHistory_Title" xml:space="preserve">
+    <value>Historial de Versiones y Restauración</value>
+  </data>
+  <data name="SaveHistory_Subtitle" xml:space="preserve">
+    <value>Revise instantáneas inmutables con fecha y restaure cualquier versión anterior con un solo clic.</value>
+  </data>
+  <data name="SaveHistory_EmptyTitle" xml:space="preserve">
+    <value>No hay instantáneas guardadas todavía</value>
+  </data>
+  <data name="SaveHistory_EmptySubtitle" xml:space="preserve">
+    <value>Las instantáneas se crean automáticamente al salir del juego o antes de sincronizar con la nube.</value>
+  </data>
+  <data name="SaveHistory_BtnDrive" xml:space="preserve">
+    <value>Abrir en Google Drive</value>
+  </data>
+  <data name="SaveHistory_BtnFolder" xml:space="preserve">
+    <value>Abrir Carpeta de Instantáneas</value>
+  </data>
+  <data name="SaveHistory_BtnLocal" xml:space="preserve">
+    <value>Abrir Almacenamiento Local</value>
+  </data>
+  <data name="SaveHistory_BtnClose" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="SaveHistory_BtnBrowse" xml:space="preserve">
+    <value>Examinar</value>
+  </data>
+  <data name="SaveHistory_BtnRestore" xml:space="preserve">
+    <value>Restaurar Versión</value>
+  </data>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>

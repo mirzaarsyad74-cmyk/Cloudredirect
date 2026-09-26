@@ -2195,6 +2195,90 @@ Steam 클라우드가 활성화된 경우 Steam이 복원된 파일을 덮어쓸
   <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
     <value>사용자 지정</value>
   </data>
+  <data name="InteractiveGuide_TitleBar" xml:space="preserve">
+    <value>CloudRedirect — 인터랙티브 기능 가이드</value>
+  </data>
+  <data name="InteractiveGuideTitleBar" xml:space="preserve">
+    <value>CloudRedirect — 인터랙티브 기능 가이드</value>
+  </data>
+  <data name="InteractiveGuide_Highlights" xml:space="preserve">
+    <value>주요 핵심 요약:</value>
+  </data>
+  <data name="InteractiveGuideHighlights" xml:space="preserve">
+    <value>주요 핵심 요약:</value>
+  </data>
+  <data name="InteractiveGuide_HowItWorks" xml:space="preserve">
+    <value>백그라운드 작동 원리</value>
+  </data>
+  <data name="InteractiveGuideHowItWorks" xml:space="preserve">
+    <value>백그라운드 작동 원리</value>
+  </data>
+  <data name="InteractiveGuide_ProTip" xml:space="preserve">
+    <value>전문가 꿀팁</value>
+  </data>
+  <data name="InteractiveGuideProTip" xml:space="preserve">
+    <value>전문가 꿀팁</value>
+  </data>
+  <data name="InteractiveGuide_Prev" xml:space="preserve">
+    <value>이전</value>
+  </data>
+  <data name="InteractiveGuidePrev" xml:space="preserve">
+    <value>이전</value>
+  </data>
+  <data name="InteractiveGuide_Next" xml:space="preserve">
+    <value>다음 단계</value>
+  </data>
+  <data name="InteractiveGuideNext" xml:space="preserve">
+    <value>다음 단계</value>
+  </data>
+  <data name="InteractiveGuide_Jump" xml:space="preserve">
+    <value>기능으로 이동 🚀</value>
+  </data>
+  <data name="InteractiveGuideJump" xml:space="preserve">
+    <value>기능으로 이동 🚀</value>
+  </data>
+  <data name="InteractiveGuide_Footer" xml:space="preserve">
+    <value>CloudRedirect: 정품 Steam 클라우드 리디렉션 및 유니버설 안전 모드 세이브 보호</value>
+  </data>
+  <data name="InteractiveGuideFooter" xml:space="preserve">
+    <value>CloudRedirect: 정품 Steam 클라우드 리디렉션 및 유니버설 안전 모드 세이브 보호</value>
+  </data>
+  <data name="InteractiveGuide_Close" xml:space="preserve">
+    <value>가이드 닫기</value>
+  </data>
+  <data name="InteractiveGuideClose" xml:space="preserve">
+    <value>가이드 닫기</value>
+  </data>
+  <data name="SaveHistory_Title" xml:space="preserve">
+    <value>세이브 버전 기록 및 롤백</value>
+  </data>
+  <data name="SaveHistory_Subtitle" xml:space="preserve">
+    <value>타임스탬프 스냅샷을 확인하고 클릭 한 번으로 이전 세이브로 안전하게 복원하세요.</value>
+  </data>
+  <data name="SaveHistory_EmptyTitle" xml:space="preserve">
+    <value>기록된 세이브 스냅샷이 없습니다</value>
+  </data>
+  <data name="SaveHistory_EmptySubtitle" xml:space="preserve">
+    <value>게임 종료 시 또는 클라우드 동기화 직전에 스냅샷이 자동으로 생성됩니다.</value>
+  </data>
+  <data name="SaveHistory_BtnDrive" xml:space="preserve">
+    <value>Google Drive에서 열기</value>
+  </data>
+  <data name="SaveHistory_BtnFolder" xml:space="preserve">
+    <value>스냅샷 폴더 열기</value>
+  </data>
+  <data name="SaveHistory_BtnLocal" xml:space="preserve">
+    <value>로컬 저장소 열기</value>
+  </data>
+  <data name="SaveHistory_BtnClose" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="SaveHistory_BtnBrowse" xml:space="preserve">
+    <value>찾아보기</value>
+  </data>
+  <data name="SaveHistory_BtnRestore" xml:space="preserve">
+    <value>버전 복원</value>
+  </data>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>자동</value>
   </data>
