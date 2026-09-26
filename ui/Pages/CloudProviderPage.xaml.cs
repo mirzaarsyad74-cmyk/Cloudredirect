@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using CloudRedirect.Resources;
 
 namespace CloudRedirect.Pages;
@@ -334,11 +335,36 @@ public partial class CloudProviderPage : Page
         _oauth = new Services.OAuthService();
 
         SignInButton.IsEnabled = false;
+        CopyAuthUrlButton.Visibility = Visibility.Visible;
+        CopyAuthUrlButton.IsEnabled = false;
+        OpenBrowserButton.Visibility = Visibility.Visible;
+        OpenBrowserButton.IsEnabled = false;
         CancelAuthButton.Visibility = Visibility.Visible;
+        AuthAssistCard.Visibility = Visibility.Visible;
+        ManualCodeInput.Text = string.Empty;
+        ManualCodeError.Visibility = Visibility.Collapsed;
+        SubmitManualCodeButton.IsEnabled = true;
         ProviderCombo.IsEnabled = false;
         LogBorder.Visibility = Visibility.Visible;
         _logBuffer.Clear();
         LogOutput.Text = "";
+
+        _oauth.AuthUrlReady += url => Dispatcher.BeginInvoke(() =>
+        {
+            CopyAuthUrlButton.IsEnabled = true;
+            OpenBrowserButton.IsEnabled = true;
+            if (string.IsNullOrEmpty(_oauth?.MobileHelperUrl))
+            {
+                QrModeWifiRadio.IsEnabled = false;
+                QrModeDirectRadio.IsChecked = true;
+            }
+            else
+            {
+                QrModeWifiRadio.IsEnabled = true;
+                QrModeWifiRadio.IsChecked = true;
+            }
+            UpdateQrCode();
+        });
 
         try
         {
@@ -371,10 +397,131 @@ public partial class CloudProviderPage : Page
             _isAuthenticating = false;
 
             SignInButton.IsEnabled = true;
+            CopyAuthUrlButton.Visibility = Visibility.Collapsed;
+            OpenBrowserButton.Visibility = Visibility.Collapsed;
             CancelAuthButton.Visibility = Visibility.Collapsed;
+            AuthAssistCard.Visibility = Visibility.Collapsed;
+            ManualCodeError.Visibility = Visibility.Collapsed;
             ProviderCombo.IsEnabled = true;
 
             UpdateAuthStatus();
+        }
+    }
+
+    private void CopyAuthUrl_Click(object sender, RoutedEventArgs e)
+    {
+        var url = _oauth?.CurrentAuthUrl;
+        if (!string.IsNullOrEmpty(url))
+        {
+            try
+            {
+                Clipboard.SetText(url);
+                CopyAuthUrlButton.Content = S.Get("CloudProvider_Copied");
+                AppendLog("Copied authorization link to clipboard.");
+                var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                timer.Tick += (s, ev) =>
+                {
+                    CopyAuthUrlButton.Content = S.Get("CloudProvider_CopyLink");
+                    timer.Stop();
+                };
+                timer.Start();
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Could not copy link to clipboard: {ex.Message}");
+            }
+        }
+    }
+
+    private void OpenBrowser_Click(object sender, RoutedEventArgs e)
+    {
+        var url = _oauth?.CurrentAuthUrl;
+        if (!string.IsNullOrEmpty(url))
+        {
+            AppendLog("Retrying browser launch...");
+            Services.OAuthService.TryOpenBrowser(url, msg => Dispatcher.BeginInvoke(() => AppendLog(msg)));
+        }
+    }
+
+    private void SubmitManualCode_Click(object sender, RoutedEventArgs e)
+    {
+        ManualCodeError.Visibility = Visibility.Collapsed;
+        ManualCodeError.Text = string.Empty;
+
+        var text = ManualCodeInput.Text?.Trim();
+        if (string.IsNullOrEmpty(text))
+        {
+            ManualCodeError.Text = S.Get("CloudProvider_MissingManualCode");
+            ManualCodeError.Visibility = Visibility.Visible;
+            return;
+        }
+
+        if (_oauth == null)
+        {
+            ManualCodeError.Text = "Authorization session is not active. Click 'Sign In' first.";
+            ManualCodeError.Visibility = Visibility.Visible;
+            return;
+        }
+
+        if (_oauth.TrySubmitManualCodeOrUrl(text, out var error))
+        {
+            AppendLog("Manual authorization code accepted. Exchanging for tokens...");
+            ManualCodeInput.Text = string.Empty;
+            ManualCodeError.Visibility = Visibility.Collapsed;
+            SubmitManualCodeButton.IsEnabled = false;
+        }
+        else
+        {
+            ManualCodeError.Text = error;
+            ManualCodeError.Visibility = Visibility.Visible;
+            AppendLog($"Manual code entry error: {error}");
+        }
+    }
+
+    private void ManualCodeInput_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            SubmitManualCode_Click(sender, e);
+        }
+    }
+
+    private void UpdateQrCode()
+    {
+        try
+        {
+            string? payload = null;
+            if (QrModeWifiRadio?.IsChecked == true && !string.IsNullOrEmpty(_oauth?.MobileHelperUrl))
+            {
+                payload = _oauth.MobileHelperUrl;
+                QrModeHintText.Text = S.Get("CloudProvider_QrModeWifiHint");
+            }
+            else
+            {
+                payload = _oauth?.CurrentAuthUrl;
+                QrModeHintText.Text = S.Get("CloudProvider_QrModeDirectHint");
+            }
+
+            if (!string.IsNullOrEmpty(payload))
+            {
+                QrCodeImage.Source = Services.QrCodeHelper.GenerateQrCode(payload, 5);
+            }
+            else
+            {
+                QrCodeImage.Source = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            AppendLog($"Notice: QR Code generation error: {ex.Message}");
+        }
+    }
+
+    private void QrMode_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_isAuthenticating)
+        {
+            UpdateQrCode();
         }
     }
 

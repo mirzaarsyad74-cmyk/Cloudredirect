@@ -559,6 +559,48 @@ Si omites esto, las partidas se almacenarán localmente en tu carpeta de Steam.<
   <data name="CloudProvider_Cancel" xml:space="preserve">
     <value>Cancelar</value>
   </data>
+  <data name="CloudProvider_CopyLink" xml:space="preserve">
+    <value>Copiar enlace</value>
+  </data>
+  <data name="CloudProvider_Copied" xml:space="preserve">
+    <value>¡Copiado!</value>
+  </data>
+  <data name="CloudProvider_OpenBrowser" xml:space="preserve">
+    <value>Abrir navegador</value>
+  </data>
+  <data name="CloudProvider_AuthAssistTitle" xml:space="preserve">
+    <value>¿El navegador no se abrió o estás autorizando desde otro dispositivo?</value>
+  </data>
+  <data name="CloudProvider_AuthAssistHint" xml:space="preserve">
+    <value>Puedes abrir el enlace de autorización en cualquier navegador o en tu teléfono/tableta. Tras iniciar sesión, si el navegador no puede conectar con localhost, copia la URL de la barra de direcciones y pégala abajo.</value>
+  </data>
+  <data name="CloudProvider_ManualCodePlaceholder" xml:space="preserve">
+    <value>Pega la URL de redirección (http://localhost:.../callback?code=...) o el código aquí...</value>
+  </data>
+  <data name="CloudProvider_CompleteSignIn" xml:space="preserve">
+    <value>Completar inicio de sesión</value>
+  </data>
+  <data name="CloudProvider_MissingManualCode" xml:space="preserve">
+    <value>Por favor pega la URL de redirección o el código de autorización.</value>
+  </data>
+  <data name="CloudProvider_QrTitle" xml:space="preserve">
+    <value>Escanear con teléfono móvil</value>
+  </data>
+  <data name="CloudProvider_QrDescription" xml:space="preserve">
+    <value>Escanea este código QR con la cámara de tu teléfono para iniciar sesión desde tu móvil.</value>
+  </data>
+  <data name="CloudProvider_QrModeWifi" xml:space="preserve">
+    <value>Envío automático por Wi-Fi</value>
+  </data>
+  <data name="CloudProvider_QrModeWifiHint" xml:space="preserve">
+    <value>Abre un asistente móvil en tu teléfono que envía automáticamente el código de autorización a tu PC.</value>
+  </data>
+  <data name="CloudProvider_QrModeDirect" xml:space="preserve">
+    <value>Inicio de sesión directo con Google</value>
+  </data>
+  <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
+    <value>Abre el inicio de sesión de Google directamente en el teléfono. Copia la URL redirigida y pégala en el cuadro inferior.</value>
+  </data>
 
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
     <value>No se encontró config.json -- usando valores predeterminados</value>

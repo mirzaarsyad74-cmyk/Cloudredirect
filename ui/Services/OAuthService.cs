@@ -88,6 +88,23 @@ public sealed class OAuthService : IDisposable
     private string? _oauthState;      // CSRF protection
     private string? _codeVerifier;    // PKCE code verifier
     private string? _currentProvider; // Track current provider for state validation
+    private TaskCompletionSource<string>? _manualCodeTcs;
+    private MobileAuthServer? _mobileServer;
+
+    /// <summary>
+    /// The authorization URL generated for the current or most recent OAuth session.
+    /// </summary>
+    public string? CurrentAuthUrl { get; private set; }
+
+    /// <summary>
+    /// The local mobile helper URL for scanning QR code on phone via Wi-Fi.
+    /// </summary>
+    public string? MobileHelperUrl => _mobileServer?.ServerUrl;
+
+    /// <summary>
+    /// Event triggered when the authorization URL is generated and ready to be used or copied.
+    /// </summary>
+    public event Action<string>? AuthUrlReady;
 
     /// <summary>
     /// Run the full OAuth flow for the given provider.
@@ -196,17 +213,29 @@ public sealed class OAuthService : IDisposable
             _ => throw new ArgumentException($"Unknown provider: {provider}")
         };
 
-        // Open browser
-        log("Opening browser for authorization...");
+        CurrentAuthUrl = authUrl;
+        _manualCodeTcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // Start mobile helper server for QR code scanning over Wi-Fi
         try
         {
-            Process.Start(new ProcessStartInfo(authUrl) { UseShellExecute = true })?.Dispose();
+            _mobileServer = new MobileAuthServer(this, authUrl, log);
+            _mobileServer.Start();
         }
         catch (Exception ex)
         {
-            log($"ERROR: Could not open browser: {ex.Message}");
-            log($"Please manually open: {authUrl}");
+            log($"Mobile Assist: Could not start local server: {ex.Message}");
         }
+
+        AuthUrlReady?.Invoke(authUrl);
+
+        // Open browser with fallback strategies
+        log("Opening browser for authorization...");
+        TryOpenBrowser(authUrl, log);
+
+        log($"Authorization link generated:\n{authUrl}");
+        log("Tip: If your browser did not open automatically, click 'Copy Link' or open the link above.");
+        log("If using a phone/tablet or localhost is unreachable, paste the redirected URL or code below.");
 
         // Wait for the callback
         string? code = null;
@@ -425,14 +454,59 @@ public sealed class OAuthService : IDisposable
 
     private async Task<string?> WaitForCallbackAsync(CancellationToken cancel)
     {
-        // Wait up to 5 minutes for the user to complete auth
-        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+        // Wait up to 10 minutes for the user to complete auth or submit manual code
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(10));
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancel, timeout.Token);
 
         // Loop to skip non-OAuth requests (browser favicon, preflight, etc.)
         while (true)
         {
-            var ctx = await _listener!.GetContextAsync().WaitAsync(linked.Token);
+            linked.Token.ThrowIfCancellationRequested();
+
+            Task<HttpListenerContext>? listenerTask = null;
+            if (_listener != null && _listener.IsListening)
+            {
+                listenerTask = _listener.GetContextAsync();
+            }
+
+            Task<string>? manualTask = _manualCodeTcs?.Task;
+
+            HttpListenerContext? ctx = null;
+
+            if (listenerTask != null && manualTask != null)
+            {
+                var cancelTcs = new TaskCompletionSource<bool>();
+                using var reg = linked.Token.Register(() => cancelTcs.TrySetCanceled());
+
+                var completedTask = await Task.WhenAny(listenerTask, manualTask, cancelTcs.Task);
+                if (completedTask == cancelTcs.Task)
+                {
+                    linked.Token.ThrowIfCancellationRequested();
+                }
+
+                if (completedTask == manualTask)
+                {
+                    _ = listenerTask.ContinueWith(_ => { }, TaskContinuationOptions.OnlyOnFaulted);
+                    return await manualTask;
+                }
+
+                ctx = await listenerTask;
+            }
+            else if (listenerTask != null)
+            {
+                ctx = await listenerTask.WaitAsync(linked.Token);
+            }
+            else if (manualTask != null)
+            {
+                return await manualTask.WaitAsync(linked.Token);
+            }
+            else
+            {
+                return null;
+            }
+
+            if (ctx == null) continue;
+
             var query = ctx.Request.QueryString;
             string? code = query["code"];
             string? error = query["error"];
@@ -454,35 +528,35 @@ public sealed class OAuthService : IDisposable
                 code = null;
             }
 
-        // Send a response to the browser
-        string html;
-        if (!string.IsNullOrEmpty(code))
-        {
-            html = $"""
-                <html><body style="font-family:Segoe UI,sans-serif;text-align:center;padding:60px;background:#1e1e1e;color:#fff">
-                <h1>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthSuccessTitle"))}</h1>
-                <p>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthSuccessBody"))}</p>
-                </body></html>
-                """;
-        }
-        else
-        {
-            html = $"""
-                <html><body style="font-family:Segoe UI,sans-serif;text-align:center;padding:60px;background:#1e1e1e;color:#fff">
-                <h1>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthFailedTitle"))}</h1>
-                <p>Error: {System.Net.WebUtility.HtmlEncode(error ?? "unknown")}</p>
-                <p>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthFailedBody"))}</p>
-                </body></html>
-                """;
-        }
+            // Send a response to the browser
+            string html;
+            if (!string.IsNullOrEmpty(code))
+            {
+                html = $"""
+                    <html><body style="font-family:Segoe UI,sans-serif;text-align:center;padding:60px;background:#1e1e1e;color:#fff">
+                    <h1>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthSuccessTitle"))}</h1>
+                    <p>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthSuccessBody"))}</p>
+                    </body></html>
+                    """;
+            }
+            else
+            {
+                html = $"""
+                    <html><body style="font-family:Segoe UI,sans-serif;text-align:center;padding:60px;background:#1e1e1e;color:#fff">
+                    <h1>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthFailedTitle"))}</h1>
+                    <p>Error: {System.Net.WebUtility.HtmlEncode(error ?? "unknown")}</p>
+                    <p>{System.Net.WebUtility.HtmlEncode(S.Get("OAuth_AuthFailedBody"))}</p>
+                    </body></html>
+                    """;
+            }
 
-        byte[] buf = Encoding.UTF8.GetBytes(html);
-        ctx.Response.ContentType = "text/html; charset=utf-8";
-        ctx.Response.ContentLength64 = buf.Length;
-        await ctx.Response.OutputStream.WriteAsync(buf, linked.Token);
-        ctx.Response.Close();
+            byte[] buf = Encoding.UTF8.GetBytes(html);
+            ctx.Response.ContentType = "text/html; charset=utf-8";
+            ctx.Response.ContentLength64 = buf.Length;
+            await ctx.Response.OutputStream.WriteAsync(buf, linked.Token);
+            ctx.Response.Close();
 
-        return code;
+            return code;
         } // end while
     }
 
@@ -587,8 +661,188 @@ public sealed class OAuthService : IDisposable
         }
     }
 
+    /// <summary>
+    /// Attempts to open a URL using multiple fallback strategies on Windows:
+    /// 1. Default ShellExecute
+    /// 2. Windows cmd.exe start launcher
+    /// 3. Direct execution of installed browsers (Edge, Chrome, Firefox, Brave)
+    /// </summary>
+    public static bool TryOpenBrowser(string url, Action<string>? log = null)
+    {
+        // 1. Standard ShellExecute
+        try
+        {
+            var p = Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            p?.Dispose();
+            return true;
+        }
+        catch (Exception ex1)
+        {
+            log?.Invoke($"Standard browser launch failed: {ex1.Message}. Trying command launcher...");
+        }
+
+        // 2. Command launcher: cmd.exe /c start "" "<url>"
+        try
+        {
+            var psi = new ProcessStartInfo("cmd.exe", $"/c start \"\" \"{url.Replace("\"", "%22")}\"")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            Process.Start(psi)?.Dispose();
+            return true;
+        }
+        catch (Exception ex2)
+        {
+            log?.Invoke($"Command launcher failed: {ex2.Message}. Searching for installed browsers...");
+        }
+
+        // 3. Fallback: Directly launch known browser executables
+        string[] candidates =
+        [
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Microsoft\Edge\Application\msedge.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Microsoft\Edge\Application\msedge.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Google\Chrome\Application\chrome.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Google\Chrome\Application\chrome.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Google\Chrome\Application\chrome.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"Mozilla Firefox\firefox.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"BraveSoftware\Brave-Browser\Application\brave.exe"),
+        ];
+
+        foreach (var exe in candidates)
+        {
+            if (File.Exists(exe))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(exe, $"\"{url}\"") { UseShellExecute = false })?.Dispose();
+                    log?.Invoke($"Opened browser via {Path.GetFileName(exe)}.");
+                    return true;
+                }
+                catch { /* try next candidate */ }
+            }
+        }
+
+        log?.Invoke("Notice: Could not automatically open the browser. Please copy and paste the link manually.");
+        return false;
+    }
+
+    /// <summary>
+    /// Parses and accepts a manually submitted authorization code or full redirect URL
+    /// (e.g. if the user authorized on a mobile device or if localhost connection failed).
+    /// </summary>
+    public bool TrySubmitManualCodeOrUrl(string rawInput, out string errorMessage)
+    {
+        errorMessage = string.Empty;
+        if (string.IsNullOrWhiteSpace(rawInput))
+        {
+            errorMessage = S.Get("CloudProvider_MissingManualCode");
+            return false;
+        }
+
+        string input = rawInput.Trim().Trim('"', '\'', '`', '<', '>');
+        string code = input;
+
+        // If it looks like a URL or contains query parameters:
+        if (input.Contains("code=") || input.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            input.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || input.Contains("?"))
+        {
+            try
+            {
+                string queryString = string.Empty;
+                int qIdx = input.IndexOf('?');
+                if (qIdx >= 0)
+                {
+                    queryString = input.Substring(qIdx + 1);
+                }
+                else if (input.Contains("code="))
+                {
+                    queryString = input;
+                }
+
+                if (!string.IsNullOrEmpty(queryString))
+                {
+                    var query = ParseQueryString(queryString);
+                    if (query.TryGetValue("error", out var errorVal) && !string.IsNullOrEmpty(errorVal))
+                    {
+                        var desc = query.GetValueOrDefault("error_description", errorVal);
+                        errorMessage = $"Authorization failed: {desc}";
+                        return false;
+                    }
+
+                    if (query.TryGetValue("state", out var stateVal) && !string.IsNullOrEmpty(stateVal))
+                    {
+                        if (!string.IsNullOrEmpty(_oauthState) && !string.Equals(stateVal, _oauthState, StringComparison.Ordinal))
+                        {
+                            errorMessage = "State mismatch (security check failed). Please make sure you copied the URL from this exact sign-in attempt.";
+                            return false;
+                        }
+                    }
+
+                    if (query.TryGetValue("code", out var codeVal) && !string.IsNullOrEmpty(codeVal))
+                    {
+                        code = codeVal;
+                    }
+                    else
+                    {
+                        errorMessage = "Could not find 'code' parameter in the URL. Please verify you copied the full redirect URL.";
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error parsing URL: {ex.Message}";
+                return false;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            errorMessage = "No valid authorization code found.";
+            return false;
+        }
+
+        if (_manualCodeTcs == null || _manualCodeTcs.Task.IsCompleted)
+        {
+            errorMessage = "Sign-in is not currently waiting for a code. Click 'Sign In' first.";
+            return false;
+        }
+
+        _manualCodeTcs.TrySetResult(code);
+        return true;
+    }
+
+    private static Dictionary<string, string> ParseQueryString(string query)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (string.IsNullOrEmpty(query)) return dict;
+        if (query.StartsWith('?')) query = query.Substring(1);
+        int hashIdx = query.IndexOf('#');
+        if (hashIdx >= 0) query = query.Substring(0, hashIdx);
+
+        var pairs = query.Split('&', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var pair in pairs)
+        {
+            var eq = pair.IndexOf('=');
+            if (eq >= 0)
+            {
+                var key = Uri.UnescapeDataString(pair.Substring(0, eq));
+                var val = Uri.UnescapeDataString(pair.Substring(eq + 1));
+                dict[key] = val;
+            }
+            else
+            {
+                dict[Uri.UnescapeDataString(pair)] = string.Empty;
+            }
+        }
+        return dict;
+    }
+
     private void StopListener()
     {
+        _mobileServer?.Dispose();
+        _mobileServer = null;
         try { _listener?.Stop(); } catch { }
         try { _listener?.Close(); } catch { }
         _listener = null;
@@ -596,6 +850,7 @@ public sealed class OAuthService : IDisposable
 
     public void Dispose()
     {
+        _manualCodeTcs?.TrySetCanceled();
         StopListener();
         _cts?.Dispose();
         _http.Dispose();

@@ -777,6 +777,48 @@
   <data name="CloudProvider_Cancel" xml:space="preserve">
     <value>取消</value>
   </data>
+  <data name="CloudProvider_CopyLink" xml:space="preserve">
+    <value>复制链接</value>
+  </data>
+  <data name="CloudProvider_Copied" xml:space="preserve">
+    <value>已复制！</value>
+  </data>
+  <data name="CloudProvider_OpenBrowser" xml:space="preserve">
+    <value>打开浏览器</value>
+  </data>
+  <data name="CloudProvider_AuthAssistTitle" xml:space="preserve">
+    <value>浏览器未打开或在其他设备上授权？</value>
+  </data>
+  <data name="CloudProvider_AuthAssistHint" xml:space="preserve">
+    <value>您可以在任何浏览器或手机/平板上打开授权链接。登录后如果浏览器无法连接 localhost，请复制地址栏中的重定向网址（或代码）并粘贴到下方。</value>
+  </data>
+  <data name="CloudProvider_ManualCodePlaceholder" xml:space="preserve">
+    <value>在此粘贴重定向网址 (http://localhost:.../callback?code=...) 或代码...</value>
+  </data>
+  <data name="CloudProvider_CompleteSignIn" xml:space="preserve">
+    <value>完成登录</value>
+  </data>
+  <data name="CloudProvider_MissingManualCode" xml:space="preserve">
+    <value>请粘贴重定向网址或授权代码。</value>
+  </data>
+  <data name="CloudProvider_QrTitle" xml:space="preserve">
+    <value>手机扫码登录</value>
+  </data>
+  <data name="CloudProvider_QrDescription" xml:space="preserve">
+    <value>使用手机相机扫描二维码即可在手机上完成登录。</value>
+  </data>
+  <data name="CloudProvider_QrModeWifi" xml:space="preserve">
+    <value>Wi-Fi 局域网自动同步</value>
+  </data>
+  <data name="CloudProvider_QrModeWifiHint" xml:space="preserve">
+    <value>在手机上打开授权助手网页，授权后自动将凭据同步回电脑。</value>
+  </data>
+  <data name="CloudProvider_QrModeDirect" xml:space="preserve">
+    <value>直连 Google 登录</value>
+  </data>
+  <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
+    <value>手机直接打开 Google 授权页面，授权后复制网址并粘贴到下方输入框。</value>
+  </data>
 
   <!-- CloudProviderPage code-behind -->
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">

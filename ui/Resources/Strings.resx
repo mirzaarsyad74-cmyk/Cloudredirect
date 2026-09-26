@@ -778,6 +778,48 @@ Force-kill it?</value>
   <data name="CloudProvider_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="CloudProvider_CopyLink" xml:space="preserve">
+    <value>Copy Link</value>
+  </data>
+  <data name="CloudProvider_Copied" xml:space="preserve">
+    <value>Copied!</value>
+  </data>
+  <data name="CloudProvider_OpenBrowser" xml:space="preserve">
+    <value>Open Browser</value>
+  </data>
+  <data name="CloudProvider_AuthAssistTitle" xml:space="preserve">
+    <value>Browser didn't open or authorizing from another device?</value>
+  </data>
+  <data name="CloudProvider_AuthAssistHint" xml:space="preserve">
+    <value>You can open the authorization link in any browser or on your phone/tablet. Once signed in, if the browser cannot reach localhost, copy the redirected URL (or code) from the address bar and paste it below.</value>
+  </data>
+  <data name="CloudProvider_ManualCodePlaceholder" xml:space="preserve">
+    <value>Paste redirect URL (http://localhost:.../callback?code=...) or code here...</value>
+  </data>
+  <data name="CloudProvider_CompleteSignIn" xml:space="preserve">
+    <value>Complete Sign-In</value>
+  </data>
+  <data name="CloudProvider_MissingManualCode" xml:space="preserve">
+    <value>Please paste the redirect URL or authorization code.</value>
+  </data>
+  <data name="CloudProvider_QrTitle" xml:space="preserve">
+    <value>Scan with Smartphone</value>
+  </data>
+  <data name="CloudProvider_QrDescription" xml:space="preserve">
+    <value>Scan this QR code with your phone camera to complete sign-in on your phone.</value>
+  </data>
+  <data name="CloudProvider_QrModeWifi" xml:space="preserve">
+    <value>Auto-Send via Wi-Fi</value>
+  </data>
+  <data name="CloudProvider_QrModeWifiHint" xml:space="preserve">
+    <value>Opens a mobile helper on your phone that sends the authorization code back to your PC automatically.</value>
+  </data>
+  <data name="CloudProvider_QrModeDirect" xml:space="preserve">
+    <value>Direct Google Sign-In</value>
+  </data>
+  <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
+    <value>Opens Google sign-in directly on your phone. Copy the redirected URL and paste it in the box below.</value>
+  </data>
 
   <!-- CloudProviderPage code-behind -->
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
@@ -1760,6 +1802,18 @@ Are you sure?</value>
   <data name="Settings_ShowNonSteamGameHint" xml:space="preserve">
     <value>When playing a game unlocked by a Lua, show it as your Steam status instead of appearing online but not actively in a game.</value>
   </data>
+  <data name="Settings_CustomCloudIcon" xml:space="preserve">
+    <value>Steam Cloud Status Icon</value>
+  </data>
+  <data name="Settings_CustomCloudIconHint" xml:space="preserve">
+    <value>Replace the Steam Library cloud status icon with CloudRedirect's icon for Lua games only (original owned games keep Steam's stock icon).</value>
+  </data>
+  <data name="Settings_CustomCloudIconSuccess" xml:space="preserve">
+    <value>CloudRedirect icon injected into Steam! Restart Steam or press F5 in the Steam Library to view the updated icon.</value>
+  </data>
+  <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
+    <value>Steam Cloud status icon restored to default. Restart Steam or press F5 in the Steam Library.</value>
+  </data>
   <data name="Settings_Experimental" xml:space="preserve">
     <value>Experimental Features</value>
   </data>
@@ -2108,18 +2162,6 @@ Are you sure?</value>
     <value>Scanning source provider...</value>
   </data>
 
-  <data name="Settings_CustomCloudIcon" xml:space="preserve">
-    <value>Steam Cloud Status Icon</value>
-  </data>
-  <data name="Settings_CustomCloudIconHint" xml:space="preserve">
-    <value>Replace the Steam Library cloud status icon with CloudRedirect's icon for Lua games only (original owned games keep Steam's stock icon).</value>
-  </data>
-  <data name="Settings_CustomCloudIconSuccess" xml:space="preserve">
-    <value>CloudRedirect icon injected into Steam! Restart Steam or press F5 in the Steam Library to view the updated icon.</value>
-  </data>
-  <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
-    <value>Steam Cloud status icon restored to default. Restart Steam or press F5 in the Steam Library.</value>
-  </data>
   <data name="Dashboard_UniversalSavesTitle" xml:space="preserve">
     <value>Universal Cloud Saves (Safe Mode)</value>
   </data>

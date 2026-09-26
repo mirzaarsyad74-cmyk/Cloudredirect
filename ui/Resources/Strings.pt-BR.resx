@@ -559,6 +559,48 @@ Forçar encerramento?</value>
   <data name="CloudProvider_Cancel" xml:space="preserve">
     <value>Cancelar</value>
   </data>
+  <data name="CloudProvider_CopyLink" xml:space="preserve">
+    <value>Copiar Link</value>
+  </data>
+  <data name="CloudProvider_Copied" xml:space="preserve">
+    <value>Copiado!</value>
+  </data>
+  <data name="CloudProvider_OpenBrowser" xml:space="preserve">
+    <value>Abrir Navegador</value>
+  </data>
+  <data name="CloudProvider_AuthAssistTitle" xml:space="preserve">
+    <value>O navegador não abriu ou está autorizando em outro dispositivo?</value>
+  </data>
+  <data name="CloudProvider_AuthAssistHint" xml:space="preserve">
+    <value>Você pode abrir o link de autorização em qualquer navegador ou no seu celular/tablet. Após o login, se o navegador não conseguir conectar ao localhost, copie a URL da barra de endereços e cole abaixo.</value>
+  </data>
+  <data name="CloudProvider_ManualCodePlaceholder" xml:space="preserve">
+    <value>Cole a URL de redirecionamento (http://localhost:.../callback?code=...) ou o código aqui...</value>
+  </data>
+  <data name="CloudProvider_CompleteSignIn" xml:space="preserve">
+    <value>Concluir Login</value>
+  </data>
+  <data name="CloudProvider_MissingManualCode" xml:space="preserve">
+    <value>Por favor, cole a URL de redirecionamento ou o código de autorização.</value>
+  </data>
+  <data name="CloudProvider_QrTitle" xml:space="preserve">
+    <value>Escanear com Smartphone</value>
+  </data>
+  <data name="CloudProvider_QrDescription" xml:space="preserve">
+    <value>Escaneie este código QR com a câmera do seu celular para concluir o login no seu telefone.</value>
+  </data>
+  <data name="CloudProvider_QrModeWifi" xml:space="preserve">
+    <value>Envio Automático via Wi-Fi</value>
+  </data>
+  <data name="CloudProvider_QrModeWifiHint" xml:space="preserve">
+    <value>Abre um assistente móvel no seu celular que envia o código de autorização de volta ao seu PC automaticamente.</value>
+  </data>
+  <data name="CloudProvider_QrModeDirect" xml:space="preserve">
+    <value>Login Direto do Google</value>
+  </data>
+  <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
+    <value>Abre o login do Google diretamente no seu celular. Copie a URL redirecionada e cole no campo abaixo.</value>
+  </data>
 
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
     <value>config.json não encontrado -- usando padrões</value>

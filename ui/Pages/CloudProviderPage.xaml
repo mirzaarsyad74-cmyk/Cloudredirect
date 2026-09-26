@@ -243,12 +243,152 @@
                            Icon="{ui:SymbolIcon PersonKey20}"
                            Click="SignIn_Click"
                            Margin="0,0,8,0" />
+                <ui:Button x:Name="CopyAuthUrlButton"
+                           Content="{res:Loc CloudProvider_CopyLink}"
+                           Icon="{ui:SymbolIcon Copy24}"
+                           Click="CopyAuthUrl_Click"
+                           Margin="0,0,8,0"
+                           Visibility="Collapsed" />
+                <ui:Button x:Name="OpenBrowserButton"
+                           Content="{res:Loc CloudProvider_OpenBrowser}"
+                           Icon="{ui:SymbolIcon ArrowUpRight24}"
+                           Click="OpenBrowser_Click"
+                           Margin="0,0,8,0"
+                           Visibility="Collapsed" />
                 <ui:Button x:Name="CancelAuthButton"
                            Content="{res:Loc CloudProvider_Cancel}"
                            Icon="{ui:SymbolIcon Dismiss24}"
                            Click="CancelAuth_Click"
                            Visibility="Collapsed" />
             </StackPanel>
+
+            <!-- OAuth Assist & Cross-Device / Manual Fallback Card -->
+            <Border x:Name="AuthAssistCard"
+                    Background="{StaticResource SteamCardGradient}"
+                    BorderBrush="{StaticResource SteamBorderHighlightColor}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="16,14"
+                    Margin="0,0,0,16"
+                    Visibility="Collapsed">
+                <StackPanel>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="Globe24" FontSize="20" Foreground="{StaticResource SteamAccentCyanColor}" Margin="0,1,10,0" VerticalAlignment="Top" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{res:Loc CloudProvider_AuthAssistTitle}"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{StaticResource SteamTextPrimaryColor}" />
+                            <TextBlock Text="{res:Loc CloudProvider_AuthAssistHint}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource SteamTextSecondaryColor}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- QR Code / Smartphone Assist Section -->
+                    <Border Background="{DynamicResource SteamBgDarkestColor}"
+                            BorderBrush="{StaticResource SteamBorderSubtleColor}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="14"
+                            Margin="0,4,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- QR Code Frame -->
+                            <Border Grid.Column="0"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    Padding="6"
+                                    Width="134"
+                                    Height="134"
+                                    VerticalAlignment="Top"
+                                    Margin="0,0,16,0">
+                                <Image x:Name="QrCodeImage"
+                                       Width="122"
+                                       Height="122"
+                                       Stretch="Uniform"
+                                       RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                            </Border>
+
+                            <!-- QR Description & Mode Selector -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <ui:SymbolIcon Symbol="QrCode24" FontSize="16" Foreground="{StaticResource SteamAccentLightBlueColor}" Margin="0,0,6,0" />
+                                    <TextBlock Text="{res:Loc CloudProvider_QrTitle}"
+                                               FontWeight="SemiBold"
+                                               FontSize="13"
+                                               Foreground="{StaticResource SteamTextPrimaryColor}" />
+                                </StackPanel>
+
+                                <TextBlock x:Name="QrDescriptionText"
+                                           Text="{res:Loc CloudProvider_QrDescription}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource SteamTextSecondaryColor}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,0,0,10" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <RadioButton x:Name="QrModeWifiRadio"
+                                                 Content="{res:Loc CloudProvider_QrModeWifi}"
+                                                 IsChecked="True"
+                                                 GroupName="QrMode"
+                                                 FontSize="12"
+                                                 Checked="QrMode_Checked"
+                                                 Margin="0,0,14,0" />
+                                    <RadioButton x:Name="QrModeDirectRadio"
+                                                 Content="{res:Loc CloudProvider_QrModeDirect}"
+                                                 GroupName="QrMode"
+                                                 FontSize="12"
+                                                 Checked="QrMode_Checked" />
+                                </StackPanel>
+
+                                <TextBlock x:Name="QrModeHintText"
+                                           Text="{res:Loc CloudProvider_QrModeWifiHint}"
+                                           FontSize="11"
+                                           Foreground="{StaticResource SteamTextTertiaryColor}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox x:Name="ManualCodeInput"
+                                    Grid.Column="0"
+                                    PlaceholderText="{res:Loc CloudProvider_ManualCodePlaceholder}"
+                                    FontSize="12"
+                                    KeyDown="ManualCodeInput_KeyDown" />
+                        <ui:Button x:Name="SubmitManualCodeButton"
+                                   Grid.Column="1"
+                                   Content="{res:Loc CloudProvider_CompleteSignIn}"
+                                   Appearance="Primary"
+                                   Icon="{ui:SymbolIcon Checkmark24}"
+                                   Margin="8,0,0,0"
+                                   Click="SubmitManualCode_Click" />
+                    </Grid>
+
+                    <TextBlock x:Name="ManualCodeError"
+                               FontSize="12"
+                               Foreground="#FFE06C75"
+                               TextWrapping="Wrap"
+                               Margin="0,6,0,0"
+                               Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
 
             <Border x:Name="LogBorder"
                     Background="{DynamicResource ControlFillColorDefaultBrush}"

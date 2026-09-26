@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.8.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageReference Include="WPF-UI" Version="4.2.0" />
   </ItemGroup>
@@ -53,16 +54,10 @@
       <NativeCliDest>$(MSBuildProjectDirectory)\Resources\cloud_redirect_cli.exe</NativeCliDest>
     </PropertyGroup>
     <MakeDir Directories="$(MSBuildProjectDirectory)\Resources" Condition="!Exists('$(MSBuildProjectDirectory)\Resources')" />
-    <Copy SourceFiles="$(NativeDllSource)" DestinationFiles="$(NativeDllDest)"
-          Condition="Exists('$(NativeDllSource)')"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(NativeCliSource)" DestinationFiles="$(NativeCliDest)"
-          Condition="Exists('$(NativeCliSource)')"
-          SkipUnchangedFiles="true" />
-    <Warning Text="cloud_redirect.dll not found at $(NativeDllSource) — embedded resource will be stale or missing"
-             Condition="!Exists('$(NativeDllSource)')" />
-    <Warning Text="cloud_redirect_cli.exe not found at $(NativeCliSource) — embedded CLI will be stale or missing"
-             Condition="!Exists('$(NativeCliSource)')" />
+    <Copy SourceFiles="$(NativeDllSource)" DestinationFiles="$(NativeDllDest)" Condition="Exists('$(NativeDllSource)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(NativeCliSource)" DestinationFiles="$(NativeCliDest)" Condition="Exists('$(NativeCliSource)')" SkipUnchangedFiles="true" />
+    <Warning Text="cloud_redirect.dll not found at $(NativeDllSource) — embedded resource will be stale or missing" Condition="!Exists('$(NativeDllSource)')" />
+    <Warning Text="cloud_redirect_cli.exe not found at $(NativeCliSource) — embedded CLI will be stale or missing" Condition="!Exists('$(NativeCliSource)')" />
   </Target>
 
 </Project>

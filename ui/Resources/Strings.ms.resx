@@ -757,6 +757,48 @@ Force-kill it?</value>
   <data name="CloudProvider_Cancel" xml:space="preserve">
     <value>Batal</value>
   </data>
+  <data name="CloudProvider_CopyLink" xml:space="preserve">
+    <value>Salin Pautan</value>
+  </data>
+  <data name="CloudProvider_Copied" xml:space="preserve">
+    <value>Disalin!</value>
+  </data>
+  <data name="CloudProvider_OpenBrowser" xml:space="preserve">
+    <value>Buka Pelayar</value>
+  </data>
+  <data name="CloudProvider_AuthAssistTitle" xml:space="preserve">
+    <value>Pelayar tidak terbuka atau mengesahkan dari peranti lain?</value>
+  </data>
+  <data name="CloudProvider_AuthAssistHint" xml:space="preserve">
+    <value>Anda boleh membuka pautan pengesahan dalam mana-mana pelayar atau pada telefon/tablet anda. Selepas log masuk, jika pelayar tidak dapat menyambung ke localhost, salin URL dari bar alamat dan tampal di bawah.</value>
+  </data>
+  <data name="CloudProvider_ManualCodePlaceholder" xml:space="preserve">
+    <value>Tampal URL haluan semula (http://localhost:.../callback?code=...) atau kod di sini...</value>
+  </data>
+  <data name="CloudProvider_CompleteSignIn" xml:space="preserve">
+    <value>Selesaikan Log Masuk</value>
+  </data>
+  <data name="CloudProvider_MissingManualCode" xml:space="preserve">
+    <value>Sila tampal URL haluan semula atau kod pengesahan.</value>
+  </data>
+  <data name="CloudProvider_QrTitle" xml:space="preserve">
+    <value>Imbas dengan Telefon Pintar</value>
+  </data>
+  <data name="CloudProvider_QrDescription" xml:space="preserve">
+    <value>Imbas kod QR ini menggunakan kamera telefon untuk menyelesaikan log masuk pada telefon anda.</value>
+  </data>
+  <data name="CloudProvider_QrModeWifi" xml:space="preserve">
+    <value>Hantar Automatik melalui Wi-Fi</value>
+  </data>
+  <data name="CloudProvider_QrModeWifiHint" xml:space="preserve">
+    <value>Membuka pembantu mudah alih pada telefon anda yang menghantar kod pengesahan kembali ke PC secara automatik.</value>
+  </data>
+  <data name="CloudProvider_QrModeDirect" xml:space="preserve">
+    <value>Log Masuk Google Terus</value>
+  </data>
+  <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
+    <value>Membuka log masuk Google secara terus pada telefon. Salin URL yang dihalakan dan tampal pada kotak di bawah.</value>
+  </data>
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
     <value>No config.json found - using defaults</value>
   </data>
