@@ -2093,6 +2093,87 @@
   <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
     <value>Steam 云状态图标已恢复默认。请重启 Steam 或在 Steam 库中按 F5 刷新。</value>
   </data>
+  <data name="Dashboard_UniversalSavesTitle" xml:space="preserve">
+    <value>通用云存档 (安全模式)</value>
+  </data>
+  <data name="Dashboard_UniversalSavesSubtitle" xml:space="preserve">
+    <value>非云端与反作弊游戏</value>
+  </data>
+  <data name="Dashboard_UniversalSavesConfiguredFormat" xml:space="preserve">
+    <value>已配置游戏: {0}</value>
+  </data>
+  <data name="Dashboard_UniversalSavesDesc" xml:space="preserve">
+    <value>适用于《艾尔登法环》、《博德之门 3》和独立游戏等的零注入存档备份与同步。</value>
+  </data>
+  <data name="UniversalSaves_Title" xml:space="preserve">
+    <value>通用云存档</value>
+  </data>
+  <data name="UniversalSaves_SafeModeBadge" xml:space="preserve">
+    <value>安全模式 (100% 反作弊安全)</value>
+  </data>
+  <data name="UniversalSaves_Description" xml:space="preserve">
+    <value>专为不支持 Steam 云或受虚拟机监控程序/反作弊保护的游戏打造的零注入、进程外云同步与版本控制。</value>
+  </data>
+  <data name="UniversalSaves_ScanSteamLibrary" xml:space="preserve">
+    <value>扫描 Steam 游戏库</value>
+  </data>
+  <data name="UniversalSaves_AutoScanPc" xml:space="preserve">
+    <value>自动扫描电脑存档</value>
+  </data>
+  <data name="UniversalSaves_AddPreset" xml:space="preserve">
+    <value>添加预设</value>
+  </data>
+  <data name="UniversalSaves_AddCustomGame" xml:space="preserve">
+    <value>添加自定义游戏</value>
+  </data>
+  <data name="UniversalSaves_InteractiveGuide" xml:space="preserve">
+    <value>互动指南</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksTitle" xml:space="preserve">
+    <value>通用安全模式工作原理</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksDesc" xml:space="preserve">
+    <value>CloudRedirect 从外部监控游戏进程。当游戏关闭时，它会自动快照您的存档文件夹并将其同步到您的云存储。完全不进行内存挂钩或 DLL 注入，确保在 EasyAntiCheat、BattlEye、Vanguard 和虚拟机监控程序下 100% 安全。</value>
+  </data>
+  <data name="UniversalSaves_BtnSync" xml:space="preserve">
+    <value>同步</value>
+  </data>
+  <data name="UniversalSaves_BtnHistory" xml:space="preserve">
+    <value>历史</value>
+  </data>
+  <data name="UniversalSaves_BtnFolder" xml:space="preserve">
+    <value>文件夹</value>
+  </data>
+  <data name="UniversalSaves_BtnDrive" xml:space="preserve">
+    <value>云端网盘</value>
+  </data>
+  <data name="UniversalSaves_Status_Monitoring" xml:space="preserve">
+    <value>监控中</value>
+  </data>
+  <data name="UniversalSaves_Status_UpToDate" xml:space="preserve">
+    <value>已是最新</value>
+  </data>
+  <data name="UniversalSaves_Status_Syncing" xml:space="preserve">
+    <value>同步中...</value>
+  </data>
+  <data name="UniversalSaves_Status_GameRunning" xml:space="preserve">
+    <value>游戏运行中 🎮</value>
+  </data>
+  <data name="UniversalSaves_Tag_AutoProtected" xml:space="preserve">
+    <value>自动保护</value>
+  </data>
+  <data name="UniversalSaves_Tag_GenuineSteam" xml:space="preserve">
+    <value>正版 Steam (无云端)</value>
+  </data>
+  <data name="UniversalSaves_Tag_AntiCheatSafe" xml:space="preserve">
+    <value>反作弊/HV安全</value>
+  </data>
+  <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
+    <value>自定义</value>
+  </data>
+  <data name="Zoom_Auto" xml:space="preserve">
+    <value>自动</value>
+  </data>
 </root>
 
 

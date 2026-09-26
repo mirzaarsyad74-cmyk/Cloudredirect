@@ -42,6 +42,25 @@ public partial class UniversalSavesPage : Page
         GamesItemsControl.ItemsSource = list;
         EmptyStateBorder.Visibility = list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         GamesItemsControl.Visibility = list.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        _ = Task.Run(async () =>
+        {
+            var appIds = list.Where(p => p.SteamAppId > 0).Select(p => p.SteamAppId).Distinct().ToList();
+            if (appIds.Count > 0)
+            {
+                var store = await SteamStoreClient.Shared.GetAppInfoAsync(appIds);
+                Dispatcher.Invoke(() =>
+                {
+                    foreach (var p in list)
+                    {
+                        if (p.SteamAppId > 0 && store.TryGetValue(p.SteamAppId, out var info) && !string.IsNullOrEmpty(info.HeaderUrl))
+                        {
+                            p.HeaderUrl = info.HeaderUrl;
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private async void AddPreset_Click(object sender, RoutedEventArgs e)
@@ -401,6 +420,25 @@ public partial class UniversalSavesPage : Page
             await UniversalSaveWatcherService.SyncProfileNowAsync(profile, "Manual Sync");
             RefreshList();
         }
+    }
+
+    private async void OpenDrive_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.Tag is UniversalGameProfile profile)
+        {
+            var acctId = "0";
+            var appIdOrName = profile.SteamAppId > 0 ? profile.SteamAppId.ToString() : profile.GameName;
+            await CloudLocationService.OpenCloudLocationAsync(acctId, appIdOrName, profile.GameName);
+        }
+    }
+
+    private void OpenGuide_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Dialogs.InteractiveGuideDialog
+        {
+            Owner = Window.GetWindow(this)
+        };
+        dlg.ShowDialog();
     }
 
     private void SaveHistory_Click(object sender, RoutedEventArgs e)

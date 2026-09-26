@@ -31,11 +31,21 @@ public static class CloudLocationService
 
                 if (!string.IsNullOrEmpty(accessToken))
                 {
-                    using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+                    using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(7) };
                     http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                    // Search for folder with this appId
-                    var query = Uri.EscapeDataString($"name='{appId}' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+                    // Search for folder with this appId or game title
+                    string query;
+                    if (!string.IsNullOrEmpty(displayName) && !string.Equals(displayName, appId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var safeName = displayName.Replace("'", "\\'");
+                        query = Uri.EscapeDataString($"(name='{appId}' or name='{safeName}') and mimeType='application/vnd.google-apps.folder' and trashed=false");
+                    }
+                    else
+                    {
+                        query = Uri.EscapeDataString($"name='{appId}' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+                    }
+
                     var url = $"https://www.googleapis.com/drive/v3/files?q={query}&fields=files(id,name,webViewLink,parents,modifiedTime)&orderBy=modifiedTime desc";
 
                     var resp = await http.GetAsync(url);
@@ -59,15 +69,17 @@ public static class CloudLocationService
                     }
                 }
 
-                // Fallback to Google Drive search for this app
-                var searchUrl = $"https://drive.google.com/drive/search?q={Uri.EscapeDataString(appId)}";
+                // Fallback to Google Drive search for this app or game name
+                var searchTerm = !string.IsNullOrEmpty(displayName) ? displayName : appId;
+                var searchUrl = $"https://drive.google.com/drive/search?q={Uri.EscapeDataString(searchTerm)}";
                 Process.Start(new ProcessStartInfo(searchUrl) { UseShellExecute = true })?.Dispose();
                 return;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error opening Google Drive location: {ex}");
-                var searchUrl = $"https://drive.google.com/drive/search?q={Uri.EscapeDataString(appId)}";
+                var searchTerm = !string.IsNullOrEmpty(displayName) ? displayName : appId;
+                var searchUrl = $"https://drive.google.com/drive/search?q={Uri.EscapeDataString(searchTerm)}";
                 Process.Start(new ProcessStartInfo(searchUrl) { UseShellExecute = true })?.Dispose();
                 return;
             }

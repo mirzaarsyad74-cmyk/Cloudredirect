@@ -4,18 +4,36 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CloudRedirect.Resources;
 
 namespace CloudRedirect.Services;
 
-public class UniversalGameProfile
+public class UniversalGameProfile : System.ComponentModel.INotifyPropertyChanged
 {
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged(string prop) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(prop));
+
+    private string? _headerUrl;
+    private string _status = "Monitoring";
+
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string GameName { get; set; } = "";
     public string ProcessName { get; set; } = "";
     public string SaveFolderPath { get; set; } = "";
     public bool Enabled { get; set; } = true;
     public DateTime? LastSyncTime { get; set; }
-    public string Status { get; set; } = "Monitoring";
+    public string Status
+    {
+        get => _status;
+        set
+        {
+            if (_status != value)
+            {
+                _status = value;
+                OnPropertyChanged(nameof(Status));
+            }
+        }
+    }
     public uint SteamAppId { get; set; } = 0;
     public bool IsAutoEnrolled { get; set; } = false;
     public bool IsGenuineSteamGame { get; set; } = false;
@@ -23,15 +41,48 @@ public class UniversalGameProfile
 
     public bool HasSteamAppId => SteamAppId > 0;
     public bool HasProcess => !string.IsNullOrWhiteSpace(ProcessName);
-    public string? HeaderUrl => SteamAppId > 0
-        ? $"https://cdn.akamai.steamstatic.com/steam/apps/{SteamAppId}/header.jpg"
-        : null;
+    
+    public string? HeaderUrl
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(_headerUrl))
+                return _headerUrl;
+            return SteamAppId > 0
+                ? $"https://cdn.akamai.steamstatic.com/steam/apps/{SteamAppId}/header.jpg"
+                : null;
+        }
+        set
+        {
+            if (_headerUrl != value)
+            {
+                _headerUrl = value;
+                OnPropertyChanged(nameof(HeaderUrl));
+            }
+        }
+    }
+
+    public string LocalizedStatus
+    {
+        get
+        {
+            if (string.Equals(Status, "Monitoring", StringComparison.OrdinalIgnoreCase))
+                return S.Get("UniversalSaves_Status_Monitoring");
+            if (string.Equals(Status, "Up to Date", StringComparison.OrdinalIgnoreCase))
+                return S.Get("UniversalSaves_Status_UpToDate");
+            if (string.Equals(Status, "Syncing...", StringComparison.OrdinalIgnoreCase))
+                return S.Get("UniversalSaves_Status_Syncing");
+            if (Status.Contains("Game Running", StringComparison.OrdinalIgnoreCase))
+                return S.Get("UniversalSaves_Status_GameRunning");
+            return Status;
+        }
+    }
 
     public string ProtectionTypeTag
     {
         get => IsGenuineSteamGame
-            ? "Genuine Steam (No Cloud)"
-            : (HasAntiCheat ? "Anti-Cheat / HV Safe" : (IsAutoEnrolled ? "Auto-Protected" : "Custom"));
+            ? S.Get("UniversalSaves_Tag_GenuineSteam")
+            : (HasAntiCheat ? S.Get("UniversalSaves_Tag_AntiCheatSafe") : (IsAutoEnrolled ? S.Get("UniversalSaves_Tag_AutoProtected") : S.Get("UniversalSaves_Tag_Custom")));
         set { }
     }
 
@@ -291,62 +342,39 @@ public static class UniversalSaveWatcherService
 
     public static async Task<bool> SyncProfileNowAsync(UniversalGameProfile profile, string triggerReason = "Manual Sync")
     {
-        return await Task.Run(() =>
+        try
         {
-            try
+            var saveDir = profile.ExpandedSavePath;
+            if (!Directory.Exists(saveDir))
             {
-                var saveDir = profile.ExpandedSavePath;
-                if (!Directory.Exists(saveDir))
-                {
-                    UpdateProfileStatus(profile, "Folder Not Found");
-                    return false;
-                }
-
-                UpdateProfileStatus(profile, "Syncing...");
-
-                // 1. Create a versioned local snapshot first (Advanced Save Protection)
-                var snapshot = SaveHistoryManager.CreateSnapshot(profile.GameName, saveDir, triggerReason);
-
-                // 2. If a local sync folder or cloud sync target is configured, sync to it
-                try
-                {
-                    var config = SteamDetector.ReadConfig();
-                    if (config?.SyncPath != null && Directory.Exists(config.SyncPath))
-                    {
-                        var cloudDest = Path.Combine(config.SyncPath, "UniversalCloudSaves", SaveHistoryManager.SanitizeFolderName(profile.GameName));
-                        if (!Directory.Exists(cloudDest))
-                            Directory.CreateDirectory(cloudDest);
-
-                        foreach (var srcFile in Directory.GetFiles(saveDir, "*", SearchOption.AllDirectories))
-                        {
-                            var rel = Path.GetRelativePath(saveDir, srcFile);
-                            var dest = Path.Combine(cloudDest, rel);
-                            var destD = Path.GetDirectoryName(dest)!;
-                            if (!Directory.Exists(destD))
-                                Directory.CreateDirectory(destD);
-
-                            File.Copy(srcFile, dest, overwrite: true);
-                        }
-                    }
-                }
-                catch { }
-
-                profile.LastSyncTime = DateTime.Now;
-                UpdateProfileStatus(profile, "Up to Date");
-                SaveProfiles();
-
-                TrayIconService.Instance.ShowNotification(
-                    "CloudRedirect Universal Save",
-                    $"{profile.GameName}: Save files successfully backed up and synchronized.");
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error syncing universal profile {profile.GameName}: {ex}");
-                UpdateProfileStatus(profile, "Sync Error");
+                UpdateProfileStatus(profile, "Folder Not Found");
                 return false;
             }
-        });
+
+            UpdateProfileStatus(profile, "Syncing...");
+
+            // 1. Create a versioned local snapshot first (Advanced Save Protection)
+            var snapshot = SaveHistoryManager.CreateSnapshot(profile.GameName, saveDir, triggerReason);
+
+            // 2. Upload to Cloud Provider (Google Drive, Local Folder, OneDrive)
+            var syncResult = await UniversalCloudSyncService.UploadProfileSavesToCloudAsync(profile);
+
+            profile.LastSyncTime = DateTime.Now;
+            UpdateProfileStatus(profile, syncResult.Success ? "Up to Date" : "Sync Warning");
+            SaveProfiles();
+
+            var message = syncResult.Success
+                ? $"{profile.GameName}: Save files successfully backed up and synchronized to cloud."
+                : $"{profile.GameName}: Local snapshot saved. Cloud sync: {syncResult.Message}";
+
+            TrayIconService.Instance.ShowNotification("CloudRedirect Universal Save", message);
+            return syncResult.Success;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error syncing universal profile {profile.GameName}: {ex}");
+            UpdateProfileStatus(profile, "Sync Error");
+            return false;
+        }
     }
 }

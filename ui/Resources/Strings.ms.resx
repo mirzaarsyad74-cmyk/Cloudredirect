@@ -1988,4 +1988,85 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
   <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
     <value>Ikon status Steam Cloud dikembalikan ke lalai. Mulakan semula Steam atau tekan F5 dalam Perpustakaan Steam.</value>
   </data>
+  <data name="Dashboard_UniversalSavesTitle" xml:space="preserve">
+    <value>Simpanan Awan Universal (Mod Selamat)</value>
+  </data>
+  <data name="Dashboard_UniversalSavesSubtitle" xml:space="preserve">
+    <value>Permainan Tanpa Awan &amp; Anti-Cheat</value>
+  </data>
+  <data name="Dashboard_UniversalSavesConfiguredFormat" xml:space="preserve">
+    <value>Permainan dikonfigurasi: {0}</value>
+  </data>
+  <data name="Dashboard_UniversalSavesDesc" xml:space="preserve">
+    <value>Sandaran &amp; penyegerakan simpanan sifar suntikan untuk permainan seperti Elden Ring, Baldur's Gate 3 dan permainan indie.</value>
+  </data>
+  <data name="UniversalSaves_Title" xml:space="preserve">
+    <value>Simpanan Awan Universal</value>
+  </data>
+  <data name="UniversalSaves_SafeModeBadge" xml:space="preserve">
+    <value>Mod Selamat (100% Selamat dari Anti-Cheat)</value>
+  </data>
+  <data name="UniversalSaves_Description" xml:space="preserve">
+    <value>Penyegerakan awan &amp; pemversian luar proses tanpa suntikan untuk permainan tanpa Steam Cloud atau dilindungi oleh Anti-Cheat.</value>
+  </data>
+  <data name="UniversalSaves_ScanSteamLibrary" xml:space="preserve">
+    <value>Imbas Perpustakaan Steam</value>
+  </data>
+  <data name="UniversalSaves_AutoScanPc" xml:space="preserve">
+    <value>Imbas Auto PC untuk Simpanan</value>
+  </data>
+  <data name="UniversalSaves_AddPreset" xml:space="preserve">
+    <value>Tambah Pratetap</value>
+  </data>
+  <data name="UniversalSaves_AddCustomGame" xml:space="preserve">
+    <value>Tambah Permainan Tersuai</value>
+  </data>
+  <data name="UniversalSaves_InteractiveGuide" xml:space="preserve">
+    <value>Panduan Interaktif</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksTitle" xml:space="preserve">
+    <value>Bagaimana Mod Selamat Universal Berfungsi</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksDesc" xml:space="preserve">
+    <value>CloudRedirect memantau proses permainan dari luar. Apabila permainan ditutup, ia secara automatik mengambil gambar folder simpanan anda dan menyegerakkannya ke pembekal awan anda. Tiada cangkuk memori atau suntikan DLL dilakukan, menjadikannya 100% selamat dengan EasyAntiCheat, BattlEye, Vanguard, dan Hypervisor.</value>
+  </data>
+  <data name="UniversalSaves_BtnSync" xml:space="preserve">
+    <value>Segerak</value>
+  </data>
+  <data name="UniversalSaves_BtnHistory" xml:space="preserve">
+    <value>Sejarah</value>
+  </data>
+  <data name="UniversalSaves_BtnFolder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="UniversalSaves_BtnDrive" xml:space="preserve">
+    <value>Drive</value>
+  </data>
+  <data name="UniversalSaves_Status_Monitoring" xml:space="preserve">
+    <value>Memantau</value>
+  </data>
+  <data name="UniversalSaves_Status_UpToDate" xml:space="preserve">
+    <value>Terkini</value>
+  </data>
+  <data name="UniversalSaves_Status_Syncing" xml:space="preserve">
+    <value>Menyegerak...</value>
+  </data>
+  <data name="UniversalSaves_Status_GameRunning" xml:space="preserve">
+    <value>Permainan Berjalan 🎮</value>
+  </data>
+  <data name="UniversalSaves_Tag_AutoProtected" xml:space="preserve">
+    <value>Auto-Dilindungi</value>
+  </data>
+  <data name="UniversalSaves_Tag_GenuineSteam" xml:space="preserve">
+    <value>Steam Tulen (Tiada Awan)</value>
+  </data>
+  <data name="UniversalSaves_Tag_AntiCheatSafe" xml:space="preserve">
+    <value>Selamat Anti-Cheat/HV</value>
+  </data>
+  <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
+    <value>Tersuai</value>
+  </data>
+  <data name="Zoom_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
 </root>

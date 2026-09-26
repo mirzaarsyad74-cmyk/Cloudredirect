@@ -4,7 +4,8 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:res="clr-namespace:CloudRedirect.Resources"
         Title="Save Version History &amp; Rollback"
-        Width="640" Height="480"
+        Width="720" Height="500"
+        MinWidth="680" MinHeight="440"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource SteamWindowBackgroundGradient}"
         ExtendsContentIntoTitleBar="True">
@@ -157,7 +158,13 @@
 
         <!-- Bottom Action Bar -->
         <Border Grid.Row="2" Background="#141E28" BorderBrush="#253548" BorderThickness="0,1,0,0" Padding="20,12">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
+                <ui:Button Content="Close"
+                           Appearance="Secondary"
+                           Click="Close_Click"
+                           DockPanel.Dock="Right"
+                           HorizontalAlignment="Right"
+                           MinWidth="80" />
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <ui:Button Content="Open in Google Drive"
                                Appearance="Secondary"
@@ -174,11 +181,6 @@
                                Icon="{ui:SymbolIcon FolderOpen24}"
                                Click="OpenLocalFolder_Click" />
                 </StackPanel>
-                <ui:Button Content="Close"
-                           Appearance="Secondary"
-                           Click="Close_Click"
-                           DockPanel.Dock="Right"
-                           HorizontalAlignment="Right" />
             </DockPanel>
         </Border>
     </Grid>

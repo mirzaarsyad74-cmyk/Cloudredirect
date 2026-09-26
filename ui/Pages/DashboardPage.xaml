@@ -53,6 +53,14 @@
                         </StackPanel>
                     </Border>
                     <ui:Button Appearance="Secondary"
+                               Icon="{ui:SymbolIcon QuestionCircle24}"
+                               Content="Guide"
+                               ToolTip="Interactive Guide for each feature &amp; function"
+                               Click="OpenGuide_Click"
+                               Margin="0,0,10,0"
+                               Padding="12,6"
+                               Cursor="Hand" />
+                    <ui:Button Appearance="Secondary"
                                Icon="{ui:SymbolIcon Settings24}"
                                Content="{res:Loc Nav_Settings}"
                                Click="SettingsAction_Click"
@@ -103,11 +111,26 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Green Pulse Icon -->
-                    <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20"
-                            Background="#223B1E" Margin="0,0,12,0" VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="Games24" FontSize="22"
-                                       Foreground="#A4D007" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <!-- Steam Game Poster / Capsule Artwork -->
+                    <Border Grid.Column="0"
+                            x:Name="ActiveGameArtworkBorder"
+                            Width="104" Height="48"
+                            CornerRadius="5"
+                            Margin="0,0,12,0"
+                            VerticalAlignment="Center"
+                            Background="#182A1A"
+                            BorderBrush="#3D681C"
+                            BorderThickness="1"
+                            ClipToBounds="True">
+                        <Grid>
+                            <ui:SymbolIcon x:Name="ActiveGameFallbackIcon"
+                                           Symbol="Games24" FontSize="22"
+                                           Foreground="#A4D007"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Image x:Name="ActiveGamePosterImage"
+                                   Stretch="UniformToFill"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Grid>
                     </Border>
 
                     <!-- Active Game Details -->
@@ -415,10 +438,10 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Universal Cloud Saves (Safe Mode)"
+                            <TextBlock Text="{res:Loc Dashboard_UniversalSavesTitle}"
                                        FontSize="11" FontWeight="SemiBold"
                                        Foreground="#FF8F98A0" />
-                            <TextBlock Text="Non-Cloud &amp; Anti-Cheat Games"
+                            <TextBlock Text="{res:Loc Dashboard_UniversalSavesSubtitle}"
                                        FontSize="11" Foreground="#FF66C0F4" Margin="6,0,0,0" />
                         </StackPanel>
                         <TextBlock x:Name="UniversalSavesCountText"
@@ -426,7 +449,7 @@
                                    FontSize="15" FontWeight="Bold"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    Margin="0,3,0,3" />
-                        <TextBlock Text="Zero-injection save backup &amp; sync for games like Elden Ring, Baldur's Gate 3, and indie games."
+                        <TextBlock Text="{res:Loc Dashboard_UniversalSavesDesc}"
                                    FontSize="11"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
@@ -479,6 +502,13 @@
                                Margin="0,0,8,6"
                                Cursor="Hand"
                                Click="MigrationAction_Click" />
+
+                    <ui:Button Content="Interactive Guide"
+                               Icon="{ui:SymbolIcon QuestionCircle24}"
+                               Padding="12,6"
+                               Margin="0,0,8,6"
+                               Cursor="Hand"
+                               Click="OpenGuide_Click" />
 
                     <!-- Utility Buttons -->
                     <ui:Button Content="{res:Loc Dashboard_OpenLogFile}"

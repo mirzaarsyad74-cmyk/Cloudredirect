@@ -61,97 +61,101 @@
         </Style>
     </Page.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16">
-        <DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True" Margin="24,18,24,16">
 
-            <!-- Page Header: Structured vertically so buttons never collide with title on any DPI / window width -->
-            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-                <!-- Row 1: Title and Safe Mode Pill -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
-                    <TextBlock Text="Universal Cloud Saves"
-                               FontSize="26" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,12,0" />
-                    <Border Background="#12251A"
-                            BorderBrush="#214D2E"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="8,3"
-                            VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <ui:SymbolIcon Symbol="ShieldCheckmark20" FontSize="13" Foreground="#A4D007" Margin="0,0,5,0" VerticalAlignment="Center" />
-                            <TextBlock Text="Safe Mode (100% Anti-Cheat Safe)"
-                                       FontFamily="Segoe UI"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="#A4D007"
-                                       VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-
-                <!-- Row 2: Subtitle Description -->
-                <TextBlock Text="Zero-injection, out-of-process cloud sync &amp; versioning for games without Steam Cloud or protected by Hypervisors / Anti-Cheat."
-                           FontSize="12"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,12" />
-
-                <!-- Row 3: Action Toolbar (WrapPanel guarantees clean wrapping on any window width) -->
-                <WrapPanel Margin="0,0,0,4">
-                    <ui:Button Content="Scan Steam Library"
-                               Appearance="Primary"
-                               Icon="{ui:SymbolIcon Games24}"
-                               Click="ScanSteamLibrary_Click"
-                               Margin="0,0,8,6" />
-                    <ui:Button Content="Auto-Scan PC for Saves"
-                               Appearance="Secondary"
-                               Icon="{ui:SymbolIcon Search24}"
-                               Click="AutoScan_Click"
-                               Margin="0,0,8,6" />
-                    <ui:Button Content="Add Preset"
-                               Appearance="Secondary"
-                               Icon="{ui:SymbolIcon Sparkle24}"
-                               Click="AddPreset_Click"
-                               Margin="0,0,8,6" />
-                    <ui:Button Content="Add Custom Game"
-                               Appearance="Secondary"
-                               Icon="{ui:SymbolIcon Add24}"
-                               Click="AddCustomGame_Click"
-                               Margin="0,0,8,6" />
-                </WrapPanel>
+        <!-- Page Header: Structured vertically so buttons never collide with title on any DPI / window width -->
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+            <!-- Row 1: Title and Safe Mode Pill -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                <TextBlock Text="{res:Loc UniversalSaves_Title}"
+                           FontSize="26" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0" />
+                <Border Background="#12251A"
+                        BorderBrush="#214D2E"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="8,3"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="ShieldCheckmark20" FontSize="13" Foreground="#A4D007" Margin="0,0,5,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{res:Loc UniversalSaves_SafeModeBadge}"
+                                   FontFamily="Segoe UI"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#A4D007"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
-            <!-- Explanation & Safe Mode Info Card -->
-            <Border DockPanel.Dock="Top"
-                    Background="#14212D"
-                    BorderBrush="#253E54"
-                    BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="14,10"
-                    Margin="0,0,0,16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18"
-                            Background="#1A344A" Margin="0,0,12,0" VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="20" Foreground="#66C0F4"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="How Universal Safe Mode Works"
-                                   FontWeight="SemiBold" FontSize="13"
-                                   Foreground="#66C0F4" />
-                        <TextBlock Text="CloudRedirect monitors the game process from the outside. When the game closes, it automatically snapshots your save folder and synchronizes it to your cloud provider. No memory hooks or DLL injections are performed, making it 100% safe with EasyAntiCheat, BattlEye, Vanguard, and Hypervisors."
-                                   FontSize="11.5"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                   TextWrapping="Wrap" Margin="0,2,0,0" />
-                    </StackPanel>
-                </Grid>
-            </Border>
+            <!-- Row 2: Subtitle Description -->
+            <TextBlock Text="{res:Loc UniversalSaves_Description}"
+                       FontSize="12"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,12" />
+
+            <!-- Row 3: Action Toolbar (WrapPanel guarantees clean wrapping on any window width) -->
+            <WrapPanel Margin="0,0,0,4">
+                <ui:Button Content="{res:Loc UniversalSaves_ScanSteamLibrary}"
+                           Appearance="Primary"
+                           Icon="{ui:SymbolIcon Games24}"
+                           Click="ScanSteamLibrary_Click"
+                           Margin="0,0,8,6" />
+                <ui:Button Content="{res:Loc UniversalSaves_AutoScanPc}"
+                           Appearance="Secondary"
+                           Icon="{ui:SymbolIcon Search24}"
+                           Click="AutoScan_Click"
+                           Margin="0,0,8,6" />
+                <ui:Button Content="{res:Loc UniversalSaves_AddPreset}"
+                           Appearance="Secondary"
+                           Icon="{ui:SymbolIcon Sparkle24}"
+                           Click="AddPreset_Click"
+                           Margin="0,0,8,6" />
+                <ui:Button Content="{res:Loc UniversalSaves_AddCustomGame}"
+                           Appearance="Secondary"
+                           Icon="{ui:SymbolIcon Add24}"
+                           Click="AddCustomGame_Click"
+                           Margin="0,0,8,6" />
+                <ui:Button Content="{res:Loc UniversalSaves_InteractiveGuide}"
+                           Appearance="Secondary"
+                           Icon="{ui:SymbolIcon QuestionCircle24}"
+                           Click="OpenGuide_Click"
+                           Margin="0,0,8,6" />
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Explanation & Safe Mode Info Card -->
+        <Border DockPanel.Dock="Top"
+                Background="#14212D"
+                BorderBrush="#253E54"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="14,10"
+                Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18"
+                        Background="#1A344A" Margin="0,0,12,0" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="20" Foreground="#66C0F4"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{res:Loc UniversalSaves_HowItWorksTitle}"
+                               FontWeight="SemiBold" FontSize="13"
+                               Foreground="#66C0F4" />
+                    <TextBlock Text="{res:Loc UniversalSaves_HowItWorksDesc}"
+                               FontSize="11.5"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap" Margin="0,2,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
 
             <!-- Empty State when no games added -->
             <Border x:Name="EmptyStateBorder"
@@ -189,7 +193,8 @@
             </Border>
 
             <!-- Games List -->
-            <ItemsControl x:Name="GamesItemsControl">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="GamesItemsControl">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border Style="{StaticResource GameCardBorderStyle}">
@@ -285,7 +290,7 @@
                                                 CornerRadius="3" Padding="6,1" Margin="6,0,0,0" VerticalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                 <Ellipse Width="6" Height="6" Fill="#A4D007" Margin="0,0,5,0" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding Status}"
+                                                <TextBlock Text="{Binding LocalizedStatus}"
                                                            FontSize="10.5" FontWeight="SemiBold"
                                                            Foreground="#A4D007" VerticalAlignment="Center" />
                                             </StackPanel>
@@ -338,7 +343,19 @@
                                                Padding="8,5">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:SymbolIcon Symbol="ArrowSync24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
-                                            <TextBlock Text="Sync" FontSize="11" VerticalAlignment="Center" />
+                                            <TextBlock Text="{res:Loc UniversalSaves_BtnSync}" FontSize="11" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </ui:Button>
+
+                                    <ui:Button Appearance="Secondary"
+                                               Click="OpenDrive_Click"
+                                               Tag="{Binding}"
+                                               ToolTip="Open save folder in Google Drive (or active cloud provider)"
+                                               Margin="0,0,6,0"
+                                               Padding="8,5">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="FolderOpen24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
+                                            <TextBlock Text="{res:Loc UniversalSaves_BtnDrive}" FontSize="11" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </ui:Button>
 
@@ -350,7 +367,7 @@
                                                Padding="8,5">
                                         <StackPanel Orientation="Horizontal">
                                             <ui:SymbolIcon Symbol="History24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
-                                            <TextBlock Text="History" FontSize="11" VerticalAlignment="Center" />
+                                            <TextBlock Text="{res:Loc UniversalSaves_BtnHistory}" FontSize="11" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </ui:Button>
 
@@ -361,8 +378,8 @@
                                                Margin="0,0,6,0"
                                                Padding="8,5">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="FolderOpen24" FontSize="14" Margin="0,0,4,0" Foreground="#A4D007" />
-                                            <TextBlock Text="Folder" FontSize="11" VerticalAlignment="Center" />
+                                            <ui:SymbolIcon Symbol="Folder24" FontSize="14" Margin="0,0,4,0" Foreground="#A4D007" />
+                                            <TextBlock Text="{res:Loc UniversalSaves_BtnFolder}" FontSize="11" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </ui:Button>
 
@@ -380,7 +397,7 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+        </ScrollViewer>
 
-        </DockPanel>
-    </ScrollViewer>
+    </DockPanel>
 </Page>

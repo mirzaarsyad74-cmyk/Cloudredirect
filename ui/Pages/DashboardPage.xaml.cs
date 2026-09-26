@@ -202,7 +202,7 @@ public partial class DashboardPage : Page
             }
 
             var uniCount = Services.UniversalSaveWatcherService.GetProfiles().Count;
-            UniversalSavesCountText.Text = $"Configured Games: {uniCount}";
+            UniversalSavesCountText.Text = S.Format("Dashboard_UniversalSavesConfiguredFormat", uniCount);
         }
         }
         finally
@@ -211,14 +211,56 @@ public partial class DashboardPage : Page
         }
     }
 
+    private Services.ActiveGameInfo? _currentActiveGame;
+
     private void HandleActiveGameChanged(Services.ActiveGameInfo? game)
     {
+        _currentActiveGame = game;
         Dispatcher.Invoke(() =>
         {
             if (game != null)
             {
                 ActiveGameCard.Visibility = Visibility.Visible;
                 ActiveGameTitle.Text = game.Name;
+                ActiveGamePosterImage.Source = null;
+                ActiveGameFallbackIcon.Visibility = Visibility.Visible;
+
+                // Load artwork from profile if available
+                if (game.UniversalProfile != null && !string.IsNullOrEmpty(game.UniversalProfile.HeaderUrl))
+                {
+                    try
+                    {
+                        ActiveGamePosterImage.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(game.UniversalProfile.HeaderUrl));
+                        ActiveGameFallbackIcon.Visibility = Visibility.Collapsed;
+                    }
+                    catch { }
+                }
+
+                // If AppID > 0, fetch full official Steam artwork asynchronously
+                if (game.AppId > 0)
+                {
+                    var targetAppId = game.AppId;
+                    _ = Task.Run(async () =>
+                    {
+                        var store = await Services.SteamStoreClient.Shared.GetAppInfoAsync(new[] { targetAppId });
+                        if (store.TryGetValue(targetAppId, out var info) && !string.IsNullOrEmpty(info.HeaderUrl))
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                if (_currentActiveGame != null && _currentActiveGame.AppId == targetAppId)
+                                {
+                                    try
+                                    {
+                                        ActiveGamePosterImage.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(info.HeaderUrl));
+                                        ActiveGameFallbackIcon.Visibility = Visibility.Collapsed;
+                                    }
+                                    catch { }
+                                }
+                            });
+                        }
+                    });
+                }
+
                 if (game.IsUniversal)
                 {
                     if (game.IsGenuineOwned)
@@ -256,11 +298,22 @@ public partial class DashboardPage : Page
             else
             {
                 ActiveGameCard.Visibility = Visibility.Collapsed;
+                ActiveGamePosterImage.Source = null;
+                ActiveGameFallbackIcon.Visibility = Visibility.Visible;
             }
 
             // Trigger zoom recalculation when banner appears/disappears
             Services.UiZoomManager.Instance.TriggerAutoFitRecalculation();
         });
+    }
+
+    private void OpenGuide_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Dialogs.InteractiveGuideDialog
+        {
+            Owner = Window.GetWindow(this)
+        };
+        dlg.ShowDialog();
     }
 
     private void UniversalSavesCard_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)

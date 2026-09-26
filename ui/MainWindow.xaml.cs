@@ -84,7 +84,8 @@ public partial class MainWindow : FluentWindow
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        ZoomPercentText.Text = isAuto ? $"Auto ({Math.Round(scale * 100)}%)" : $"{Math.Round(scale * 100)}%";
+                        var autoLabel = S.Get("Zoom_Auto");
+                        ZoomPercentText.Text = isAuto ? $"{autoLabel} ({Math.Round(scale * 100)}%)" : $"{Math.Round(scale * 100)}%";
                         ZoomPercentText.Foreground = new System.Windows.Media.SolidColorBrush(
                             isAuto ? System.Windows.Media.Color.FromRgb(0x66, 0xC0, 0xF4) : System.Windows.Media.Color.FromRgb(0xC6, 0xD4, 0xDF));
                         AutoFitBtn.Background = new System.Windows.Media.SolidColorBrush(

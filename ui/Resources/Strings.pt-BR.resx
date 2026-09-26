@@ -2072,4 +2072,85 @@ Tem certeza?</value>
   <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
     <value>Ícone de status do Steam Cloud restaurado para o padrão. Reinicie o Steam ou pressione F5 na Biblioteca Steam.</value>
   </data>
+  <data name="Dashboard_UniversalSavesTitle" xml:space="preserve">
+    <value>Saves Universais na Nuvem (Modo Seguro)</value>
+  </data>
+  <data name="Dashboard_UniversalSavesSubtitle" xml:space="preserve">
+    <value>Jogos sem Nuvem e com Anti-Cheat</value>
+  </data>
+  <data name="Dashboard_UniversalSavesConfiguredFormat" xml:space="preserve">
+    <value>Jogos configurados: {0}</value>
+  </data>
+  <data name="Dashboard_UniversalSavesDesc" xml:space="preserve">
+    <value>Backup e sincronização sem injeção para jogos como Elden Ring, Baldur's Gate 3 e indies.</value>
+  </data>
+  <data name="UniversalSaves_Title" xml:space="preserve">
+    <value>Saves Universais na Nuvem</value>
+  </data>
+  <data name="UniversalSaves_SafeModeBadge" xml:space="preserve">
+    <value>Modo Seguro (100% Seguro com Anti-Cheat)</value>
+  </data>
+  <data name="UniversalSaves_Description" xml:space="preserve">
+    <value>Sincronização na nuvem e versionamento fora do processo sem injeção para jogos sem Steam Cloud ou protegidos por Anti-Cheat.</value>
+  </data>
+  <data name="UniversalSaves_ScanSteamLibrary" xml:space="preserve">
+    <value>Escanear Biblioteca Steam</value>
+  </data>
+  <data name="UniversalSaves_AutoScanPc" xml:space="preserve">
+    <value>Escanear PC para Saves</value>
+  </data>
+  <data name="UniversalSaves_AddPreset" xml:space="preserve">
+    <value>Adicionar Predefinição</value>
+  </data>
+  <data name="UniversalSaves_AddCustomGame" xml:space="preserve">
+    <value>Adicionar Jogo Personalizado</value>
+  </data>
+  <data name="UniversalSaves_InteractiveGuide" xml:space="preserve">
+    <value>Guia Interativo</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksTitle" xml:space="preserve">
+    <value>Como Funciona o Modo Seguro Universal</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksDesc" xml:space="preserve">
+    <value>O CloudRedirect monitora o processo do jogo externamente. Quando o jogo fecha, ele cria automaticamente um snapshot da sua pasta de save e sincroniza com o provedor na nuvem. Nenhuma injeção de memória ou DLL é realizada, tornando-o 100% seguro com EasyAntiCheat, BattlEye, Vanguard e hipervisores.</value>
+  </data>
+  <data name="UniversalSaves_BtnSync" xml:space="preserve">
+    <value>Sincronizar</value>
+  </data>
+  <data name="UniversalSaves_BtnHistory" xml:space="preserve">
+    <value>Histórico</value>
+  </data>
+  <data name="UniversalSaves_BtnFolder" xml:space="preserve">
+    <value>Pasta</value>
+  </data>
+  <data name="UniversalSaves_BtnDrive" xml:space="preserve">
+    <value>Drive</value>
+  </data>
+  <data name="UniversalSaves_Status_Monitoring" xml:space="preserve">
+    <value>Monitorando</value>
+  </data>
+  <data name="UniversalSaves_Status_UpToDate" xml:space="preserve">
+    <value>Atualizado</value>
+  </data>
+  <data name="UniversalSaves_Status_Syncing" xml:space="preserve">
+    <value>Sincronizando...</value>
+  </data>
+  <data name="UniversalSaves_Status_GameRunning" xml:space="preserve">
+    <value>Jogo em Execução 🎮</value>
+  </data>
+  <data name="UniversalSaves_Tag_AutoProtected" xml:space="preserve">
+    <value>Auto-Protegido</value>
+  </data>
+  <data name="UniversalSaves_Tag_GenuineSteam" xml:space="preserve">
+    <value>Steam Genuíno (Sem Nuvem)</value>
+  </data>
+  <data name="UniversalSaves_Tag_AntiCheatSafe" xml:space="preserve">
+    <value>Seguro Anti-Cheat/HV</value>
+  </data>
+  <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
+    <value>Personalizado</value>
+  </data>
+  <data name="Zoom_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
 </root>

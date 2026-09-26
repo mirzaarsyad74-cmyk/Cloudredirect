@@ -2117,4 +2117,85 @@ Steam 클라우드가 활성화된 경우 Steam이 복원된 파일을 덮어쓸
   <data name="Settings_CustomCloudIconReverted" xml:space="preserve">
     <value>Steam WebUI 패치가 원래대로 복원되었습니다.</value>
   </data>
+  <data name="Dashboard_UniversalSavesTitle" xml:space="preserve">
+    <value>범용 클라우드 세이브 (안전 모드)</value>
+  </data>
+  <data name="Dashboard_UniversalSavesSubtitle" xml:space="preserve">
+    <value>비클라우드 및 안티치트 게임</value>
+  </data>
+  <data name="Dashboard_UniversalSavesConfiguredFormat" xml:space="preserve">
+    <value>구성된 게임: {0}개</value>
+  </data>
+  <data name="Dashboard_UniversalSavesDesc" xml:space="preserve">
+    <value>엘든 링, 발더스 게이트 3, 인디 게임 등을 위한 제로 인젝션 세이브 백업 및 동기화.</value>
+  </data>
+  <data name="UniversalSaves_Title" xml:space="preserve">
+    <value>범용 클라우드 세이브</value>
+  </data>
+  <data name="UniversalSaves_SafeModeBadge" xml:space="preserve">
+    <value>안전 모드 (100% 안티치트 안전)</value>
+  </data>
+  <data name="UniversalSaves_Description" xml:space="preserve">
+    <value>Steam Cloud가 없거나 하이퍼바이저/안티치트로 보호되는 게임을 위한 무주입 외부 프로세스 클라우드 동기화 및 버전 관리입니다.</value>
+  </data>
+  <data name="UniversalSaves_ScanSteamLibrary" xml:space="preserve">
+    <value>Steam 라이브러리 검사</value>
+  </data>
+  <data name="UniversalSaves_AutoScanPc" xml:space="preserve">
+    <value>PC에서 세이브 자동 검색</value>
+  </data>
+  <data name="UniversalSaves_AddPreset" xml:space="preserve">
+    <value>프리셋 추가</value>
+  </data>
+  <data name="UniversalSaves_AddCustomGame" xml:space="preserve">
+    <value>사용자 지정 게임 추가</value>
+  </data>
+  <data name="UniversalSaves_InteractiveGuide" xml:space="preserve">
+    <value>대화형 가이드</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksTitle" xml:space="preserve">
+    <value>범용 안전 모드 작동 방식</value>
+  </data>
+  <data name="UniversalSaves_HowItWorksDesc" xml:space="preserve">
+    <value>CloudRedirect는 게임 프로세스를 외부에서 모니터링합니다. 게임이 종료되면 세이브 폴더를 자동으로 스냅샷으로 저장하고 클라우드 제공업체에 동기화합니다. 메모리 후킹이나 DLL 인젝션이 전혀 발생하지 않아 EasyAntiCheat, BattlEye, Vanguard 및 하이퍼바이저에서 100% 안전합니다.</value>
+  </data>
+  <data name="UniversalSaves_BtnSync" xml:space="preserve">
+    <value>동기화</value>
+  </data>
+  <data name="UniversalSaves_BtnHistory" xml:space="preserve">
+    <value>기록</value>
+  </data>
+  <data name="UniversalSaves_BtnFolder" xml:space="preserve">
+    <value>폴더</value>
+  </data>
+  <data name="UniversalSaves_BtnDrive" xml:space="preserve">
+    <value>드라이브</value>
+  </data>
+  <data name="UniversalSaves_Status_Monitoring" xml:space="preserve">
+    <value>모니터링 중</value>
+  </data>
+  <data name="UniversalSaves_Status_UpToDate" xml:space="preserve">
+    <value>최신 상태</value>
+  </data>
+  <data name="UniversalSaves_Status_Syncing" xml:space="preserve">
+    <value>동기화 중...</value>
+  </data>
+  <data name="UniversalSaves_Status_GameRunning" xml:space="preserve">
+    <value>게임 실행 중 🎮</value>
+  </data>
+  <data name="UniversalSaves_Tag_AutoProtected" xml:space="preserve">
+    <value>자동 보호됨</value>
+  </data>
+  <data name="UniversalSaves_Tag_GenuineSteam" xml:space="preserve">
+    <value>정품 Steam (클라우드 없음)</value>
+  </data>
+  <data name="UniversalSaves_Tag_AntiCheatSafe" xml:space="preserve">
+    <value>안티치트/HV 안전</value>
+  </data>
+  <data name="UniversalSaves_Tag_Custom" xml:space="preserve">
+    <value>사용자 지정</value>
+  </data>
+  <data name="Zoom_Auto" xml:space="preserve">
+    <value>자동</value>
+  </data>
 </root>
