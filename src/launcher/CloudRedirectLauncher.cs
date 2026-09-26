@@ -174,17 +174,17 @@ namespace CloudRedirectLauncher
                     else return false;
                 }
 
-                string arguments = args != null && args.Length > 0 ? string.Join(" ", args) : "";
+                string launcherPath = Application.ExecutablePath;
+                string launcherArg = "--launcher \"" + launcherPath + "\"";
+                string arguments = args != null && args.Length > 0 ? string.Join(" ", args) + " " + launcherArg : launcherArg;
 
                 var psi = new ProcessStartInfo
                 {
                     FileName = targetExe,
                     Arguments = arguments,
                     WorkingDirectory = Path.GetDirectoryName(targetExe),
-                    UseShellExecute = false
+                    UseShellExecute = true
                 };
-
-                psi.EnvironmentVariables["CLOUDREDIRECT_LAUNCHER_PATH"] = Application.ExecutablePath;
 
                 Process.Start(psi);
                 return true;

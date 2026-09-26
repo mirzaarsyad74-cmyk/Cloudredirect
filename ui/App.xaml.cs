@@ -34,6 +34,26 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(System.Windows.StartupEventArgs e)
     {
+        AppDomain.CurrentDomain.UnhandledException += (s, args) =>
+        {
+            try
+            {
+                var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect", "crash.log");
+                File.AppendAllText(logPath, $"[{DateTime.Now}] AppDomain UnhandledException:\n{args.ExceptionObject}\n\n");
+            }
+            catch { }
+        };
+
+        DispatcherUnhandledException += (s, args) =>
+        {
+            try
+            {
+                var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect", "crash.log");
+                File.AppendAllText(logPath, $"[{DateTime.Now}] DispatcherUnhandledException:\n{args.Exception}\n\n");
+            }
+            catch { }
+        };
+
         bool isNewInstance;
         try
         {
@@ -46,21 +66,29 @@ public partial class App : System.Windows.Application
 
         if (!isNewInstance)
         {
-            // Another instance of CloudRedirect is already running!
-            // Signal the running instance to open / restore from tray and bring to foreground
+            // Another instance might already be running.
+            // Try signaling the running instance to open / restore from tray and bring to foreground.
+            bool signaled = false;
             try
             {
                 if (EventWaitHandle.TryOpenExisting(ShowWindowEventName, out var showEvent))
                 {
                     showEvent.Set();
                     showEvent.Dispose();
+                    signaled = true;
                 }
             }
             catch { }
 
-            // Exit immediately so only one instance runs
-            Shutdown(0);
-            return;
+            // If another instance was actively listening and signaled, exit this instance.
+            if (signaled)
+            {
+                Shutdown(0);
+                return;
+            }
+
+            // Otherwise, the mutex was likely abandoned by a terminated or dead process.
+            // Continue starting up as the active instance!
         }
 
         // We are the primary instance. Create the event wait handle for secondary instance signals
@@ -102,6 +130,20 @@ public partial class App : System.Windows.Application
             _eventWaitThread.Start();
         }
         catch { }
+
+        for (int i = 0; i < e.Args.Length; i++)
+        {
+            if (e.Args[i].Equals("--launcher", StringComparison.OrdinalIgnoreCase) && i + 1 < e.Args.Length)
+            {
+                Environment.SetEnvironmentVariable("CLOUDREDIRECT_LAUNCHER_PATH", e.Args[i + 1].Trim('"'));
+                break;
+            }
+            if (e.Args[i].StartsWith("--launcher=", StringComparison.OrdinalIgnoreCase))
+            {
+                Environment.SetEnvironmentVariable("CLOUDREDIRECT_LAUNCHER_PATH", e.Args[i].Substring(11).Trim('"'));
+                break;
+            }
+        }
 
         StartMinimized = e.Args.Any(a => a.Equals("-minimized", StringComparison.OrdinalIgnoreCase) ||
                                          a.Equals("--minimized", StringComparison.OrdinalIgnoreCase));
@@ -148,6 +190,13 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        try
+        {
+            var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CloudRedirect", "app_exit.log");
+            File.AppendAllText(logPath, $"[{DateTime.Now}] OnExit called (ExitCode: {e.ApplicationExitCode}). StackTrace:\n{Environment.StackTrace}\n\n");
+        }
+        catch { }
+
         try
         {
             _showWindowEvent?.Dispose();
