@@ -820,6 +820,9 @@ Force-kill it?</value>
   <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
     <value>Opens Google sign-in directly on your phone. Copy the redirected URL and paste it in the box below.</value>
   </data>
+  <data name="CloudProvider_SecurityWarning" xml:space="preserve">
+    <value>Security Warning: Never share this QR code, link, or authorization code with anyone. It gives access to your cloud account.</value>
+  </data>
 
   <!-- CloudProviderPage code-behind -->
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">

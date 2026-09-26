@@ -799,6 +799,9 @@ Force-kill it?</value>
   <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
     <value>Membuka log masuk Google secara terus pada telefon. Salin URL yang dihalakan dan tampal pada kotak di bawah.</value>
   </data>
+  <data name="CloudProvider_SecurityWarning" xml:space="preserve">
+    <value>Amaran Keselamatan: Jangan sekali-kali berkongsi kod QR, pautan atau kod kebenaran ini dengan sesiapa pun. Ia memberikan akses kepada akaun awan anda.</value>
+  </data>
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
     <value>No config.json found - using defaults</value>
   </data>

@@ -107,6 +107,16 @@ public sealed class OAuthService : IDisposable
     public event Action<string>? AuthUrlReady;
 
     /// <summary>
+    /// The token path for the active OAuth session.
+    /// </summary>
+    public string? CurrentTokenPath { get; private set; }
+
+    /// <summary>
+    /// Whether the current token file is authenticated.
+    /// </summary>
+    public bool IsCurrentAuthenticated => !string.IsNullOrEmpty(CurrentTokenPath) && CheckTokenStatus(CurrentTokenPath).IsAuthenticated;
+
+    /// <summary>
     /// Run the full OAuth flow for the given provider.
     /// Opens the browser, waits for the callback, exchanges the code, and saves tokens.
     /// </summary>
@@ -123,6 +133,7 @@ public sealed class OAuthService : IDisposable
     {
         // Track current provider for state validation
         _currentProvider = provider;
+        CurrentTokenPath = tokenPath;
         
         // Find an available port and start the listener
         // OneDrive uses fixed port 53682 (rclone's Azure AD app requirement)
@@ -731,8 +742,9 @@ public sealed class OAuthService : IDisposable
     /// Parses and accepts a manually submitted authorization code or full redirect URL
     /// (e.g. if the user authorized on a mobile device or if localhost connection failed).
     /// </summary>
-    public bool TrySubmitManualCodeOrUrl(string rawInput, out string errorMessage)
+    public bool ValidateManualCodeOrUrl(string rawInput, out string code, out string errorMessage)
     {
+        code = string.Empty;
         errorMessage = string.Empty;
         if (string.IsNullOrWhiteSpace(rawInput))
         {
@@ -741,7 +753,7 @@ public sealed class OAuthService : IDisposable
         }
 
         string input = rawInput.Trim().Trim('"', '\'', '`', '<', '>');
-        string code = input;
+        code = input;
 
         // If it looks like a URL or contains query parameters:
         if (input.Contains("code=") || input.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
@@ -803,6 +815,15 @@ public sealed class OAuthService : IDisposable
             return false;
         }
 
+        return true;
+    }
+
+    public bool TrySubmitManualCodeOrUrl(string rawInput, out string errorMessage)
+    {
+        if (!ValidateManualCodeOrUrl(rawInput, out string code, out errorMessage))
+            return false;
+
+
         if (_manualCodeTcs == null || _manualCodeTcs.Task.IsCompleted)
         {
             errorMessage = "Sign-in is not currently waiting for a code. Click 'Sign In' first.";
@@ -841,11 +862,22 @@ public sealed class OAuthService : IDisposable
 
     private void StopListener()
     {
-        _mobileServer?.Dispose();
-        _mobileServer = null;
         try { _listener?.Stop(); } catch { }
         try { _listener?.Close(); } catch { }
         _listener = null;
+
+        // Keep _mobileServer alive for a short grace period (10 seconds)
+        // so in-flight HTTP requests and final confirmation finish cleanly.
+        if (_mobileServer != null)
+        {
+            var ms = _mobileServer;
+            _mobileServer = null;
+            Task.Run(async () =>
+            {
+                await Task.Delay(10000);
+                ms.Dispose();
+            });
+        }
     }
 
     public void Dispose()

@@ -819,6 +819,9 @@
   <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
     <value>手机直接打开 Google 授权页面，授权后复制网址并粘贴到下方输入框。</value>
   </data>
+  <data name="CloudProvider_SecurityWarning" xml:space="preserve">
+    <value>安全提示：请勿将此二维码、链接或授权码分享给任何人。它们可直接访问您的云端账户。</value>
+  </data>
 
   <!-- CloudProviderPage code-behind -->
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">

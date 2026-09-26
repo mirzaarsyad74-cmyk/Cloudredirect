@@ -601,6 +601,9 @@ Si omites esto, las partidas se almacenarán localmente en tu carpeta de Steam.<
   <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
     <value>Abre el inicio de sesión de Google directamente en el teléfono. Copia la URL redirigida y pégala en el cuadro inferior.</value>
   </data>
+  <data name="CloudProvider_SecurityWarning" xml:space="preserve">
+    <value>Advertencia de seguridad: Nunca comparta este código QR, enlace o código de autorización con nadie. Otorga acceso a su cuenta en la nube.</value>
+  </data>
 
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
     <value>No se encontró config.json -- usando valores predeterminados</value>

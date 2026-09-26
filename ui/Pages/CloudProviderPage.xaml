@@ -291,6 +291,32 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- Security Warning Banner -->
+                    <Border Background="#22F5A623"
+                            BorderBrush="#66F5A623"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="10,8"
+                            Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ui:SymbolIcon Symbol="Warning24"
+                                           FontSize="16"
+                                           Foreground="#FFF5A623"
+                                           Margin="0,1,8,0"
+                                           VerticalAlignment="Top" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{res:Loc CloudProvider_SecurityWarning}"
+                                       FontSize="11.5"
+                                       Foreground="#FFF5A623"
+                                       TextWrapping="Wrap"
+                                       LineHeight="16" />
+                        </Grid>
+                    </Border>
+
                     <!-- QR Code / Smartphone Assist Section -->
                     <Border Background="{DynamicResource SteamBgDarkestBrush}"
                             BorderBrush="{StaticResource SteamBorderSubtleBrush}"

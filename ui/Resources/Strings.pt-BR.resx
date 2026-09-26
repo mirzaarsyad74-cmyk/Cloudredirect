@@ -601,6 +601,9 @@ Forçar encerramento?</value>
   <data name="CloudProvider_QrModeDirectHint" xml:space="preserve">
     <value>Abre o login do Google diretamente no seu celular. Copie a URL redirecionada e cole no campo abaixo.</value>
   </data>
+  <data name="CloudProvider_SecurityWarning" xml:space="preserve">
+    <value>Aviso de Segurança: Nunca compartilhe este código QR, link ou código de autorização com ninguém. Ele concede acesso à sua conta na nuvem.</value>
+  </data>
 
   <data name="CloudProvider_NoConfigFound" xml:space="preserve">
     <value>config.json não encontrado -- usando padrões</value>
