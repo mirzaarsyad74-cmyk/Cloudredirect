@@ -2258,6 +2258,15 @@
   <data name="Zoom_Auto" xml:space="preserve">
     <value>自动</value>
   </data>
+  <data name="Dashboard_GuideBtn" xml:space="preserve">
+    <value>向导</value>
+  </data>
+  <data name="Dashboard_GuideTooltip" xml:space="preserve">
+    <value>各项功能的交互式详细向导</value>
+  </data>
+  <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
+    <value>交互式功能向导</value>
+  </data>
 </root>
 
 

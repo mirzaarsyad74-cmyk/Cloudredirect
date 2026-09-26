@@ -54,8 +54,8 @@
                     </Border>
                     <ui:Button Appearance="Secondary"
                                Icon="{ui:SymbolIcon QuestionCircle24}"
-                               Content="Guide"
-                               ToolTip="Interactive Guide for each feature &amp; function"
+                               Content="{res:Loc Dashboard_GuideBtn}"
+                               ToolTip="{res:Loc Dashboard_GuideTooltip}"
                                Click="OpenGuide_Click"
                                Margin="0,0,10,0"
                                Padding="12,6"
@@ -503,8 +503,9 @@
                                Cursor="Hand"
                                Click="MigrationAction_Click" />
 
-                    <ui:Button Content="Interactive Guide"
+                    <ui:Button Content="{res:Loc Dashboard_InteractiveGuideBtn}"
                                Icon="{ui:SymbolIcon QuestionCircle24}"
+                               ToolTip="{res:Loc Dashboard_GuideTooltip}"
                                Padding="12,6"
                                Margin="0,0,8,6"
                                Cursor="Hand"

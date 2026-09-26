@@ -2153,4 +2153,13 @@ Fail can be restored from the Pulihkan tab. Continue?</value>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
+  <data name="Dashboard_GuideBtn" xml:space="preserve">
+    <value>Panduan</value>
+  </data>
+  <data name="Dashboard_GuideTooltip" xml:space="preserve">
+    <value>Panduan interaktif untuk setiap ciri &amp; fungsi</value>
+  </data>
+  <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
+    <value>Panduan Interaktif</value>
+  </data>
 </root>

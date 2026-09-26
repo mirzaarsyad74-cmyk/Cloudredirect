@@ -2232,4 +2232,13 @@ Esto puede causar pérdida de datos en algunos casos.
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
+  <data name="Dashboard_GuideBtn" xml:space="preserve">
+    <value>Guía</value>
+  </data>
+  <data name="Dashboard_GuideTooltip" xml:space="preserve">
+    <value>Guía interactiva para cada función y característica</value>
+  </data>
+  <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
+    <value>Guía Interactiva</value>
+  </data>
 </root>

@@ -2285,4 +2285,13 @@ Are you sure?</value>
   <data name="Zoom_Auto" xml:space="preserve">
     <value>Auto</value>
   </data>
+  <data name="Dashboard_GuideBtn" xml:space="preserve">
+    <value>Guide</value>
+  </data>
+  <data name="Dashboard_GuideTooltip" xml:space="preserve">
+    <value>Interactive Guide for each feature &amp; function</value>
+  </data>
+  <data name="Dashboard_InteractiveGuideBtn" xml:space="preserve">
+    <value>Interactive Guide</value>
+  </data>
 </root>
