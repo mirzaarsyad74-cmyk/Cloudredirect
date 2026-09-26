@@ -421,25 +421,33 @@ public partial class MainWindow : FluentWindow
     {
         if (RootFrame.Content?.GetType() == pageType) return;
 
-        var page = Activator.CreateInstance(pageType);
-        RootFrame.Navigate(page);
-
-        bool isDashboard = pageType == typeof(Pages.DashboardPage);
-        TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
-        if (!isDashboard)
+        try
         {
-            BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
-            CurrentPageTitle.Text = pageType.Name switch
+            var page = Activator.CreateInstance(pageType);
+            RootFrame.Navigate(page);
+
+            bool isDashboard = pageType == typeof(Pages.DashboardPage);
+            TopNavHeader.Visibility = isDashboard ? Visibility.Collapsed : Visibility.Visible;
+            if (!isDashboard)
             {
-                nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
-                nameof(Pages.AppsPage) => S.Get("Nav_Apps"),
-                nameof(Pages.CleanupPage) => S.Get("Nav_Cleanup"),
-                nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
-                nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
-                nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
-                nameof(Pages.UniversalSavesPage) => S.Get("Nav_UniversalSaves"),
-                _ => ""
-            };
+                BackToDashboardBtn.Content = S.Get("Nav_BackToDashboard");
+                CurrentPageTitle.Text = pageType.Name switch
+                {
+                    nameof(Pages.CloudProviderPage) => S.Get("Nav_CloudProvider"),
+                    nameof(Pages.AppsPage) => S.Get("Nav_Apps"),
+                    nameof(Pages.CleanupPage) => S.Get("Nav_Cleanup"),
+                    nameof(Pages.StatsPage) => S.Get("Nav_Stats"),
+                    nameof(Pages.MigrationPage) => S.Get("Nav_Migration"),
+                    nameof(Pages.SettingsPage) => S.Get("Nav_Settings"),
+                    nameof(Pages.UniversalSavesPage) => S.Get("Nav_UniversalSaves"),
+                    _ => ""
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            App.LogStartup($"NavigateTo({pageType.Name}) failed: {ex}");
+            _ = Services.Dialog.ShowErrorAsync("Navigation Error", $"Failed to open {pageType.Name}:\n{ex.Message}");
         }
     }
 

@@ -265,7 +265,7 @@
             <!-- OAuth Assist & Cross-Device / Manual Fallback Card -->
             <Border x:Name="AuthAssistCard"
                     Background="{StaticResource SteamCardGradient}"
-                    BorderBrush="{StaticResource SteamBorderHighlightColor}"
+                    BorderBrush="{StaticResource SteamBorderHighlightBrush}"
                     BorderThickness="1"
                     CornerRadius="6"
                     Padding="16,14"
@@ -277,23 +277,23 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <ui:SymbolIcon Symbol="Globe24" FontSize="20" Foreground="{StaticResource SteamAccentCyanColor}" Margin="0,1,10,0" VerticalAlignment="Top" />
+                        <ui:SymbolIcon Symbol="Globe24" FontSize="20" Foreground="{StaticResource SteamAccentCyanBrush}" Margin="0,1,10,0" VerticalAlignment="Top" />
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="{res:Loc CloudProvider_AuthAssistTitle}"
                                        FontWeight="SemiBold"
                                        FontSize="13"
-                                       Foreground="{StaticResource SteamTextPrimaryColor}" />
+                                       Foreground="{StaticResource SteamTextPrimaryBrush}" />
                             <TextBlock Text="{res:Loc CloudProvider_AuthAssistHint}"
                                        FontSize="12"
-                                       Foreground="{StaticResource SteamTextSecondaryColor}"
+                                       Foreground="{StaticResource SteamTextSecondaryBrush}"
                                        TextWrapping="Wrap"
                                        Margin="0,3,0,0" />
                         </StackPanel>
                     </Grid>
 
                     <!-- QR Code / Smartphone Assist Section -->
-                    <Border Background="{DynamicResource SteamBgDarkestColor}"
-                            BorderBrush="{StaticResource SteamBorderSubtleColor}"
+                    <Border Background="{DynamicResource SteamBgDarkestBrush}"
+                            BorderBrush="{StaticResource SteamBorderSubtleBrush}"
                             BorderThickness="1"
                             CornerRadius="6"
                             Padding="14"
@@ -323,17 +323,17 @@
                             <!-- QR Description & Mode Selector -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                    <ui:SymbolIcon Symbol="QrCode24" FontSize="16" Foreground="{StaticResource SteamAccentLightBlueColor}" Margin="0,0,6,0" />
+                                    <ui:SymbolIcon Symbol="QrCode24" FontSize="16" Foreground="{StaticResource SteamAccentLightBlueBrush}" Margin="0,0,6,0" />
                                     <TextBlock Text="{res:Loc CloudProvider_QrTitle}"
                                                FontWeight="SemiBold"
                                                FontSize="13"
-                                               Foreground="{StaticResource SteamTextPrimaryColor}" />
+                                               Foreground="{StaticResource SteamTextPrimaryBrush}" />
                                 </StackPanel>
 
                                 <TextBlock x:Name="QrDescriptionText"
                                            Text="{res:Loc CloudProvider_QrDescription}"
                                            FontSize="12"
-                                           Foreground="{StaticResource SteamTextSecondaryColor}"
+                                           Foreground="{StaticResource SteamTextSecondaryBrush}"
                                            TextWrapping="Wrap"
                                            Margin="0,0,0,10" />
 
@@ -355,7 +355,7 @@
                                 <TextBlock x:Name="QrModeHintText"
                                            Text="{res:Loc CloudProvider_QrModeWifiHint}"
                                            FontSize="11"
-                                           Foreground="{StaticResource SteamTextTertiaryColor}"
+                                           Foreground="{StaticResource SteamTextTertiaryBrush}"
                                            TextWrapping="Wrap"
                                            Margin="0,4,0,0" />
                             </StackPanel>
