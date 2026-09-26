@@ -13,8 +13,8 @@ using Microsoft.Win32;
 [assembly: AssemblyTitle("CloudRedirect")]
 [assembly: AssemblyDescription("CloudRedirect Steam Cloud Synchronization & Save Redirection Companion")]
 [assembly: AssemblyProduct("CloudRedirect")]
-[assembly: AssemblyVersion("2.9.13.0")]
-[assembly: AssemblyFileVersion("2.9.13.0")]
+[assembly: AssemblyVersion("2.9.14.0")]
+[assembly: AssemblyFileVersion("2.9.14.0")]
 
 namespace CloudRedirectLauncher
 {
@@ -155,7 +155,7 @@ namespace CloudRedirectLauncher
                         {
                             foreach (var p in Process.GetProcessesByName("CloudRedirect.Core"))
                             {
-                                try { p.Kill(); p.WaitForExit(1000); } catch { }
+                                try { p.Kill(); p.WaitForExit(3000); } catch { }
                             }
                         }
                         catch { }
@@ -177,29 +177,32 @@ namespace CloudRedirectLauncher
                         }
                     }
 
-                    if (File.Exists(targetExe))
+                    bool extracted = false;
+                    for (int attempt = 0; attempt < 10; attempt++)
                     {
-                        for (int attempt = 0; attempt < 5; attempt++)
+                        try
                         {
-                            try
+                            if (File.Exists(targetExe))
                             {
                                 File.Delete(targetExe);
-                                break;
                             }
-                            catch
+                            if (File.Exists(tempTarget))
                             {
-                                Thread.Sleep(100);
+                                File.Move(tempTarget, targetExe);
                             }
+                            extracted = true;
+                            break;
+                        }
+                        catch
+                        {
+                            Thread.Sleep(300);
                         }
                     }
 
-                    if (File.Exists(tempTarget))
+                    if (!extracted)
                     {
-                        if (File.Exists(targetExe))
-                        {
-                            try { File.Delete(targetExe); } catch { }
-                        }
-                        File.Move(tempTarget, targetExe);
+                        Debug.WriteLine("Extraction error: Could not overwrite targetExe after 10 attempts.");
+                        return false;
                     }
                     return true;
                 }
@@ -215,9 +218,22 @@ namespace CloudRedirectLauncher
         {
             try
             {
+                // If any lingering CloudRedirect.Core is completely hung/not responding, terminate it first
+                try
+                {
+                    foreach (var p in Process.GetProcessesByName("CloudRedirect.Core"))
+                    {
+                        if (!p.Responding)
+                        {
+                            try { p.Kill(); p.WaitForExit(1000); } catch { }
+                        }
+                    }
+                }
+                catch { }
+
                 if (!EnsurePayloadExtracted())
                 {
-                    MessageBox.Show("Could not extract application payload.", "CloudRedirect", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Could not extract application payload. Please close any running CloudRedirect processes and try again.", "CloudRedirect", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
 

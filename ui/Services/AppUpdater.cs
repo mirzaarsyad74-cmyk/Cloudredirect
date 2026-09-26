@@ -374,22 +374,58 @@ internal static class AppUpdater
                 targetLauncher = Path.Combine(Path.GetDirectoryName(targetLauncher) ?? AppContext.BaseDirectory, "CloudRedirect.exe");
             }
 
+            var dir = Path.GetDirectoryName(targetLauncher);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
             var backupPath = targetLauncher + ".old";
 
-            // Swap: rename current launcher -> .old, move staged -> current launcher
-            try
+            // Cross-volume safe copy: stagedExePath may be on C: while targetLauncher is on D: or network drive.
+            // File.Copy works across different volumes, whereas File.Move throws IOException.
+            bool updated = false;
+            for (int attempt = 0; attempt < 5; attempt++)
             {
-                if (File.Exists(backupPath))
-                    File.Delete(backupPath);
-                if (File.Exists(targetLauncher))
-                    File.Move(targetLauncher, backupPath);
-                File.Move(stagedExePath, targetLauncher);
+                try
+                {
+                    if (File.Exists(targetLauncher))
+                    {
+                        try
+                        {
+                            if (File.Exists(backupPath)) File.Delete(backupPath);
+                            File.Copy(targetLauncher, backupPath, overwrite: true);
+                        }
+                        catch { }
+                    }
+
+                    File.Copy(stagedExePath, targetLauncher, overwrite: true);
+                    updated = true;
+                    try { File.Delete(stagedExePath); } catch { }
+                    try { if (File.Exists(backupPath)) File.Delete(backupPath); } catch { }
+                    break;
+                }
+                catch
+                {
+                    Thread.Sleep(300);
+                }
             }
-            catch (Exception ex)
+
+            if (!updated)
             {
-                if (!File.Exists(targetLauncher) && File.Exists(backupPath))
-                    File.Move(backupPath, targetLauncher);
-                return $"Could not replace exe: {ex.Message}";
+                // Fallback: spawn external updater batch to swap after this process terminates
+                var updaterCmd = Path.Combine(Path.GetTempPath(), "cloudredirect_update.cmd");
+                var batchContent = $"@echo off\r\ntimeout /t 1 /nobreak >nul\r\ncopy /y \"{stagedExePath}\" \"{targetLauncher}\" >nul\r\ndel /f /q \"{stagedExePath}\" >nul\r\nstart \"\" \"{targetLauncher}\"\r\ndel /f /q \"%~f0\"\r\n";
+                File.WriteAllText(updaterCmd, batchContent);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c \"{updaterCmd}\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                });
+                Environment.Exit(0);
+                return null;
             }
 
             // Relaunch the launcher (CloudRedirect.exe).

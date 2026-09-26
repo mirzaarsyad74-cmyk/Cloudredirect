@@ -28,6 +28,28 @@ public partial class App : System.Windows.Application
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool AllowSetForegroundWindow(int dwProcessId);
+    private const int ASFW_ANY = -1;
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool BringWindowToTop(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
     private const int SW_RESTORE = 9;
 
     public static bool StartMinimized { get; private set; }
@@ -105,6 +127,7 @@ public partial class App : System.Windows.Application
             if (signaled)
             {
                 LogStartup("Shutting down secondary instance.");
+                try { AllowSetForegroundWindow(ASFW_ANY); } catch { }
                 // Do NOT set StartupUri = null (WPF throws ArgumentNullException).
                 // Instead, set ShutdownMode so Shutdown() works immediately without
                 // needing a MainWindow, and clear StartupUri via the XAML-declared
@@ -185,11 +208,12 @@ public partial class App : System.Windows.Application
     {
         try
         {
+            LogStartup("BringToForeground called.");
             Services.TrayIconService.Instance.RestoreFromTray();
 
-            if (Current?.MainWindow != null)
+            var win = Current?.MainWindow;
+            if (win != null)
             {
-                var win = Current.MainWindow;
                 if (!win.IsVisible)
                 {
                     win.Show();
@@ -204,16 +228,38 @@ public partial class App : System.Windows.Application
                 if (hwnd != IntPtr.Zero)
                 {
                     ShowWindow(hwnd, SW_RESTORE);
-                    SetForegroundWindow(hwnd);
+                    BringWindowToTop(hwnd);
+
+                    var fgWnd = GetForegroundWindow();
+                    uint fgThread = GetWindowThreadProcessId(fgWnd, out _);
+                    uint curThread = GetCurrentThreadId();
+                    if (fgThread != curThread && fgThread != 0)
+                    {
+                        AttachThreadInput(curThread, fgThread, true);
+                        SetForegroundWindow(hwnd);
+                        AttachThreadInput(curThread, fgThread, false);
+                    }
+                    else
+                    {
+                        SetForegroundWindow(hwnd);
+                    }
                 }
 
                 win.Activate();
                 win.Topmost = true;
                 win.Topmost = false;
                 win.Focus();
+                LogStartup("BringToForeground finished successfully.");
+            }
+            else
+            {
+                LogStartup("BringToForeground: Current.MainWindow is null!");
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            LogStartup("BringToForeground exception: " + ex);
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
