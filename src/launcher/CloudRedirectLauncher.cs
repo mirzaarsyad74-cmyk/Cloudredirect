@@ -35,9 +35,23 @@ namespace CloudRedirectLauncher
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // 1. If .NET 8 Desktop Runtime is already installed on this PC:
+            bool forceSetup = false;
+            if (args != null)
+            {
+                foreach (var a in args)
+                {
+                    if (string.Equals(a, "--test-setup", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "-setup", StringComparison.OrdinalIgnoreCase))
+                    {
+                        forceSetup = true;
+                        break;
+                    }
+                }
+            }
+
+            // 1. If .NET 8 Desktop Runtime is already installed on this PC and not forced:
             // Extract the embedded payload if needed and launch immediately!
-            if (RuntimeChecker.IsDotNet8DesktopInstalled())
+            if (!forceSetup && RuntimeChecker.IsDotNet8DesktopInstalled())
             {
                 if (LaunchMainApp(args))
                 {
@@ -45,9 +59,9 @@ namespace CloudRedirectLauncher
                 }
             }
 
-            // 2. If .NET 8 Desktop Runtime is NOT installed:
+            // 2. If .NET 8 Desktop Runtime is NOT installed (or --test-setup is used):
             // Show the Steam-styled dark Setup window with custom progress bar to download & install runtime
-            Application.Run(new LauncherForm(args));
+            Application.Run(new LauncherForm(args, forceSetup));
         }
 
         public static string GetTargetAppPath()
@@ -276,6 +290,7 @@ namespace CloudRedirectLauncher
     public class LauncherForm : Form
     {
         private string[] _args;
+        private bool _forceSetup;
         private Label _titleLabel;
         private Label _subtitleLabel;
         private Label _statusLabel;
@@ -284,9 +299,10 @@ namespace CloudRedirectLauncher
         private Button _actionButton;
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public LauncherForm(string[] args)
+        public LauncherForm(string[] args, bool forceSetup = false)
         {
             _args = args;
+            _forceSetup = forceSetup;
             InitializeUi();
             Shown += (s, e) => StartSetupWorkflow();
         }
@@ -386,7 +402,7 @@ namespace CloudRedirectLauncher
             try
             {
                 // 1. Check & Install .NET 8 Desktop Runtime (x64)
-                if (!RuntimeChecker.IsDotNet8DesktopInstalled())
+                if (_forceSetup || !RuntimeChecker.IsDotNet8DesktopInstalled())
                 {
                     UpdateStatus("Downloading .NET 8 Desktop Runtime (x64)...", "Downloading official Microsoft component...");
                     string dotnetUrl = "https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe";
