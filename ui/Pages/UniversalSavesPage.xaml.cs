@@ -103,6 +103,38 @@ public partial class UniversalSavesPage : Page
         }
     }
 
+    private async void ScanSteamLibrary_Click(object sender, RoutedEventArgs e)
+    {
+        var summary = await SteamGameScannerService.ScanInstalledSteamGamesAsync(autoEnroll: true);
+        RefreshList();
+
+        string details = $"Scanned {summary.TotalInstalledGames} installed Steam games across all libraries:\n\n" +
+                         $"• Lua / CloudRedirect Games: {summary.LuaGamesCount} (Synced to your cloud)\n" +
+                         $"• Genuine Steam Cloud Games: {summary.GenuineCloudGamesCount} (Using native Steam Cloud)\n" +
+                         $"• Games without Steam Cloud: {summary.NonCloudGamesCount} (Protected by Universal Saves)\n\n";
+
+        if (summary.NewlyEnrolledCount > 0)
+        {
+            details += $"Successfully auto-enrolled {summary.NewlyEnrolledCount} new game(s) into Universal Cloud Saves!";
+        }
+        else if (summary.TotalInstalledGames == 0)
+        {
+            details = "No installed Steam games were found in your Steam libraries.";
+        }
+        else
+        {
+            details += "All eligible games are already monitored and up to date!";
+        }
+
+        var msg = new Wpf.Ui.Controls.MessageBox
+        {
+            Title = "Steam Library Scan Results",
+            Content = details,
+            CloseButtonText = "OK"
+        };
+        await msg.ShowDialogAsync();
+    }
+
     private async void AutoScan_Click(object sender, RoutedEventArgs e)
     {
         var detected = await System.Threading.Tasks.Task.Run(() => GameSaveAutoDetector.ScanInstalledGameSaves());

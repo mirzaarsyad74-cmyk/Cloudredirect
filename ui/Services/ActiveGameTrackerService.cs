@@ -238,42 +238,7 @@ public static class ActiveGameTrackerService
                 }
             }
 
-            // 3. Auto-detect running non-Steam or standalone game processes if enabled
-            if (AppSettings.AutoProtectNonCloudGames)
-            {
-                var detectedGames = GameSaveAutoDetector.DetectFromRunningProcesses();
-                if (detectedGames.Count > 0)
-                {
-                    var detected = detectedGames[0];
-                    var profile = UniversalSaveWatcherService.AutoEnrollIfNeeded(
-                        detected.GameName, detected.ProcessName, 0, detected.SaveFolderPath);
-
-                    if (profile != null)
-                    {
-                        _currentGame = new ActiveGameInfo(
-                            0,
-                            profile.GameName,
-                            null,
-                            detected.ProcessName,
-                            true,
-                            DateTime.Now,
-                            IsLuaGame: false,
-                            HasSteamCloud: false,
-                            IsGenuineOwned: false,
-                            HasAntiCheat: profile.HasAntiCheat,
-                            UniversalProfile: profile
-                        );
-                        _lastMonitoredUniversalProcess = detected.ProcessName;
-                        _lastActiveUniversalProfile = profile;
-
-                        UniversalSaveWatcherService.UpdateProfileStatus(profile, "Game Running 🎮");
-                        OnActiveGameChanged?.Invoke(_currentGame);
-                        return;
-                    }
-                }
-            }
-
-            // 4. If a game was active and now stopped:
+            // 3. If a game was active and now stopped:
             if (_currentGame != null)
             {
                 var exitedGame = _currentGame;

@@ -70,6 +70,14 @@ public partial class MainWindow : FluentWindow
                 });
 
                 Services.ActiveGameTrackerService.Start();
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Services.SteamGameScannerService.ScanInstalledSteamGamesAsync(autoEnroll: true);
+                    }
+                    catch { }
+                });
 
                 Services.UiZoomManager.Instance.Initialize(this, ContentAreaHost, RootFrame, GuiScaleTransform);
                 Services.UiZoomManager.Instance.OnZoomChanged += (scale, isAuto) =>

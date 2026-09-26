@@ -329,7 +329,7 @@ add_custom_target(ui ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:cloud_redirect_cli>"
         "${CMAKE_SOURCE_DIR}/build/Release/cloud_redirect_cli.exe"
-    COMMAND dotnet publish -c Release -r win-x64 --self-contained false -o bin/publish
+    COMMAND dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o bin/publish
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ui
     COMMENT "Publishing CloudRedirect UI"
     DEPENDS cloud_redirect cloud_redirect_cli

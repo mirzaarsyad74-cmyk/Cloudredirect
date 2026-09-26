@@ -21,9 +21,13 @@ public class UniversalGameProfile
     public bool IsGenuineSteamGame { get; set; } = false;
     public bool HasAntiCheat { get; set; } = false;
 
-    public string ProtectionTypeTag => IsGenuineSteamGame
-        ? "Genuine Steam (No Cloud)"
-        : (HasAntiCheat ? "Anti-Cheat / HV Safe" : (IsAutoEnrolled ? "Auto-Protected" : "Custom"));
+    public string ProtectionTypeTag
+    {
+        get => IsGenuineSteamGame
+            ? "Genuine Steam (No Cloud)"
+            : (HasAntiCheat ? "Anti-Cheat / HV Safe" : (IsAutoEnrolled ? "Auto-Protected" : "Custom"));
+        set { }
+    }
 
     public string ExpandedSavePath
     {
@@ -44,9 +48,14 @@ public class UniversalGameProfile
                 return SaveFolderPath;
             }
         }
+        set { }
     }
 
-    public bool FolderExists => Directory.Exists(ExpandedSavePath);
+    public bool FolderExists
+    {
+        get => Directory.Exists(ExpandedSavePath);
+        set { }
+    }
 }
 
 /// <summary>
@@ -133,6 +142,8 @@ public static class UniversalSaveWatcherService
                 // Sanitize: remove any spurious system processes
                 int countBefore = _profiles.Count;
                 _profiles.RemoveAll(p => GameSaveAutoDetector.IsSystemProcess(p.ProcessName) ||
+                                         p.GameName.Contains("Antigravity", StringComparison.OrdinalIgnoreCase) ||
+                                         p.ProcessName.Contains("antigravity", StringComparison.OrdinalIgnoreCase) ||
                                          p.GameName.Equals("Windows Input Experience", StringComparison.OrdinalIgnoreCase));
                 if (_profiles.Count != countBefore)
                 {

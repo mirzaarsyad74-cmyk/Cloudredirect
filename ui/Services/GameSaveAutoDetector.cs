@@ -569,9 +569,10 @@ public static class GameSaveAutoDetector
             "taskmgr", "cmd", "powershell", "CloudRedirect", "discord", "spotify", "slack",
             "system", "idle", "svchost", "csrss", "dwm", "runtimebroker", "searchhost",
             "textinputhost", "shellexperiencehost", "applicationframehost", "startmenuexperiencehost",
-            "widgets", "ctfmon", "conhost", "sihost", "fontdrvhost"
+            "widgets", "ctfmon", "conhost", "sihost", "fontdrvhost", "antigravity", "antigravity-manager",
+            "node", "python", "cursor", "git", "bash", "wsl", "windowsterminal", "gemini"
         };
-        return sys.Any(s => s.Equals(procName, StringComparison.OrdinalIgnoreCase));
+        return sys.Any(s => s.Equals(procName, StringComparison.OrdinalIgnoreCase) || procName.Contains("antigravity", StringComparison.OrdinalIgnoreCase));
     }
 
     private static bool IsIgnoredSystemFolder(string name)
@@ -579,8 +580,8 @@ public static class GameSaveAutoDetector
         var ignore = new[]
         {
             "Microsoft", "Windows", "Adobe", "Google", "Intel", "NVIDIA", "AMD", "Apple",
-            "Temp", "CrashDumps", "Logs", "CloudRedirect", "Antigravity", "Packages"
+            "Temp", "CrashDumps", "Logs", "CloudRedirect", "Antigravity", "Gemini", "Packages"
         };
-        return ignore.Any(i => i.Equals(name, StringComparison.OrdinalIgnoreCase));
+        return ignore.Any(i => i.Equals(name, StringComparison.OrdinalIgnoreCase) || name.Contains("Antigravity", StringComparison.OrdinalIgnoreCase));
     }
 }

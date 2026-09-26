@@ -5,7 +5,7 @@
 1. **Bump Version Number**: Increment `<ReleaseVersion>` in `Version.props` (e.g. `2.6.5` -> `2.6.6`) so that running instances of CloudRedirect can auto-detect the newer version and prompt/auto-install it.
 2. **Build and Publish the Windows Executable (`.exe`)**:
    ```powershell
-   dotnet publish ui/CloudRedirect.csproj -c Release -r win-x64 --self-contained false -o ui/bin/publish
+   dotnet publish ui/CloudRedirect.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o ui/bin/publish
    ```
    The published executable will be at `ui/bin/publish/CloudRedirect.exe`.
 3. **Commit & Push Code**:

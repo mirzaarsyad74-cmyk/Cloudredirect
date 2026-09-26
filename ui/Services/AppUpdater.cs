@@ -180,11 +180,11 @@ internal static class AppUpdater
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
-    // Hard caps on a downloaded update payload. Framework-dependent single-file is ~8 MB;
-    // 50 MB leaves ample headroom while ensuring a hostile or corrupted response cannot
-    // exhaust memory or disk before validation rejects it.
+    // Hard caps on a downloaded update payload. Self-contained single-file with bundled
+    // .NET 8 desktop runtime is ~75 MB; 150 MB leaves ample headroom while ensuring
+    // a hostile or corrupted response cannot exhaust memory or disk before validation rejects it.
     private const long MinUpdateBytes = 1L * 1024 * 1024;
-    private const long MaxUpdateBytes = 50L * 1024 * 1024;
+    private const long MaxUpdateBytes = 150L * 1024 * 1024;
 
     /// <summary>
     /// Downloads the update, validates it, swaps the running exe, and relaunches.

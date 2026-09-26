@@ -12,8 +12,13 @@
             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                        <ui:Button Content="Auto-Scan PC for Saves"
+                        <ui:Button Content="Scan Steam Library"
                                    Appearance="Primary"
+                                   Icon="{ui:SymbolIcon Gamepad24}"
+                                   Click="ScanSteamLibrary_Click"
+                                   Margin="0,0,8,0" />
+                        <ui:Button Content="Auto-Scan PC for Saves"
+                                   Appearance="Secondary"
                                    Icon="{ui:SymbolIcon Search24}"
                                    Click="AutoScan_Click"
                                    Margin="0,0,8,0" />
@@ -152,12 +157,10 @@
 
                                     <!-- Process & Folder Details -->
                                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                        <TextBlock FontSize="11" Foreground="#8F98A0">
-                                            <Run Text="Process: " Foreground="#55697E" />
-                                            <Run Text="{Binding ProcessName, Mode=OneWay}" Foreground="#C6D4DF" />
-                                            <Run Text="  •  Path: " Foreground="#55697E" />
-                                            <Run Text="{Binding ExpandedSavePath, Mode=OneWay}" Foreground="#8F98A0" />
-                                        </TextBlock>
+                                        <TextBlock Text="Process: " FontSize="11" Foreground="#55697E" />
+                                        <TextBlock Text="{Binding ProcessName, Mode=OneWay}" FontSize="11" Foreground="#C6D4DF" Margin="0,0,8,0" />
+                                        <TextBlock Text="•  Path: " FontSize="11" Foreground="#55697E" Margin="0,0,4,0" />
+                                        <TextBlock Text="{Binding ExpandedSavePath, Mode=OneWay}" FontSize="11" Foreground="#8F98A0" TextTrimming="CharacterEllipsis" MaxWidth="500" />
                                     </StackPanel>
                                 </StackPanel>
 
