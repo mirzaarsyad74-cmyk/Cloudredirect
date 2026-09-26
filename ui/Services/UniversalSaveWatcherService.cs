@@ -16,6 +16,14 @@ public class UniversalGameProfile
     public bool Enabled { get; set; } = true;
     public DateTime? LastSyncTime { get; set; }
     public string Status { get; set; } = "Monitoring";
+    public uint SteamAppId { get; set; } = 0;
+    public bool IsAutoEnrolled { get; set; } = false;
+    public bool IsGenuineSteamGame { get; set; } = false;
+    public bool HasAntiCheat { get; set; } = false;
+
+    public string ProtectionTypeTag => IsGenuineSteamGame
+        ? "Genuine Steam (No Cloud)"
+        : (HasAntiCheat ? "Anti-Cheat / HV Safe" : (IsAutoEnrolled ? "Auto-Protected" : "Custom"));
 
     public string ExpandedSavePath
     {
@@ -162,6 +170,62 @@ public static class UniversalSaveWatcherService
         }
     }
 
+    public static UniversalGameProfile? FindProfile(uint appId, string? processName, string? gameName)
+    {
+        var list = GetProfiles();
+        if (appId > 0)
+        {
+            var match = list.FirstOrDefault(p => p.SteamAppId == appId);
+            if (match != null) return match;
+        }
+
+        if (!string.IsNullOrWhiteSpace(processName))
+        {
+            var cleanProc = processName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                ? Path.GetFileNameWithoutExtension(processName)
+                : processName;
+            var match = list.FirstOrDefault(p =>
+                !string.IsNullOrWhiteSpace(p.ProcessName) &&
+                (p.ProcessName.Equals(cleanProc, StringComparison.OrdinalIgnoreCase) ||
+                 p.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase)));
+            if (match != null) return match;
+        }
+
+        if (!string.IsNullOrWhiteSpace(gameName))
+        {
+            var match = list.FirstOrDefault(p => p.GameName.Equals(gameName, StringComparison.OrdinalIgnoreCase));
+            if (match != null) return match;
+        }
+
+        return null;
+    }
+
+    public static UniversalGameProfile? AutoEnrollIfNeeded(string gameName, string? processName, uint appId, string saveFolderPath, bool hasAntiCheat = false, bool isGenuine = false)
+    {
+        if (string.IsNullOrWhiteSpace(gameName) || string.IsNullOrWhiteSpace(saveFolderPath))
+            return null;
+
+        var existing = FindProfile(appId, processName, gameName);
+        if (existing != null)
+            return existing;
+
+        var profile = new UniversalGameProfile
+        {
+            GameName = gameName,
+            ProcessName = processName ?? "",
+            SteamAppId = appId,
+            SaveFolderPath = saveFolderPath,
+            Enabled = true,
+            IsAutoEnrolled = true,
+            IsGenuineSteamGame = isGenuine,
+            HasAntiCheat = hasAntiCheat,
+            Status = "Auto-Protected 🛡️"
+        };
+
+        AddProfile(profile);
+        return profile;
+    }
+
     public static void AddProfile(UniversalGameProfile profile)
     {
         if (GameSaveAutoDetector.IsSystemProcess(profile.ProcessName) ||
@@ -171,7 +235,8 @@ public static class UniversalSaveWatcherService
         }
 
         var list = GetProfiles();
-        if (list.Any(p => p.GameName.Equals(profile.GameName, StringComparison.OrdinalIgnoreCase)))
+        if (list.Any(p => p.GameName.Equals(profile.GameName, StringComparison.OrdinalIgnoreCase) ||
+                         (profile.SteamAppId > 0 && p.SteamAppId == profile.SteamAppId)))
             return;
 
         list.Add(profile);

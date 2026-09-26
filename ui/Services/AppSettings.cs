@@ -78,6 +78,12 @@ public static class AppSettings
         set => WriteBool("auto_fit_zoom", value);
     }
 
+    public static bool AutoProtectNonCloudGames
+    {
+        get => ReadBool("auto_protect_non_cloud_games", true);
+        set => WriteBool("auto_protect_non_cloud_games", value);
+    }
+
     public static double ZoomScale
     {
         get => ReadDouble("zoom_scale", 1.0);

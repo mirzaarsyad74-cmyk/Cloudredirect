@@ -245,6 +245,63 @@ namespace CloudRedirect.Services
             return null;
         }
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<uint, bool> _hasCloudSaveCache = new();
+
+        /// <summary>
+        /// Checks whether a given Steam game has native Steam Cloud save support.
+        /// Returns true if the game defines UFS rules or cloud quota, or has active files in userdata/remote.
+        /// Returns false if the game does not support Steam Cloud (e.g. Dark Souls 3, Elden Ring, Black Myth Wukong, etc.).
+        /// </summary>
+        public static bool HasCloudSave(uint appId, string? steamPath = null)
+        {
+            if (appId == 0) return false;
+            if (_hasCloudSaveCache.TryGetValue(appId, out bool cached))
+                return cached;
+
+            try
+            {
+                steamPath ??= SteamDetector.FindSteamPath();
+                if (steamPath != null)
+                {
+                    var appInfoPath = Path.Combine(steamPath, "appcache", "appinfo.vdf");
+                    if (File.Exists(appInfoPath))
+                    {
+                        var config = ParseSingle(appInfoPath, appId);
+                        if (config != null)
+                        {
+                            if (config.SaveFiles.Count > 0 || config.Quota > 0)
+                            {
+                                _hasCloudSaveCache[appId] = true;
+                                return true;
+                            }
+                        }
+                    }
+
+                    // Fallback: check if userdata/<accountId>/<appId>/remote exists and contains files
+                    var userdataDir = Path.Combine(steamPath, "userdata");
+                    if (Directory.Exists(userdataDir))
+                    {
+                        foreach (var accDir in Directory.GetDirectories(userdataDir))
+                        {
+                            var remotePath = Path.Combine(accDir, appId.ToString(), "remote");
+                            if (Directory.Exists(remotePath) && Directory.GetFiles(remotePath, "*", SearchOption.AllDirectories).Length > 0)
+                            {
+                                _hasCloudSaveCache[appId] = true;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"AppInfoParser.HasCloudSave error for {appId}: {ex}");
+            }
+
+            _hasCloudSaveCache[appId] = false;
+            return false;
+        }
+
         private static List<string> ReadStringTable(Stream fs, long offset)
         {
             var table = new List<string>();

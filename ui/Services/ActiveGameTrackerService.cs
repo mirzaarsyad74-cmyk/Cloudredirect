@@ -14,13 +14,21 @@ public record ActiveGameInfo(
     string? HeaderUrl,
     string? ProcessName,
     bool IsUniversal,
-    DateTime StartTime
+    DateTime StartTime,
+    bool IsLuaGame = false,
+    bool HasSteamCloud = true,
+    bool IsGenuineOwned = false,
+    bool HasAntiCheat = false,
+    UniversalGameProfile? UniversalProfile = null
 );
 
 /// <summary>
 /// Real-time Active Game Tracker.
-/// Detects currently running Steam games and Universal Watcher games,
-/// displays live status badges, and automatically triggers cloud save backups upon game exit.
+/// Distinguishes between:
+/// 1. Lua Games (redirected by CloudRedirect DLL).
+/// 2. Genuine Steam Games with Steam Cloud (uses original native Steam Cloud untouched).
+/// 3. Genuine Steam Games without Steam Cloud (auto-protected by CloudRedirect Universal Saves).
+/// 4. Non-Steam / Anti-Cheat / Bypass Games (monitored by Universal Safe Mode).
 /// </summary>
 public static class ActiveGameTrackerService
 {
@@ -84,13 +92,97 @@ public static class ActiveGameTrackerService
                     }
                     catch { }
 
+                    // Classify the game:
+                    bool isLuaGame = SteamDetector.IsLuaGame(runningAppId);
+                    bool hasCloud = AppInfoParser.HasCloudSave(runningAppId);
+                    bool isGenuine = !isLuaGame;
+
+                    string? procName = null;
+                    string? installDir = null;
+                    try
+                    {
+                        var steamPath = SteamDetector.FindSteamPath();
+                        if (steamPath != null)
+                        {
+                            installDir = AppCloudConfig.FindGameInstallDir(steamPath, runningAppId);
+                        }
+
+                        var procs = Process.GetProcesses();
+                        foreach (var p in procs)
+                        {
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(installDir) && p.MainModule?.FileName.StartsWith(installDir, StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    procName = p.ProcessName;
+                                    break;
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    catch { }
+
+                    bool hasAntiCheat = GameSaveAutoDetector.HasAntiCheatOrHypervisor(installDir, procName);
+
+                    UniversalGameProfile? universalProfile = null;
+
+                    // Evaluate:
+                    // Genuine game without cloud saves -> auto-protect via Universal Cloud Saves
+                    if (isGenuine && !hasCloud && AppSettings.AutoProtectNonCloudGames)
+                    {
+                        universalProfile = UniversalSaveWatcherService.FindProfile(runningAppId, procName, name);
+                        if (universalProfile == null)
+                        {
+                            var saveFolder = GameSaveAutoDetector.DetectSaveFolder(name, procName, runningAppId);
+                            if (saveFolder != null)
+                            {
+                                universalProfile = UniversalSaveWatcherService.AutoEnrollIfNeeded(
+                                    name, procName, runningAppId, saveFolder, hasAntiCheat, isGenuine: true);
+
+                                if (universalProfile != null && AppSettings.ShowSyncNotifications)
+                                {
+                                    TrayIconService.Instance.ShowNotification(
+                                        "CloudRedirect Auto-Protection",
+                                        $"{name} does not have Steam Cloud. Save folder is now automatically protected!");
+                                }
+                            }
+                        }
+                    }
+                    // Lua game without cloud saves or with anti-cheat -> also link to Universal profile if available
+                    else if (isLuaGame && (!hasCloud || hasAntiCheat) && AppSettings.AutoProtectNonCloudGames)
+                    {
+                        universalProfile = UniversalSaveWatcherService.FindProfile(runningAppId, procName, name);
+                        if (universalProfile == null)
+                        {
+                            var saveFolder = GameSaveAutoDetector.DetectSaveFolder(name, procName, runningAppId);
+                            if (saveFolder != null)
+                            {
+                                universalProfile = UniversalSaveWatcherService.AutoEnrollIfNeeded(
+                                    name, procName, runningAppId, saveFolder, hasAntiCheat, isGenuine: false);
+                            }
+                        }
+                    }
+
+                    if (universalProfile != null)
+                    {
+                        _lastActiveUniversalProfile = universalProfile;
+                        _lastMonitoredUniversalProcess = procName ?? universalProfile.ProcessName;
+                        UniversalSaveWatcherService.UpdateProfileStatus(universalProfile, "Game Running 🎮");
+                    }
+
                     _currentGame = new ActiveGameInfo(
                         runningAppId,
                         name,
                         headerUrl,
-                        null,
-                        false,
-                        DateTime.Now
+                        procName,
+                        universalProfile != null,
+                        DateTime.Now,
+                        IsLuaGame: isLuaGame,
+                        HasSteamCloud: hasCloud,
+                        IsGenuineOwned: isGenuine,
+                        HasAntiCheat: hasAntiCheat,
+                        UniversalProfile: universalProfile
                     );
 
                     OnActiveGameChanged?.Invoke(_currentGame);
@@ -123,12 +215,17 @@ public static class ActiveGameTrackerService
                         if (_currentGame == null || _currentGame.ProcessName != targetProcName)
                         {
                             _currentGame = new ActiveGameInfo(
-                                0,
+                                profile.SteamAppId,
                                 profile.GameName,
                                 null,
                                 targetProcName,
                                 true,
-                                DateTime.Now
+                                DateTime.Now,
+                                IsLuaGame: false,
+                                HasSteamCloud: false,
+                                IsGenuineOwned: profile.IsGenuineSteamGame,
+                                HasAntiCheat: profile.HasAntiCheat,
+                                UniversalProfile: profile
                             );
                             _lastMonitoredUniversalProcess = targetProcName;
                             _lastActiveUniversalProfile = profile;
@@ -141,7 +238,42 @@ public static class ActiveGameTrackerService
                 }
             }
 
-            // 3. If a game was active and now stopped:
+            // 3. Auto-detect running non-Steam or standalone game processes if enabled
+            if (AppSettings.AutoProtectNonCloudGames)
+            {
+                var detectedGames = GameSaveAutoDetector.DetectFromRunningProcesses();
+                if (detectedGames.Count > 0)
+                {
+                    var detected = detectedGames[0];
+                    var profile = UniversalSaveWatcherService.AutoEnrollIfNeeded(
+                        detected.GameName, detected.ProcessName, 0, detected.SaveFolderPath);
+
+                    if (profile != null)
+                    {
+                        _currentGame = new ActiveGameInfo(
+                            0,
+                            profile.GameName,
+                            null,
+                            detected.ProcessName,
+                            true,
+                            DateTime.Now,
+                            IsLuaGame: false,
+                            HasSteamCloud: false,
+                            IsGenuineOwned: false,
+                            HasAntiCheat: profile.HasAntiCheat,
+                            UniversalProfile: profile
+                        );
+                        _lastMonitoredUniversalProcess = detected.ProcessName;
+                        _lastActiveUniversalProfile = profile;
+
+                        UniversalSaveWatcherService.UpdateProfileStatus(profile, "Game Running 🎮");
+                        OnActiveGameChanged?.Invoke(_currentGame);
+                        return;
+                    }
+                }
+            }
+
+            // 4. If a game was active and now stopped:
             if (_currentGame != null)
             {
                 var exitedGame = _currentGame;
@@ -149,9 +281,9 @@ public static class ActiveGameTrackerService
                 OnActiveGameChanged?.Invoke(null);
 
                 // Auto-sync universal game if it just exited
-                if (exitedGame.IsUniversal && _lastActiveUniversalProfile != null)
+                if (exitedGame.UniversalProfile != null)
                 {
-                    var profileToSync = _lastActiveUniversalProfile;
+                    var profileToSync = exitedGame.UniversalProfile;
                     _lastActiveUniversalProfile = null;
                     _lastMonitoredUniversalProcess = null;
 
@@ -160,12 +292,19 @@ public static class ActiveGameTrackerService
                         await UniversalSaveWatcherService.SyncProfileNowAsync(profileToSync, "Auto-Backup on Game Exit");
                     });
                 }
-                else
+                else if (exitedGame.IsLuaGame)
                 {
-                    // Steam Game Exited: notify that saves are monitored
-                    TrayIconService.Instance.ShowNotification(
-                        "CloudRedirect",
-                        $"{exitedGame.Name} closed. Cloud save redirection remains active.");
+                    // Lua game exited: CloudRedirect redirected it
+                    if (AppSettings.ShowSyncNotifications)
+                    {
+                        TrayIconService.Instance.ShowNotification(
+                            "CloudRedirect",
+                            $"{exitedGame.Name} closed. Cloud save redirection active.");
+                    }
+                }
+                else if (exitedGame.IsGenuineOwned && exitedGame.HasSteamCloud)
+                {
+                    // Genuine owned Steam game with native cloud: Steam handles it natively, CloudRedirect does not interfere.
                 }
             }
         }

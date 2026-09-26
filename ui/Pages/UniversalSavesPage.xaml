@@ -141,6 +141,13 @@
                                                        FontSize="11" FontWeight="SemiBold"
                                                        Foreground="#A4D007" />
                                         </Border>
+                                        <!-- Protection Tag Badge -->
+                                        <Border Background="#1A2D3E" BorderBrush="#2D4D68" BorderThickness="1"
+                                                CornerRadius="4" Padding="6,2" Margin="6,0,0,0">
+                                            <TextBlock Text="{Binding ProtectionTypeTag, Mode=OneWay}"
+                                                       FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="#66C0F4" />
+                                        </Border>
                                     </StackPanel>
 
                                     <!-- Process & Folder Details -->

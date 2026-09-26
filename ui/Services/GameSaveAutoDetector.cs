@@ -198,7 +198,154 @@ public static class GameSaveAutoDetector
             catch { }
         }
 
+        // 4. Online-Fix, Goldberg, CODEX, Rune, and Steam bypass emulator locations
+        if (appId > 0)
+        {
+            var bypassCandidates = new[]
+            {
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "OnlineFix", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Steam", "CODEX", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Steam", "RUNE", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Goldberg SteamEmu Saves", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OnlineFix", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OnlineFix", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Steam", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Steam", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FLT", appId.ToString()),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "EMPRESS", appId.ToString())
+            };
+            foreach (var loc in bypassCandidates)
+            {
+                if (Directory.Exists(loc) && Directory.EnumerateFileSystemEntries(loc).Any())
+                    return loc;
+            }
+        }
+
+        // 5. Game install directory search (Unreal Engine Saved/SaveGames, standalone Saves, etc.)
+        try
+        {
+            var steamPath = SteamDetector.FindSteamPath();
+            string? installDir = null;
+            if (steamPath != null && appId > 0)
+            {
+                installDir = AppCloudConfig.FindGameInstallDir(steamPath, appId);
+            }
+
+            if (!string.IsNullOrEmpty(installDir) && Directory.Exists(installDir))
+            {
+                var foundInInstall = ScanInstallDirForSaves(installDir);
+                if (foundInInstall != null)
+                    return foundInInstall;
+            }
+        }
+        catch { }
+
         return null;
+    }
+
+    /// <summary>
+    /// Scans a game's install directory for local save folders (e.g. Unreal Engine Saved/SaveGames, OnlineFix, or standalone Save folders).
+    /// </summary>
+    public static string? ScanInstallDirForSaves(string installDir)
+    {
+        try
+        {
+            var candidateDirs = new[]
+            {
+                Path.Combine(installDir, "Save"),
+                Path.Combine(installDir, "Saves"),
+                Path.Combine(installDir, "SaveGames"),
+                Path.Combine(installDir, "SaveData"),
+                Path.Combine(installDir, "steam_settings"),
+                Path.Combine(installDir, "Profile"),
+                Path.Combine(installDir, "OnlineFix"),
+                Path.Combine(installDir, "AppData")
+            };
+
+            foreach (var cd in candidateDirs)
+            {
+                if (Directory.Exists(cd) && Directory.EnumerateFileSystemEntries(cd).Any())
+                    return cd;
+            }
+
+            // Check standard Unreal Engine layout: <installDir>/<SubFolder>/Saved/SaveGames
+            foreach (var sub in Directory.GetDirectories(installDir))
+            {
+                var ueSaved = Path.Combine(sub, "Saved", "SaveGames");
+                if (Directory.Exists(ueSaved) && Directory.EnumerateFileSystemEntries(ueSaved).Any())
+                    return ueSaved;
+
+                var ueSavedRoot = Path.Combine(sub, "Saved");
+                if (Directory.Exists(ueSavedRoot) && Directory.EnumerateFileSystemEntries(ueSavedRoot).Any())
+                    return ueSavedRoot;
+            }
+        }
+        catch { }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Detects whether a game uses an Anti-Cheat or Hypervisor system (EAC, BattlEye, Vanguard, ACE, etc.).
+    /// </summary>
+    public static bool HasAntiCheatOrHypervisor(string? installDir, string? processName = null)
+    {
+        try
+        {
+            // 1. Check running processes for known anti-cheat services/drivers
+            var knownAntiCheatProcs = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "EasyAntiCheat", "EasyAntiCheat_EOS", "EasyAntiCheat_Setup",
+                "BEService", "BEService_x64",
+                "vgk", "vgc",
+                "ACE-BASE", "AntiCheatExpert",
+                "BlackCipher",
+                "GameMon", "GameMon64",
+                "XIGNCODE"
+            };
+
+            foreach (var proc in Process.GetProcesses())
+            {
+                try
+                {
+                    if (knownAntiCheatProcs.Contains(proc.ProcessName))
+                        return true;
+                }
+                catch { }
+            }
+
+            // 2. Check game installation folder
+            if (!string.IsNullOrEmpty(installDir) && Directory.Exists(installDir))
+            {
+                var indicators = new[]
+                {
+                    "EasyAntiCheat", "EasyAntiCheat_EOS.dll", "easyanticheat_x64.dll", "easyanticheat_x86.dll",
+                    "BattlEye", "BEService_x64.exe", "BEService.exe", "BEDaisy.sys",
+                    "vgk.sys", "vgc.exe",
+                    "AntiCheatExpert", "ACE-BASE.sys",
+                    "BlackCipher", "GameMon.des",
+                    "dbdata.dll"
+                };
+
+                foreach (var ind in indicators)
+                {
+                    if (File.Exists(Path.Combine(installDir, ind)) || Directory.Exists(Path.Combine(installDir, ind)))
+                        return true;
+                }
+
+                // Check 1 level down
+                foreach (var sub in Directory.GetDirectories(installDir))
+                {
+                    var subName = Path.GetFileName(sub);
+                    if (subName.Contains("EasyAntiCheat", StringComparison.OrdinalIgnoreCase) ||
+                        subName.Contains("BattlEye", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+        }
+        catch { }
+
+        return false;
     }
 
     /// <summary>

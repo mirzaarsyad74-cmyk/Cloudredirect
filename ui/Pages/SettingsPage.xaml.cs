@@ -74,6 +74,7 @@ public partial class SettingsPage : Page
             StartWithWindowsToggle.IsChecked = AppSettings.StartWithWindows;
             MinimizeToTrayToggle.IsChecked = AppSettings.MinimizeToTrayOnClose;
             ShowNotificationsToggle.IsChecked = AppSettings.ShowSyncNotifications;
+            AutoProtectNonCloudToggle.IsChecked = AppSettings.AutoProtectNonCloudGames;
             AutoFitZoomToggle.IsChecked = AppSettings.AutoFitZoom;
         }
         finally
@@ -88,6 +89,7 @@ public partial class SettingsPage : Page
         AppSettings.StartWithWindows = StartWithWindowsToggle.IsChecked == true;
         AppSettings.MinimizeToTrayOnClose = MinimizeToTrayToggle.IsChecked == true;
         AppSettings.ShowSyncNotifications = ShowNotificationsToggle.IsChecked == true;
+        AppSettings.AutoProtectNonCloudGames = AutoProtectNonCloudToggle.IsChecked == true;
     }
 
     private void AutoFitZoomToggle_Changed(object sender, RoutedEventArgs e)

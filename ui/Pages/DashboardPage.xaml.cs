@@ -221,15 +221,36 @@ public partial class DashboardPage : Page
                 ActiveGameTitle.Text = game.Name;
                 if (game.IsUniversal)
                 {
-                    ActiveGameBadgeText.Text = "NON-CLOUD / SAFE MODE GAME";
-                    ActiveGameSubtitle.Text = $"Universal Safe Mode • Process: {game.ProcessName} • Anti-Cheat & Hypervisor Safe";
-                    ActiveGameStatusPill.Text = "Safe Mode Active";
+                    if (game.IsGenuineOwned)
+                    {
+                        ActiveGameBadgeText.Text = "GENUINE STEAM GAME (NO CLOUD)";
+                        ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Genuine Game Lacks Steam Cloud • Auto-Protected by Universal Saves";
+                        ActiveGameStatusPill.Text = "Universal Cloud Protection";
+                    }
+                    else
+                    {
+                        ActiveGameBadgeText.Text = "UNIVERSAL SAFE MODE GAME";
+                        ActiveGameSubtitle.Text = $"Universal Safe Mode • Process: {game.ProcessName} • Anti-Cheat & Hypervisor Safe";
+                        ActiveGameStatusPill.Text = "Safe Mode Active";
+                    }
+                }
+                else if (game.IsLuaGame)
+                {
+                    ActiveGameBadgeText.Text = "LUA GAME ACTIVE";
+                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • CloudRedirect Active (Lua Unlocked)";
+                    ActiveGameStatusPill.Text = "CloudRedirect Hooked";
+                }
+                else if (game.IsGenuineOwned && game.HasSteamCloud)
+                {
+                    ActiveGameBadgeText.Text = "GENUINE STEAM GAME";
+                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Using Original Steam Native Cloud (Untouched)";
+                    ActiveGameStatusPill.Text = "Original Steam Cloud";
                 }
                 else
                 {
                     ActiveGameBadgeText.Text = "STEAM GAME ACTIVE";
-                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId} • Automatic Cloud Redirection Hooked";
-                    ActiveGameStatusPill.Text = "Steam Cloud Active";
+                    ActiveGameSubtitle.Text = $"Steam AppID: {game.AppId}";
+                    ActiveGameStatusPill.Text = "Steam Game Running";
                 }
             }
             else

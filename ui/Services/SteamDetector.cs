@@ -376,6 +376,81 @@ public static class SteamDetector
         return (localCount, cloudCount);
     }
 
+    private static System.Collections.Generic.HashSet<uint>? _cachedLuaAppIds;
+    private static DateTime _lastLuaAppIdsCheck = DateTime.MinValue;
+    private static readonly object _luaCacheLock = new();
+
+    /// <summary>
+    /// Checks whether an AppID belongs to a Lua-unlocked game in config/stplug-in.
+    /// Only Lua games have their cloud saves intercepted and redirected by CloudRedirect.
+    /// </summary>
+    public static bool IsLuaGame(uint appId, string? steamPath = null)
+    {
+        if (appId == 0) return false;
+        var luaApps = GetLuaAppIds(steamPath);
+        return luaApps.Contains(appId);
+    }
+
+    /// <summary>
+    /// Gets all AppIDs defined in config/stplug-in/*.lua (cached for 3 seconds).
+    /// Matches self-unlocking or addappid rules.
+    /// </summary>
+    public static System.Collections.Generic.HashSet<uint> GetLuaAppIds(string? steamPath = null)
+    {
+        lock (_luaCacheLock)
+        {
+            if (_cachedLuaAppIds != null && (DateTime.UtcNow - _lastLuaAppIdsCheck).TotalSeconds < 3)
+                return _cachedLuaAppIds;
+        }
+
+        steamPath ??= FindSteamPath();
+        var set = new System.Collections.Generic.HashSet<uint>();
+        if (string.IsNullOrEmpty(steamPath) || !Directory.Exists(steamPath))
+            return set;
+
+        var luaDir = Path.Combine(steamPath, "config", "stplug-in");
+        if (Directory.Exists(luaDir))
+        {
+            var addAppIdRegex = new System.Text.RegularExpressions.Regex(@"addappid\s*\(\s*(\d+)", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(luaDir, "*.lua"))
+                {
+                    var stem = Path.GetFileNameWithoutExtension(file);
+                    if (uint.TryParse(stem, out var fileAppId) && fileAppId > 0)
+                    {
+                        set.Add(fileAppId);
+                    }
+
+                    try
+                    {
+                        foreach (var line in File.ReadLines(file))
+                        {
+                            var trimmed = line.TrimStart();
+                            if (trimmed.StartsWith("--", StringComparison.Ordinal)) continue;
+
+                            var match = addAppIdRegex.Match(trimmed);
+                            if (match.Success && uint.TryParse(match.Groups[1].Value, out var innerAppId) && innerAppId > 0)
+                            {
+                                set.Add(innerAppId);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        lock (_luaCacheLock)
+        {
+            _cachedLuaAppIds = set;
+            _lastLuaAppIdsCheck = DateTime.UtcNow;
+        }
+
+        return set;
+    }
+
     /// <summary>
     /// Reads Lua sync configuration (sync_luas, sync_luas_backup, sync_luas_restore).
     /// </summary>

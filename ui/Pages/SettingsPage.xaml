@@ -115,6 +115,23 @@
                                                  Unchecked="AppSettingsToggle_Changed" />
                             </ui:CardControl>
 
+                            <!-- Auto-Protect Games Without Cloud Saves -->
+                            <ui:CardControl Margin="0,8,0,0">
+                                <ui:CardControl.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="Auto-Protect Games Without Cloud Saves"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="Automatically protect genuine Steam games lacking cloud saves and anti-cheat games with Universal Cloud Saves."
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </ui:CardControl.Header>
+                                <ui:ToggleSwitch x:Name="AutoProtectNonCloudToggle"
+                                                 Checked="AppSettingsToggle_Changed"
+                                                 Unchecked="AppSettingsToggle_Changed" />
+                            </ui:CardControl>
+
                             <!-- Auto-Fit Window (No Scrolling) -->
                             <ui:CardControl Margin="0,8,0,0">
                                 <ui:CardControl.Header>
