@@ -68,8 +68,8 @@ public partial class StatsPage : Page
     private async Task LoadStatsAsync()
     {
         ShowStatus(S.Get("Stats_LoadingFromCloud"));
-        CloudUnavailableText.Visibility = Visibility.Collapsed;
-        EmptyText.Visibility = Visibility.Collapsed;
+        CloudUnavailableCard.Visibility = Visibility.Collapsed;
+        EmptyCard.Visibility = Visibility.Collapsed;
 
         // Stats are fetched from cloud via native CLI.
         var cfg = SteamDetector.ReadConfig();
@@ -81,7 +81,7 @@ public partial class StatsPage : Page
             ShowStatus("");
             _apps.Clear();
             RefreshList();
-            CloudUnavailableText.Visibility = Visibility.Visible;
+            CloudUnavailableCard.Visibility = Visibility.Visible;
             return;
         }
 
@@ -128,7 +128,7 @@ public partial class StatsPage : Page
             if (!string.IsNullOrEmpty(result.Error))
                 ShowStatus($"Cloud error: {result.Error}");
             else
-                CloudUnavailableText.Visibility =
+                CloudUnavailableCard.Visibility =
                     !IsCloudConfigured() ? Visibility.Visible : Visibility.Collapsed;
         }
     }
@@ -271,7 +271,15 @@ public partial class StatsPage : Page
             _appsView.Refresh();
         }
 
-        EmptyText.Visibility = _apps.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        EmptyCard.Visibility = _apps.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void GoToCloudProvider_Click(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current.MainWindow is MainWindow mw)
+        {
+            mw.NavigateTo(typeof(CloudProviderPage));
+        }
     }
 
     private bool AppFilter(object item)

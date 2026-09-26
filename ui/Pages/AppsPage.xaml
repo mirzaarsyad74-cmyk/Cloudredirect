@@ -53,7 +53,7 @@
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource SteamBorderHighlightBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource SteamAccentCyanBrush}" />
                     <Setter Property="Background" Value="{DynamicResource SteamBgCardSecondaryBrush}" />
                 </Trigger>
             </Style.Triggers>
@@ -116,21 +116,29 @@
             <DockPanel x:Name="AppListPanel">
 
                 <WrapPanel x:Name="ActionBar" DockPanel.Dock="Top" Margin="0,0,0,16">
+                    <ui:TextBox x:Name="AppSearchBox"
+                                PlaceholderText="{res:Loc Search_Placeholder}"
+                                Width="220"
+                                TextChanged="AppSearchBox_TextChanged"
+                                Margin="0,0,12,6" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,6">
+                        <RadioButton x:Name="FilterAllAppsRadio" Style="{StaticResource SteamFilterChipStyle}"
+                                     Content="All Games" IsChecked="True" Click="FilterChip_Click" Tag="all" />
+                        <RadioButton x:Name="FilterSyncedAppsRadio" Style="{StaticResource SteamFilterChipStyle}"
+                                     Content="Synced 🟢" Click="FilterChip_Click" Tag="synced" />
+                        <RadioButton x:Name="FilterOrphansAppsRadio" Style="{StaticResource SteamFilterChipStyle}"
+                                     Content="With Orphans ⚠️" Click="FilterChip_Click" Tag="orphans" />
+                    </StackPanel>
                     <ui:Button x:Name="RestoreSavesButton"
                                Content="{res:Loc Apps_RestoreSaves}"
                                Icon="{ui:SymbolIcon ArrowUndo24}"
                                Click="RestoreSavesButton_Click"
-                               Margin="0,0,8,0" />
+                               Margin="0,0,8,6" />
                     <ui:Button x:Name="ScanOrphansButton"
                                Content="{res:Loc Apps_ScanForOrphans}"
                                Icon="{ui:SymbolIcon Broom24}"
                                Click="ScanOrphans_Click"
-                               Margin="0,0,8,0" />
-                    <ui:TextBox x:Name="AppSearchBox"
-                                PlaceholderText="{res:Loc Search_Placeholder}"
-                                Width="250"
-                                TextChanged="AppSearchBox_TextChanged"
-                                Margin="0,0,8,0" />
+                               Margin="0,0,8,6" />
                     <TextBlock x:Name="ScanStatusText"
                                Text=""
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"

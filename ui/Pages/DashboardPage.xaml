@@ -98,6 +98,75 @@
                 </StackPanel>
             </Grid>
 
+            <!-- ONBOARDING QUICK-START STEPPER BANNER -->
+            <Border DockPanel.Dock="Top"
+                    x:Name="QuickSetupBanner"
+                    Visibility="Collapsed"
+                    Background="#142636"
+                    BorderBrush="#1A9FFF"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="14,10"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="Rocket24" FontSize="18" Foreground="#66C0F4" Margin="0,0,8,0" />
+                            <TextBlock Text="Welcome! Quick-Start Setup Checklist:"
+                                       FontSize="13" FontWeight="Bold" Foreground="#F3F3F3" />
+                        </StackPanel>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <!-- Step 1 -->
+                            <Border Grid.Column="0" Background="#16202B" BorderBrush="#263E52" BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,6,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="①" FontSize="13" FontWeight="Bold" Foreground="#A4D007" Margin="0,0,6,0" />
+                                    <StackPanel>
+                                        <TextBlock Text="Steam Integration" FontSize="11" FontWeight="SemiBold" Foreground="#F3F3F3" />
+                                        <TextBlock x:Name="QuickSetupSteamText" Text="Detected ✓" FontSize="10" Foreground="#A4D007" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <!-- Step 2 -->
+                            <Border Grid.Column="1" Background="#16202B" BorderBrush="#263E52" BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,6,0"
+                                    Cursor="Hand" MouseLeftButtonUp="CloudProviderCard_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="②" FontSize="13" FontWeight="Bold" Foreground="#66C0F4" Margin="0,0,6,0" />
+                                    <StackPanel>
+                                        <TextBlock Text="Connect Cloud Drive" FontSize="11" FontWeight="SemiBold" Foreground="#F3F3F3" />
+                                        <TextBlock Text="Setup Google Drive →" FontSize="10" Foreground="#66C0F4" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <!-- Step 3 -->
+                            <Border Grid.Column="2" Background="#16202B" BorderBrush="#263E52" BorderThickness="1" CornerRadius="6" Padding="10,6"
+                                    Cursor="Hand" MouseLeftButtonUp="UniversalSavesCard_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="③" FontSize="13" FontWeight="Bold" Foreground="#FFA4D007" Margin="0,0,6,0" />
+                                    <StackPanel>
+                                        <TextBlock Text="Play &amp; Auto-Sync" FontSize="11" FontWeight="SemiBold" Foreground="#F3F3F3" />
+                                        <TextBlock Text="Safe Mode Armed 🛡️" FontSize="10" Foreground="#8F98A0" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                    <Button Grid.Column="1" Width="22" Height="22" Padding="0" Margin="10,0,0,0"
+                            Background="Transparent" BorderThickness="0" Foreground="#8F98A0" Cursor="Hand"
+                            VerticalAlignment="Top" ToolTip="Dismiss Checklist" Click="DismissQuickSetup_Click">
+                        <ui:SymbolIcon Symbol="Dismiss20" FontSize="14" />
+                    </Button>
+                </Grid>
+            </Border>
+
             <!-- LIVE ACTIVE GAME BANNER (Auto-Detect Active Game) -->
             <Border DockPanel.Dock="Top"
                     x:Name="ActiveGameCard"
@@ -245,9 +314,9 @@
 
                 <!-- CARD 1: Cloud Storage Provider (Click to open) -->
                 <Border Grid.Row="0" Grid.Column="0"
-                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
-                        CornerRadius="8" Padding="14,10" Margin="0,0,0,10"
-                        Cursor="Hand" MouseLeftButtonUp="CloudProviderCard_Click">
+                        Style="{StaticResource SteamInteractiveCardBorderStyle}"
+                        Padding="14,10" Margin="0,0,0,10"
+                        MouseLeftButtonUp="CloudProviderCard_Click">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -310,9 +379,9 @@
 
                 <!-- CARD 3: Game Saves (Click to open) -->
                 <Border Grid.Row="1" Grid.Column="0"
-                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
-                        CornerRadius="8" Padding="14,10"
-                        Cursor="Hand" MouseLeftButtonUp="AppsSyncingCard_Click">
+                        Style="{StaticResource SteamInteractiveCardBorderStyle}"
+                        Padding="14,10"
+                        MouseLeftButtonUp="AppsSyncingCard_Click">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -396,74 +465,83 @@
                 </Border>
             </Grid>
 
-            <!-- CARD 5: Redirection Core DLL -->
-            <Border DockPanel.Dock="Top"
-                    Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
-                    CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="{res:Loc Dashboard_CloudRedirectDll}"
-                                   FontSize="11" FontWeight="SemiBold"
-                                   Foreground="#FF8F98A0" />
-                        <TextBlock x:Name="DllStatus"
-                                   Text="{res:Loc Dashboard_DllChecking}"
-                                   FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   Margin="0,3,0,2" />
-                        <TextBlock Text="{res:Loc Dashboard_DllHooked}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Background="#1B3322" BorderBrush="#FF4C7515" BorderThickness="1"
-                                CornerRadius="12" Padding="8,3" Margin="0,0,10,0">
-                            <TextBlock Text="{res:Loc Dashboard_Active}" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="#FFA4D007" />
-                        </Border>
-                        <ui:SymbolIcon x:Name="DllIcon" Symbol="PlugConnected24" FontSize="20"
-                                       Foreground="#FFA4D007" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Grid>
-            </Border>
+            <!-- Bottom 2-Column Grid: Universal Cloud Saves & Redirection Core DLL -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- CARD 6: Universal Cloud Saves (Safe Mode / Hypervisor) -->
-            <Border DockPanel.Dock="Top"
-                    Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
-                    CornerRadius="8" Padding="14,10" Margin="0,0,0,12"
-                    Cursor="Hand" MouseLeftButtonUp="UniversalSavesCard_Click">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{res:Loc Dashboard_UniversalSavesTitle}"
+                <!-- CARD 5: Universal Cloud Saves (Safe Mode / Hypervisor) -->
+                <Border Grid.Column="0"
+                        Style="{StaticResource SteamInteractiveCardBorderStyle}"
+                        Padding="14,10"
+                        MouseLeftButtonUp="UniversalSavesCard_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{res:Loc Dashboard_UniversalSavesTitle}"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="#FF8F98A0" />
+                                <TextBlock Text="{res:Loc Dashboard_UniversalSavesSubtitle}"
+                                           FontSize="11" Foreground="#FF66C0F4" Margin="6,0,0,0" />
+                            </StackPanel>
+                            <TextBlock x:Name="UniversalSavesCountText"
+                                       Text="Configured Games: 0"
+                                       FontSize="15" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Margin="0,3,0,3" />
+                            <TextBlock Text="{res:Loc Dashboard_UniversalSavesDesc}"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
+                                Background="#182E40" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="20"
+                                           Foreground="#FF66C0F4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- CARD 6: Redirection Core DLL -->
+                <Border Grid.Column="2"
+                        Background="#15212D" BorderBrush="#263E52" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{res:Loc Dashboard_CloudRedirectDll}"
                                        FontSize="11" FontWeight="SemiBold"
                                        Foreground="#FF8F98A0" />
-                            <TextBlock Text="{res:Loc Dashboard_UniversalSavesSubtitle}"
-                                       FontSize="11" Foreground="#FF66C0F4" Margin="6,0,0,0" />
+                            <TextBlock x:Name="DllStatus"
+                                       Text="{res:Loc Dashboard_DllChecking}"
+                                       FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Margin="0,3,0,2" />
+                            <TextBlock Text="{res:Loc Dashboard_DllHooked}"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
-                        <TextBlock x:Name="UniversalSavesCountText"
-                                   Text="Configured Games: 0"
-                                   FontSize="15" FontWeight="Bold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   Margin="0,3,0,3" />
-                        <TextBlock Text="{res:Loc Dashboard_UniversalSavesDesc}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    </StackPanel>
-                    <Border Grid.Column="1" Width="40" Height="40" CornerRadius="20"
-                            Background="#182E40" VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="20"
-                                       Foreground="#FF66C0F4" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
-            </Border>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Background="#1B3322" BorderBrush="#FF4C7515" BorderThickness="1"
+                                    CornerRadius="12" Padding="8,3" Margin="0,0,10,0">
+                                <TextBlock Text="{res:Loc Dashboard_Active}" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="#FFA4D007" />
+                            </Border>
+                            <ui:SymbolIcon x:Name="DllIcon" Symbol="PlugConnected24" FontSize="20"
+                                           Foreground="#FFA4D007" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
 
             <!-- Quick Actions Toolbar -->
             <DockPanel DockPanel.Dock="Top">

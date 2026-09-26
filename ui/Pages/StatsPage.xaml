@@ -43,21 +43,51 @@
                         TextChanged="SearchBox_TextChanged"
                         Margin="0,0,0,16" />
 
-            <!-- Empty state -->
-            <TextBlock x:Name="EmptyText"
-                       Text="{res:Loc Stats_NoData}"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                       TextWrapping="Wrap"
-                       Margin="0,0,0,8"
-                       Visibility="Collapsed" />
+            <!-- Rich Empty State: No Telemetry Data -->
+            <Border x:Name="EmptyCard"
+                    Style="{StaticResource SteamEmptyStateCardStyle}"
+                    Visibility="Collapsed"
+                    Margin="0,24,0,24">
+                <StackPanel HorizontalAlignment="Center">
+                    <ui:SymbolIcon Symbol="DataBarHorizontal24" FontSize="40" Foreground="#475C73" HorizontalAlignment="Center" />
+                    <TextBlock Text="{res:Loc Stats_NoData}"
+                               FontWeight="SemiBold" FontSize="15"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               HorizontalAlignment="Center" Margin="0,12,0,4" />
+                    <TextBlock Text="Play games or trigger a cloud synchronization to view live save metrics and telemetry logs here."
+                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="440" />
+                    <ui:Button Content="{res:Loc Stats_Refresh}"
+                               Appearance="Primary"
+                               Icon="{ui:SymbolIcon ArrowSync24}"
+                               Click="Refresh_Click"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,0" />
+                </StackPanel>
+            </Border>
 
-            <!-- No cloud configured -->
-            <TextBlock x:Name="CloudUnavailableText"
-                       Text="{res:Loc Stats_NoCloud}"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                       TextWrapping="Wrap"
-                       Margin="0,0,0,8"
-                       Visibility="Collapsed" />
+            <!-- Rich Empty State: Cloud Storage Not Configured -->
+            <Border x:Name="CloudUnavailableCard"
+                    Style="{StaticResource SteamEmptyStateCardStyle}"
+                    Visibility="Collapsed"
+                    Margin="0,24,0,24">
+                <StackPanel HorizontalAlignment="Center">
+                    <ui:SymbolIcon Symbol="CloudOff24" FontSize="40" Foreground="#E5A93B" HorizontalAlignment="Center" />
+                    <TextBlock Text="{res:Loc Stats_NoCloud}"
+                               FontWeight="SemiBold" FontSize="15"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               HorizontalAlignment="Center" Margin="0,12,0,4" />
+                    <TextBlock Text="Connect your Google Drive or local storage folder in Cloud Provider to enable telemetry tracking."
+                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="440" />
+                    <ui:Button Content="{res:Loc Nav_CloudProvider}"
+                               Appearance="Primary"
+                               Icon="{ui:SymbolIcon Cloud24}"
+                               Click="GoToCloudProvider_Click"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,0" />
+                </StackPanel>
+            </Border>
 
             <ItemsControl x:Name="AppList">
                 <ItemsControl.GroupStyle>

@@ -111,6 +111,7 @@ public partial class CleanupPage : Page
         ScanButton.IsEnabled = false;
         ScanStatus.Text = "";
         GameListPanel.Visibility = Visibility.Collapsed;
+        AllCleanCard.Visibility = Visibility.Collapsed;
         NukePanel.Visibility = Visibility.Collapsed;
         LoadingPanel.Visibility = Visibility.Visible;
 
@@ -163,10 +164,12 @@ public partial class CleanupPage : Page
             {
                 NukeDescription.Text = S.Format("Cleanup_NukeDescriptionFormat", totalPolluted, FileUtils.FormatSize(totalPollutedBytes), appsAffected);
                 NukePanel.Visibility = Visibility.Visible;
+                AllCleanCard.Visibility = Visibility.Collapsed;
             }
             else
             {
                 NukePanel.Visibility = Visibility.Collapsed;
+                AllCleanCard.Visibility = Visibility.Visible;
             }
             GameListPanel.Visibility = Visibility.Visible;
         }

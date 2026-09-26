@@ -58,7 +58,7 @@
     <!-- Text Colors -->
     <Color x:Key="SteamTextPrimaryColor">#FFF3F3F3</Color>
     <Color x:Key="SteamTextSecondaryColor">#FF8F98A0</Color>
-    <Color x:Key="SteamTextTertiaryColor">#FF626F7D</Color>
+    <Color x:Key="SteamTextTertiaryColor">#FF7E8E9E</Color>
     <Color x:Key="SteamTextDisabledColor">#FF414E5D</Color>
 
     <!-- ====================================================================
@@ -303,6 +303,116 @@
     <Style TargetType="{x:Type ui:TitleBar}" BasedOn="{StaticResource {x:Type ui:TitleBar}}">
         <Setter Property="Background" Value="{StaticResource TitleBarBackground}" />
         <Setter Property="Foreground" Value="{StaticResource TitleBarForeground}" />
+    </Style>
+
+    <!-- ====================================================================
+         MODERN STEAM CLIENT COMPONENT STYLES
+         ==================================================================== -->
+
+    <!-- Steam Navigation Tab RadioButton Style (Steam Client STORE / LIBRARY Style) -->
+    <Style x:Key="SteamNavTabStyle" TargetType="{x:Type RadioButton}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource SteamTextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <Border x:Name="TabBorder" Background="{TemplateBinding Background}" CornerRadius="4,4,0,0">
+                        <Grid>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                            <!-- Bottom Active Indicator Bar -->
+                            <Rectangle x:Name="ActiveIndicator" Height="3" VerticalAlignment="Bottom"
+                                       Fill="Transparent" Margin="6,0,6,0" RadiusX="1.5" RadiusY="1.5" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="TabBorder" Property="Background" Value="#1A2938" />
+                            <Setter Property="Foreground" Value="{StaticResource SteamTextPrimaryBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="TabBorder" Property="Background" Value="#1C2E42" />
+                            <Setter TargetName="ActiveIndicator" Property="Fill" Value="{StaticResource SteamAccentCyanBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource SteamAccentLightBlueBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Steam Filter Chip RadioButton Style (Filter Pills for Game Lists) -->
+    <Style x:Key="SteamFilterChipStyle" TargetType="{x:Type RadioButton}">
+        <Setter Property="Background" Value="#131F2C" />
+        <Setter Property="BorderBrush" Value="#25384B" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource SteamTextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="10,3" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <Border x:Name="ChipBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="12"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ChipBorder" Property="Background" Value="#192A3C" />
+                            <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{StaticResource SteamBorderHighlightBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource SteamTextPrimaryBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="ChipBorder" Property="Background" Value="#1B3A54" />
+                            <Setter TargetName="ChipBorder" Property="BorderBrush" Value="{StaticResource SteamAccentLightBlueBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource SteamAccentLightBlueBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Steam Interactive Card Border Style (Hover Glow) -->
+    <Style x:Key="SteamInteractiveCardBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{StaticResource SteamBgCardBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource SteamBorderDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource SteamBgCardSecondaryBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource SteamAccentCyanBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Steam Empty State Card Container Style -->
+    <Style x:Key="SteamEmptyStateCardStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{StaticResource SteamBgDarkestBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource SteamBorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="32,24" />
+        <Setter Property="MaxWidth" Value="520" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
 </ResourceDictionary>

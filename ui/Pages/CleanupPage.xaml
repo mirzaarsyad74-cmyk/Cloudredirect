@@ -138,6 +138,22 @@
                             Visibility="Collapsed"
                             Margin="0,0,0,12" />
 
+                <Border x:Name="AllCleanCard"
+                        Style="{StaticResource SteamEmptyStateCardStyle}"
+                        Visibility="Collapsed"
+                        Margin="0,20,0,20">
+                    <StackPanel HorizontalAlignment="Center">
+                        <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="44" Foreground="#A4D007" HorizontalAlignment="Center" />
+                        <TextBlock Text="Everything is Clean!"
+                                   FontWeight="SemiBold" FontSize="16"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   HorizontalAlignment="Center" Margin="0,12,0,4" />
+                        <TextBlock Text="No contaminated, duplicated, or orphaned save files were found in your library."
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="440" />
+                    </StackPanel>
+                </Border>
+
                 <StackPanel x:Name="GameListPanel"
                             Visibility="Collapsed" />
 

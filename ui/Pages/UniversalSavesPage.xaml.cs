@@ -36,10 +36,52 @@ public partial class UniversalSavesPage : Page
         Dispatcher.Invoke(RefreshList);
     }
 
+    private string _currentFilterChip = "all";
+    private System.Windows.Data.ListCollectionView? _profilesView;
+
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ApplyProfileFilter();
+    }
+
+    private void FilterChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is RadioButton { Tag: string tag })
+        {
+            _currentFilterChip = tag;
+            ApplyProfileFilter();
+        }
+    }
+
+    private void ApplyProfileFilter()
+    {
+        _profilesView?.Refresh();
+    }
+
+    private bool ProfileFilter(object item)
+    {
+        if (item is not UniversalGameProfile p) return false;
+
+        if (_currentFilterChip == "monitoring" && p.Status != "Monitoring" && p.Status != "Up to Date" && !p.Status.Contains("Running"))
+            return false;
+
+        if (_currentFilterChip == "anticheat" && !p.HasAntiCheat)
+            return false;
+
+        var query = SearchBox?.Text?.Trim() ?? "";
+        if (string.IsNullOrEmpty(query)) return true;
+
+        return p.GameName.Contains(query, StringComparison.OrdinalIgnoreCase)
+            || p.ProcessName.Contains(query, StringComparison.OrdinalIgnoreCase)
+            || (p.SteamAppId > 0 && p.SteamAppId.ToString().Contains(query));
+    }
+
     private void RefreshList()
     {
         var list = UniversalSaveWatcherService.GetProfiles().ToList();
-        GamesItemsControl.ItemsSource = list;
+        _profilesView = (System.Windows.Data.ListCollectionView)System.Windows.Data.CollectionViewSource.GetDefaultView(list);
+        _profilesView.Filter = ProfileFilter;
+        GamesItemsControl.ItemsSource = _profilesView;
         EmptyStateBorder.Visibility = list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         GamesItemsControl.Visibility = list.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 

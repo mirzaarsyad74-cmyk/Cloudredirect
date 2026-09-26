@@ -192,6 +192,17 @@ public partial class AppsPage : Page
 
     private System.Windows.Data.ListCollectionView? _appsView;
 
+    private string _currentAppFilterChip = "all";
+
+    private void FilterChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is RadioButton { Tag: string tag })
+        {
+            _currentAppFilterChip = tag;
+            ApplyAppFilter();
+        }
+    }
+
     private void ApplyAppFilter()
     {
         if (_allApps == null) return;
@@ -212,9 +223,16 @@ public partial class AppsPage : Page
 
     private bool AppFilter(object item)
     {
+        if (item is not AppInfo a) return false;
+
+        if (_currentAppFilterChip == "synced" && a.FileCount == 0)
+            return false;
+
+        if (_currentAppFilterChip == "orphans" && !a.HasOrphans)
+            return false;
+
         var query = AppSearchBox?.Text?.Trim() ?? "";
         if (string.IsNullOrEmpty(query)) return true;
-        if (item is not AppInfo a) return false;
         return a.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)
             || a.AppId.Contains(query, StringComparison.OrdinalIgnoreCase);
     }
