@@ -436,4 +436,41 @@ public partial class UniversalSavesPage : Page
             }
         }
     }
+
+    private void OpenFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.Tag is UniversalGameProfile profile)
+        {
+            OpenFolder(profile.ExpandedSavePath);
+        }
+    }
+
+    private void SavePath_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.Tag is string path)
+        {
+            e.Handled = true;
+            OpenFolder(path);
+        }
+    }
+
+    private static void OpenFolder(string path)
+    {
+        try
+        {
+            if (Directory.Exists(path))
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = path, UseShellExecute = true });
+            }
+            else
+            {
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo { FileName = dir, UseShellExecute = true });
+                }
+            }
+        }
+        catch { }
+    }
 }

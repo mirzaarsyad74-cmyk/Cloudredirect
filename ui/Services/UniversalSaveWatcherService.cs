@@ -21,6 +21,12 @@ public class UniversalGameProfile
     public bool IsGenuineSteamGame { get; set; } = false;
     public bool HasAntiCheat { get; set; } = false;
 
+    public bool HasSteamAppId => SteamAppId > 0;
+    public bool HasProcess => !string.IsNullOrWhiteSpace(ProcessName);
+    public string? HeaderUrl => SteamAppId > 0
+        ? $"https://cdn.akamai.steamstatic.com/steam/apps/{SteamAppId}/header.jpg"
+        : null;
+
     public string ProtectionTypeTag
     {
         get => IsGenuineSteamGame
@@ -139,13 +145,25 @@ public static class UniversalSaveWatcherService
                 var json = File.ReadAllText(path);
                 _profiles = JsonSerializer.Deserialize<List<UniversalGameProfile>>(json) ?? [];
 
-                // Sanitize: remove any spurious system processes
+                // Sanitize: remove any spurious system processes and fix duplicate statuses
                 int countBefore = _profiles.Count;
+                bool modified = false;
                 _profiles.RemoveAll(p => GameSaveAutoDetector.IsSystemProcess(p.ProcessName) ||
                                          p.GameName.Contains("Antigravity", StringComparison.OrdinalIgnoreCase) ||
                                          p.ProcessName.Contains("antigravity", StringComparison.OrdinalIgnoreCase) ||
                                          p.GameName.Equals("Windows Input Experience", StringComparison.OrdinalIgnoreCase));
-                if (_profiles.Count != countBefore)
+                if (_profiles.Count != countBefore) modified = true;
+
+                foreach (var p in _profiles)
+                {
+                    if (string.IsNullOrWhiteSpace(p.Status) || p.Status.StartsWith("Auto-Protected", StringComparison.OrdinalIgnoreCase))
+                    {
+                        p.Status = "Monitoring";
+                        modified = true;
+                    }
+                }
+
+                if (modified)
                 {
                     SaveProfiles();
                 }
@@ -230,7 +248,7 @@ public static class UniversalSaveWatcherService
             IsAutoEnrolled = true,
             IsGenuineSteamGame = isGenuine,
             HasAntiCheat = hasAntiCheat,
-            Status = "Auto-Protected 🛡️"
+            Status = "Monitoring"
         };
 
         AddProfile(profile);

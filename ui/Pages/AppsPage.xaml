@@ -149,6 +149,38 @@
                         <DataTemplate>
                             <Grid Margin="0,0,0,8">
                                 <Border Style="{StaticResource GameCardBorderStyle}">
+                                    <Border.ContextMenu>
+                                        <ContextMenu Background="#1A2634" BorderBrush="#2F4259">
+                                            <MenuItem Header="Open in Google Drive" Click="OpenCloudLocation_Click">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Cloud20" Foreground="#66C0F4" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Open Local Storage Folder" Click="OpenLocalStorage_Click">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="FolderOpen20" Foreground="#A4D007" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Open Steam Userdata Folder" Click="OpenSteamUserdata_Click">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Folder20" Foreground="#8F98A0" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator Background="#2F4259" />
+                                            <MenuItem Header="Save Version History &amp; Rollback" Click="SaveHistory_Click">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="History20" Foreground="#66C0F4" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator Background="#2F4259" />
+                                            <MenuItem Header="Delete App Saves..." Click="DeleteApp_Click">
+                                                <MenuItem.Icon>
+                                                    <ui:SymbolIcon Symbol="Delete20" Foreground="#FF6B6E" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+
                                     <StackPanel>
                                         <Grid Height="52">
                                             <Grid.ColumnDefinitions>
@@ -201,21 +233,14 @@
                                                            TextTrimming="CharacterEllipsis"
                                                            Margin="0,0,0,4" />
 
-                                                <!-- Line 2: Fixed Single-Line Badges -->
-                                                <Grid Grid.Row="1">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-
+                                                <!-- Line 2: Compact Cohesive Badges with Interactive Drive Pill -->
+                                                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                     <!-- AppID Pill -->
-                                                    <Border Grid.Column="0"
-                                                            Background="#121A24"
+                                                    <Border Background="#121A24"
                                                             BorderBrush="#233246"
                                                             BorderThickness="1"
-                                                            CornerRadius="3"
-                                                            Padding="5,1"
+                                                            CornerRadius="4"
+                                                            Padding="6,2"
                                                             Margin="0,0,6,0">
                                                         <TextBlock Text="{Binding AppId}"
                                                                    FontFamily="Cascadia Code,Consolas,Courier New"
@@ -224,19 +249,33 @@
                                                                    VerticalAlignment="Center" />
                                                     </Border>
 
-                                                    <!-- Files & Size Pill (Trims cleanly if space is tight) -->
-                                                    <Border Grid.Column="1"
-                                                            Background="#121A24"
+                                                    <!-- Interactive Files & Size Pill (Click to open Google Drive save folder) -->
+                                                    <Border Background="#121A24"
                                                             BorderBrush="#233246"
                                                             BorderThickness="1"
-                                                            CornerRadius="3"
-                                                            Padding="6,1"
-                                                            Margin="0,0,6,0">
+                                                            CornerRadius="4"
+                                                            Padding="7,2"
+                                                            Margin="0,0,6,0"
+                                                            Cursor="Hand"
+                                                            ToolTip="Click to open save folder in Google Drive (or local storage)"
+                                                            MouseLeftButtonUp="CloudFilesPill_Click">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="#121A24" />
+                                                                <Setter Property="BorderBrush" Value="#233246" />
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Background" Value="#172738" />
+                                                                        <Setter Property="BorderBrush" Value="#3888D8" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
                                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                             <ui:SymbolIcon Symbol="Cloud20"
                                                                            FontSize="11"
                                                                            Foreground="{DynamicResource SteamAccentCyanBrush}"
-                                                                           Margin="0,0,4,0"
+                                                                           Margin="0,0,5,0"
                                                                            VerticalAlignment="Center" />
                                                             <TextBlock FontSize="10.5"
                                                                        Foreground="#C6D4DF"
@@ -248,25 +287,30 @@
                                                                 <Run Text="  •  " Foreground="#41556C" />
                                                                 <Run Text="{Binding TotalSize}" />
                                                             </TextBlock>
+                                                            <ui:SymbolIcon Symbol="Open20"
+                                                                           FontSize="10"
+                                                                           Foreground="#66C0F4"
+                                                                           Margin="6,0,1,0"
+                                                                           VerticalAlignment="Center" />
                                                         </StackPanel>
                                                     </Border>
 
                                                     <!-- Change Number Pill -->
-                                                    <Border Grid.Column="2"
-                                                            Background="#121A24"
+                                                    <Border Background="#121A24"
                                                             BorderBrush="#233246"
                                                             BorderThickness="1"
-                                                            CornerRadius="3"
-                                                            Padding="5,1">
+                                                            CornerRadius="4"
+                                                            Padding="6,2">
                                                         <TextBlock FontSize="10.5" Foreground="#8F98A0" VerticalAlignment="Center">
                                                             <Run Text="{res:Loc Apps_ChangeNumber}" Foreground="#55697E" />
+                                                            <Run Text=" " />
                                                             <Run Text="{Binding ChangeNumber, Mode=OneWay}" />
                                                         </TextBlock>
                                                     </Border>
-                                                </Grid>
+                                                </StackPanel>
                                             </Grid>
 
-                                            <!-- Actions: Orphans & Delete -->
+                                            <!-- Actions: Orphans, Drive, History, Delete -->
                                             <StackPanel Grid.Column="2"
                                                         Orientation="Horizontal"
                                                         VerticalAlignment="Center">
@@ -276,6 +320,17 @@
                                                            Click="OrphansToggle_Click"
                                                            Visibility="{Binding HasOrphans, Converter={StaticResource BoolToVis}}"
                                                            Margin="0,0,6,0" />
+                                                <ui:Button Appearance="Secondary"
+                                                           VerticalAlignment="Center"
+                                                           Click="OpenCloudLocation_Click"
+                                                           ToolTip="Open save folder in Google Drive (or active cloud provider)"
+                                                           Margin="0,0,6,0"
+                                                           Padding="8,5">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <ui:SymbolIcon Symbol="FolderOpen24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
+                                                        <TextBlock Text="Drive" FontSize="11" />
+                                                    </StackPanel>
+                                                </ui:Button>
                                                 <ui:Button Appearance="Secondary"
                                                            VerticalAlignment="Center"
                                                            Click="SaveHistory_Click"

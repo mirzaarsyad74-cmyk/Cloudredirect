@@ -323,6 +323,77 @@ public sealed class OAuthService : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets a valid access token for the given provider (refreshing if expired).
+    /// Returns null if token file is missing or invalid.
+    /// </summary>
+    public static async Task<string?> GetValidAccessTokenAsync(string provider, string tokenPath)
+    {
+        if (string.IsNullOrEmpty(tokenPath) || !File.Exists(tokenPath))
+            return null;
+
+        try
+        {
+            var json = TokenFile.ReadJson(tokenPath);
+            if (json == null) return null;
+
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            string? accessToken = root.TryGetProperty("access_token", out var at) ? at.GetString() : null;
+            string? refreshToken = root.TryGetProperty("refresh_token", out var rt) ? rt.GetString() : null;
+            long expiresAt = root.TryGetProperty("expires_at", out var exp) && exp.TryGetInt64(out var expVal) ? expVal : 0;
+
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            // If access token is valid for at least another 60 seconds, use it
+            if (!string.IsNullOrEmpty(accessToken) && expiresAt > now + 60)
+            {
+                return accessToken;
+            }
+
+            // If we have a refresh token, attempt refresh
+            if (!string.IsNullOrEmpty(refreshToken) && provider == "gdrive")
+            {
+                using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+                var body = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["client_id"] = GDriveClientId,
+                    ["client_secret"] = GDriveClientSecret,
+                    ["refresh_token"] = refreshToken,
+                    ["grant_type"] = "refresh_token"
+                });
+
+                var resp = await http.PostAsync(GDriveTokenUrl, body);
+                if (resp.IsSuccessStatusCode)
+                {
+                    var respJson = await resp.Content.ReadAsStringAsync();
+                    using var respDoc = JsonDocument.Parse(respJson);
+                    if (respDoc.RootElement.TryGetProperty("access_token", out var newAt))
+                    {
+                        var newAccessToken = newAt.GetString();
+                        int expiresIn = respDoc.RootElement.TryGetProperty("expires_in", out var ei) ? ei.GetInt32() : 3600;
+
+                        var tokenObj = new
+                        {
+                            access_token = newAccessToken,
+                            refresh_token = refreshToken,
+                            expires_at = now + expiresIn
+                        };
+
+                        TokenFile.WriteJson(tokenPath, JsonSerializer.Serialize(tokenObj, new JsonSerializerOptions { WriteIndented = true }));
+                        return newAccessToken;
+                    }
+                }
+            }
+
+            return accessToken;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     // --- private helpers ---
 
     private static string BuildGDriveAuthUrl(string redirectUri, string state, string codeChallenge)

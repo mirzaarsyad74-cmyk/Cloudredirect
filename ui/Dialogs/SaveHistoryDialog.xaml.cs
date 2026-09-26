@@ -10,15 +10,70 @@ public partial class SaveHistoryDialog : Wpf.Ui.Controls.FluentWindow
 {
     private readonly string _gameIdentifier;
     private readonly string? _targetSaveDir;
+    private readonly string? _appId;
+    private readonly string? _accountId;
 
-    public SaveHistoryDialog(string gameIdentifier, string? targetSaveDir = null)
+    public SaveHistoryDialog(string gameIdentifier, string? targetSaveDir = null, string? appId = null, string? accountId = null)
     {
         InitializeComponent();
         _gameIdentifier = gameIdentifier;
         _targetSaveDir = targetSaveDir;
+        _appId = appId;
+        _accountId = accountId;
+
+        // If appId was not provided, see if gameIdentifier is numeric or in universal profiles
+        if (string.IsNullOrEmpty(_appId))
+        {
+            if (uint.TryParse(_gameIdentifier, out _))
+            {
+                _appId = _gameIdentifier;
+            }
+            else
+            {
+                var profile = UniversalSaveWatcherService.GetProfiles()
+                    .Find(p => p.GameName.Equals(_gameIdentifier, StringComparison.OrdinalIgnoreCase));
+                if (profile != null && profile.SteamAppId > 0)
+                {
+                    _appId = profile.SteamAppId.ToString();
+                }
+            }
+        }
 
         GameTitleText.Text = $"{gameIdentifier} — Save History";
         LoadSnapshots();
+    }
+
+    private async void OpenDriveFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(_appId))
+        {
+            var acctId = !string.IsNullOrEmpty(_accountId) ? _accountId : "0";
+            await CloudLocationService.OpenCloudLocationAsync(acctId, _appId, _gameIdentifier);
+        }
+        else
+        {
+            var url = $"https://drive.google.com/drive/search?q={Uri.EscapeDataString(_gameIdentifier)}";
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true })?.Dispose();
+            }
+            catch { }
+        }
+    }
+
+    private void OpenLocalFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(_targetSaveDir) && Directory.Exists(_targetSaveDir))
+        {
+            Process.Start(new ProcessStartInfo { FileName = _targetSaveDir, UseShellExecute = true })?.Dispose();
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(_appId))
+        {
+            var acctId = !string.IsNullOrEmpty(_accountId) ? _accountId : "0";
+            CloudLocationService.OpenLocalStorageFolder(acctId, _appId);
+        }
     }
 
     private void LoadSnapshots()

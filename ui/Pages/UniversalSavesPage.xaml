@@ -3,45 +3,124 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:res="clr-namespace:CloudRedirect.Resources"
+      xmlns:conv="clr-namespace:CloudRedirect.Converters"
       ScrollViewer.CanContentScroll="False">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,16">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:UrlToImageSourceConverter x:Key="UrlToImageSource" />
+
+        <!-- Subtle delete button that only turns red on hover (matches Apps page) -->
+        <Style x:Key="SubtleDeleteButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#55687D" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#381B1D" />
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#8A2528" />
+                                <Setter Property="Foreground" Value="#FF6B6E" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#521F22" />
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="#B3363B" />
+                                <Setter Property="Foreground" Value="#FFA4A7" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Steam card border container style with hover glow -->
+        <Style x:Key="GameCardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SteamBgCardBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SteamBorderSubtleBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource SteamBorderHighlightBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource SteamBgCardSecondaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16">
         <DockPanel LastChildFill="True">
 
-            <!-- Page Header -->
+            <!-- Page Header: Structured vertically so buttons never collide with title on any DPI / window width -->
             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-                <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-                        <ui:Button Content="Scan Steam Library"
-                                   Appearance="Primary"
-                                   Icon="{ui:SymbolIcon Games24}"
-                                   Click="ScanSteamLibrary_Click"
-                                   Margin="0,0,8,0" />
-                        <ui:Button Content="Auto-Scan PC for Saves"
-                                   Appearance="Secondary"
-                                   Icon="{ui:SymbolIcon Search24}"
-                                   Click="AutoScan_Click"
-                                   Margin="0,0,8,0" />
-                        <ui:Button Content="Add Preset"
-                                   Appearance="Secondary"
-                                   Icon="{ui:SymbolIcon Sparkle24}"
-                                   Click="AddPreset_Click"
-                                   Margin="0,0,8,0" />
-                        <ui:Button Content="Add Custom Game"
-                                   Appearance="Secondary"
-                                   Icon="{ui:SymbolIcon Add24}"
-                                   Click="AddCustomGame_Click" />
-                    </StackPanel>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Universal Cloud Saves (Safe Mode)"
-                                   FontSize="24" FontWeight="Bold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <TextBlock Text="Zero-injection, out-of-process cloud sync &amp; versioning for games without Steam Cloud or protected by Hypervisors / Anti-Cheat."
-                                   FontSize="12"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                   Margin="0,3,0,0" />
-                    </StackPanel>
-                </DockPanel>
+                <!-- Row 1: Title and Safe Mode Pill -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                    <TextBlock Text="Universal Cloud Saves"
+                               FontSize="26" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0" />
+                    <Border Background="#12251A"
+                            BorderBrush="#214D2E"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="8,3"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="ShieldCheckmark20" FontSize="13" Foreground="#A4D007" Margin="0,0,5,0" VerticalAlignment="Center" />
+                            <TextBlock Text="Safe Mode (100% Anti-Cheat Safe)"
+                                       FontFamily="Segoe UI"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="#A4D007"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Row 2: Subtitle Description -->
+                <TextBlock Text="Zero-injection, out-of-process cloud sync &amp; versioning for games without Steam Cloud or protected by Hypervisors / Anti-Cheat."
+                           FontSize="12"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,12" />
+
+                <!-- Row 3: Action Toolbar (WrapPanel guarantees clean wrapping on any window width) -->
+                <WrapPanel Margin="0,0,0,4">
+                    <ui:Button Content="Scan Steam Library"
+                               Appearance="Primary"
+                               Icon="{ui:SymbolIcon Games24}"
+                               Click="ScanSteamLibrary_Click"
+                               Margin="0,0,8,6" />
+                    <ui:Button Content="Auto-Scan PC for Saves"
+                               Appearance="Secondary"
+                               Icon="{ui:SymbolIcon Search24}"
+                               Click="AutoScan_Click"
+                               Margin="0,0,8,6" />
+                    <ui:Button Content="Add Preset"
+                               Appearance="Secondary"
+                               Icon="{ui:SymbolIcon Sparkle24}"
+                               Click="AddPreset_Click"
+                               Margin="0,0,8,6" />
+                    <ui:Button Content="Add Custom Game"
+                               Appearance="Secondary"
+                               Icon="{ui:SymbolIcon Add24}"
+                               Click="AddCustomGame_Click"
+                               Margin="0,0,8,6" />
+                </WrapPanel>
             </StackPanel>
 
             <!-- Explanation & Safe Mode Info Card -->
@@ -49,8 +128,8 @@
                     Background="#14212D"
                     BorderBrush="#253E54"
                     BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16,12"
+                    CornerRadius="6"
+                    Padding="14,10"
                     Margin="0,0,0,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -81,7 +160,7 @@
                     Background="#15212D"
                     BorderBrush="#263E52"
                     BorderThickness="1"
-                    CornerRadius="8"
+                    CornerRadius="6"
                     Padding="32"
                     Margin="0,0,0,16">
                 <StackPanel HorizontalAlignment="Center">
@@ -113,85 +192,188 @@
             <ItemsControl x:Name="GamesItemsControl">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="#16222F"
-                                BorderBrush="#26384C"
-                                BorderThickness="1"
-                                CornerRadius="8"
-                                Padding="16,12"
-                                Margin="0,0,0,10">
-                            <Grid>
+                        <Border Style="{StaticResource GameCardBorderStyle}">
+                            <Border.ContextMenu>
+                                <ContextMenu Background="#1A2634" BorderBrush="#2F4259">
+                                    <MenuItem Header="Sync Now" Click="SyncNow_Click" Tag="{Binding}">
+                                        <MenuItem.Icon>
+                                            <ui:SymbolIcon Symbol="ArrowSync20" Foreground="#66C0F4" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="View Save History &amp; Rollback" Click="SaveHistory_Click" Tag="{Binding}">
+                                        <MenuItem.Icon>
+                                            <ui:SymbolIcon Symbol="History20" Foreground="#66C0F4" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Open Save Folder in File Explorer" Click="OpenFolder_Click" Tag="{Binding}">
+                                        <MenuItem.Icon>
+                                            <ui:SymbolIcon Symbol="FolderOpen20" Foreground="#A4D007" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator Background="#2F4259" />
+                                    <MenuItem Header="Remove Game from Universal Saves" Click="DeleteProfile_Click" Tag="{Binding}">
+                                        <MenuItem.Icon>
+                                            <ui:SymbolIcon Symbol="Delete20" Foreground="#FF6B6E" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Border.ContextMenu>
+
+                            <Grid Height="50">
                                 <Grid.ColumnDefinitions>
+                                    <!-- Artwork / Icon -->
                                     <ColumnDefinition Width="Auto" />
+                                    <!-- Game Info & Path -->
                                     <ColumnDefinition Width="*" />
+                                    <!-- Action Buttons -->
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Game Icon / Avatar -->
-                                <Border Grid.Column="0" Width="42" Height="42" CornerRadius="6"
-                                        Background="#1D2E40" Margin="0,0,14,0" VerticalAlignment="Center">
-                                    <ui:SymbolIcon Symbol="Games24" FontSize="22" Foreground="#66C0F4"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <!-- Game Artwork / Banner -->
+                                <Border Grid.Column="0"
+                                        Width="96" Height="44"
+                                        CornerRadius="4"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center"
+                                        Background="#121922"
+                                        BorderBrush="#253548"
+                                        BorderThickness="1"
+                                        ClipToBounds="True">
+                                    <Grid>
+                                        <ui:SymbolIcon Symbol="Games24"
+                                                       FontSize="20"
+                                                       Foreground="#223344"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        <Border>
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="{Binding HeaderUrl, Converter={StaticResource UrlToImageSource}}"
+                                                            Stretch="UniformToFill"
+                                                            RenderOptions.BitmapScalingMode="HighQuality" />
+                                            </Border.Background>
+                                        </Border>
+                                    </Grid>
                                 </Border>
 
-                                <!-- Game Info -->
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
+                                <!-- Game Info & Badges -->
+                                <Grid Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Line 1: Title & Distinct Badges -->
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding GameName}"
-                                                   FontSize="15" FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                        <!-- Status Badge -->
-                                        <Border Background="#182E1E" BorderBrush="#35661F" BorderThickness="1"
-                                                CornerRadius="4" Padding="6,2" Margin="10,0,0,0">
-                                            <TextBlock Text="{Binding Status}"
-                                                       FontSize="11" FontWeight="SemiBold"
-                                                       Foreground="#A4D007" />
+                                                   FontSize="13.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SteamTextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center" />
+
+                                        <!-- App ID Badge (when from Steam) -->
+                                        <Border Background="#121A24" BorderBrush="#233246" BorderThickness="1"
+                                                CornerRadius="3" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                Visibility="{Binding HasSteamAppId, Converter={StaticResource BoolToVis}}">
+                                            <TextBlock Text="{Binding SteamAppId}"
+                                                       FontFamily="Cascadia Code,Consolas,Courier New"
+                                                       FontSize="10" Foreground="#8F98A0"
+                                                       VerticalAlignment="Center" />
                                         </Border>
-                                        <!-- Protection Tag Badge -->
-                                        <Border Background="#1A2D3E" BorderBrush="#2D4D68" BorderThickness="1"
-                                                CornerRadius="4" Padding="6,2" Margin="6,0,0,0">
+
+                                        <!-- Runtime Status Badge (Indicator dot + Status) -->
+                                        <Border Background="#12251A" BorderBrush="#214D2E" BorderThickness="1"
+                                                CornerRadius="3" Padding="6,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Ellipse Width="6" Height="6" Fill="#A4D007" Margin="0,0,5,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Status}"
+                                                           FontSize="10.5" FontWeight="SemiBold"
+                                                           Foreground="#A4D007" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Protection Type Tag Badge -->
+                                        <Border Background="#121D28" BorderBrush="#23384D" BorderThickness="1"
+                                                CornerRadius="3" Padding="6,1" Margin="6,0,0,0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding ProtectionTypeTag, Mode=OneWay}"
-                                                       FontSize="11" FontWeight="SemiBold"
-                                                       Foreground="#66C0F4" />
+                                                       FontSize="10.5" FontWeight="Medium"
+                                                       Foreground="#66C0F4" VerticalAlignment="Center" />
                                         </Border>
                                     </StackPanel>
 
-                                    <!-- Process & Folder Details -->
-                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                                        <TextBlock Text="Process: " FontSize="11" Foreground="#55697E" />
-                                        <TextBlock Text="{Binding ProcessName, Mode=OneWay}" FontSize="11" Foreground="#C6D4DF" Margin="0,0,8,0" />
-                                        <TextBlock Text="•  Path: " FontSize="11" Foreground="#55697E" Margin="0,0,4,0" />
-                                        <TextBlock Text="{Binding ExpandedSavePath, Mode=OneWay}" FontSize="11" Foreground="#8F98A0" TextTrimming="CharacterEllipsis" MaxWidth="500" />
-                                    </StackPanel>
-                                </StackPanel>
+                                    <!-- Line 2: Process & Clickable Save Path -->
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0" VerticalAlignment="Center">
+                                        <!-- Process Name (only when set) -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    Visibility="{Binding HasProcess, Converter={StaticResource BoolToVis}}"
+                                                    Margin="0,0,6,0">
+                                            <TextBlock Text="Process: " FontSize="10.5" Foreground="#55697E" />
+                                            <TextBlock Text="{Binding ProcessName, Mode=OneWay}" FontSize="10.5" Foreground="#C6D4DF" />
+                                            <TextBlock Text="  •" FontSize="10.5" Foreground="#3A4D62" Margin="5,0,0,0" />
+                                        </StackPanel>
 
-                                <!-- Action Buttons -->
+                                        <!-- Folder Path (Clickable to open in Explorer) -->
+                                        <Border Background="Transparent"
+                                                Cursor="Hand"
+                                                ToolTip="Click to open save folder in File Explorer"
+                                                Tag="{Binding ExpandedSavePath}"
+                                                MouseLeftButtonUp="SavePath_Click">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <ui:SymbolIcon Symbol="Folder20" FontSize="11" Foreground="#66C0F4" Margin="0,0,4,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding ExpandedSavePath, Mode=OneWay}"
+                                                           FontSize="10.5" Foreground="#8F98A0"
+                                                           TextTrimming="CharacterEllipsis" MaxWidth="500"
+                                                           VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Column 2: Harmonious Action Buttons -->
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                     <ui:Button Appearance="Secondary"
                                                Click="SyncNow_Click"
                                                Tag="{Binding}"
+                                               ToolTip="Synchronize save files now"
                                                Margin="0,0,6,0"
-                                               Padding="10,6">
+                                               Padding="8,5">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="ArrowSync24" FontSize="14" Margin="0,0,6,0" Foreground="#66C0F4" />
-                                            <TextBlock Text="Sync Now" VerticalAlignment="Center" />
+                                            <ui:SymbolIcon Symbol="ArrowSync24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
+                                            <TextBlock Text="Sync" FontSize="11" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </ui:Button>
-                                    <ui:Button Appearance="Primary"
+
+                                    <ui:Button Appearance="Secondary"
                                                Click="SaveHistory_Click"
                                                Tag="{Binding}"
+                                               ToolTip="View Save Version History &amp; 1-Click Rollback"
                                                Margin="0,0,6,0"
-                                               Padding="12,6">
+                                               Padding="8,5">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="History24" FontSize="14" Margin="0,0,6,0" />
-                                            <TextBlock Text="Save History" VerticalAlignment="Center" />
+                                            <ui:SymbolIcon Symbol="History24" FontSize="14" Margin="0,0,4,0" Foreground="#66C0F4" />
+                                            <TextBlock Text="History" FontSize="11" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </ui:Button>
-                                    <ui:Button Appearance="Danger"
-                                               Click="DeleteProfile_Click"
+
+                                    <ui:Button Appearance="Secondary"
+                                               Click="OpenFolder_Click"
                                                Tag="{Binding}"
-                                               Padding="8,6">
-                                        <ui:SymbolIcon Symbol="Delete24" FontSize="14" />
+                                               ToolTip="Open save folder in File Explorer"
+                                               Margin="0,0,6,0"
+                                               Padding="8,5">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="FolderOpen24" FontSize="14" Margin="0,0,4,0" Foreground="#A4D007" />
+                                            <TextBlock Text="Folder" FontSize="11" VerticalAlignment="Center" />
+                                        </StackPanel>
                                     </ui:Button>
+
+                                    <Button Click="DeleteProfile_Click"
+                                            Tag="{Binding}"
+                                            ToolTip="Remove game from Universal Cloud Saves"
+                                            Width="30" Height="30"
+                                            Cursor="Hand"
+                                            Style="{StaticResource SubtleDeleteButtonStyle}">
+                                        <ui:SymbolIcon Symbol="Delete24" FontSize="16" />
+                                    </Button>
                                 </StackPanel>
                             </Grid>
                         </Border>

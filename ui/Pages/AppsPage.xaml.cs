@@ -466,11 +466,49 @@ public partial class AppsPage : Page
             app.OrphansExpanded = !app.OrphansExpanded;
     }
 
+    private async void CloudFilesPill_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AppInfo app })
+        {
+            e.Handled = true;
+            await CloudLocationService.OpenCloudLocationAsync(app.AccountId, app.AppId, app.DisplayName);
+        }
+    }
+
+    private async void OpenCloudLocation_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AppInfo app })
+        {
+            await CloudLocationService.OpenCloudLocationAsync(app.AccountId, app.AppId, app.DisplayName);
+        }
+    }
+
+    private void OpenLocalStorage_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AppInfo app })
+        {
+            CloudLocationService.OpenLocalStorageFolder(app.AccountId, app.AppId);
+        }
+    }
+
+    private void OpenSteamUserdata_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AppInfo app })
+        {
+            CloudLocationService.OpenSteamUserdataFolder(app.AccountId, app.AppId);
+        }
+    }
+
     private void SaveHistory_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { DataContext: AppInfo app })
         {
-            var dialog = new Dialogs.SaveHistoryDialog(app.DisplayName, null)
+            var steamPath = SteamDetector.FindSteamPath();
+            string? targetDir = steamPath != null
+                ? Path.Combine(steamPath, "cloud_redirect", "storage", app.AccountId, app.AppId)
+                : null;
+
+            var dialog = new Dialogs.SaveHistoryDialog(app.DisplayName, targetDir, app.AppId, app.AccountId)
             {
                 Owner = Window.GetWindow(this)
             };
