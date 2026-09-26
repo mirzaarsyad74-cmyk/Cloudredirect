@@ -92,9 +92,21 @@ namespace CloudRedirectLauncher
                     if (File.Exists(targetExe))
                     {
                         var fi = new FileInfo(targetExe);
-                        if (fi.Length == stream.Length)
+                        try
                         {
-                            return true;
+                            var targetVi = FileVersionInfo.GetVersionInfo(targetExe);
+                            var launcherVi = FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
+                            if (fi.Length == stream.Length && string.Equals(targetVi.FileVersion, launcherVi.FileVersion, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
+                        }
+                        catch
+                        {
+                            if (fi.Length == stream.Length)
+                            {
+                                return true;
+                            }
                         }
 
                         // Different version or size: terminate lingering processes to allow overwrite
