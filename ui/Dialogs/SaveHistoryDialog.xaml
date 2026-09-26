@@ -109,9 +109,9 @@
                                         </Border>
                                     </StackPanel>
                                     <TextBlock FontSize="11" Foreground="#8F98A0" Margin="0,3,0,0">
-                                        <Run Text="{Binding FileCount}" />
+                                        <Run Text="{Binding FileCount, Mode=OneWay}" />
                                         <Run Text=" file(s)  •  " />
-                                        <Run Text="{Binding FormattedSize}" />
+                                        <Run Text="{Binding FormattedSize, Mode=OneWay}" />
                                     </TextBlock>
                                 </StackPanel>
 

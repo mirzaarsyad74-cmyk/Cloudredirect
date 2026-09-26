@@ -147,9 +147,9 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                         <TextBlock FontSize="11" Foreground="#8F98A0">
                                             <Run Text="Process: " Foreground="#55697E" />
-                                            <Run Text="{Binding ProcessName}" Foreground="#C6D4DF" />
+                                            <Run Text="{Binding ProcessName, Mode=OneWay}" Foreground="#C6D4DF" />
                                             <Run Text="  •  Path: " Foreground="#55697E" />
-                                            <Run Text="{Binding ExpandedSavePath}" Foreground="#8F98A0" />
+                                            <Run Text="{Binding ExpandedSavePath, Mode=OneWay}" Foreground="#8F98A0" />
                                         </TextBlock>
                                     </StackPanel>
                                 </StackPanel>
